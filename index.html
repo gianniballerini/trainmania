@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrainMania</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="hud-left">
+        <div id="level-label">LEVEL <span id="level-num">1</span></div>
+        <div id="speed-bar-wrap"><div id="speed-bar"></div></div>
+      </div>
+    </div>
+
+    <!-- Card tray -->
+    <div id="card-tray">
+      <div id="tray-label">TRACK PIECES</div>
+      <div id="cards"></div>
+    </div>
+
+    <!-- Overlay screens -->
+    <div id="overlay" class="hidden">
+      <div id="overlay-box">
+        <div id="overlay-title"></div>
+        <div id="overlay-sub"></div>
+        <button id="overlay-btn"></button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/main.ts"></script>
+</body>
+</html>
