@@ -238,6 +238,14 @@ html, body {
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
+#tab-credits a {
+  color: #f0c040;
+  text-decoration: none;
+}
+#tab-credits a:hover {
+  text-decoration: underline;
+}
+
 .settings-heading {
   font-size: 10px;
   font-weight: 700;
