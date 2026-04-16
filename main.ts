@@ -74,6 +74,9 @@ const CAM_HEIGHT = 14
 let camAngle = 0
 let isOrbitDragging = false
 let lastDragX = 0
+let dragStartX = 0
+let dragStartY = 0
+const DRAG_THRESHOLD = 5
 
 function updateCameraOrbit(): void {
   camera.position.set(
@@ -167,8 +170,10 @@ canvas!.addEventListener('click', onCanvasClick)
 canvas!.addEventListener('touchstart', onTouch, { passive: false })
 canvas!.addEventListener('contextmenu', (e) => e.preventDefault())
 canvas!.addEventListener('mousedown', (e: MouseEvent) => {
-  const canGrab = e.button === 1 || e.button === 2
+  const canGrab = e.button === 0 || e.button === 1 || e.button === 2
   if (!canGrab) return
+  dragStartX = e.clientX
+  dragStartY = e.clientY
   isOrbitDragging = true
   lastDragX = e.clientX
   canvas!.style.cursor = 'grabbing'
@@ -181,6 +186,7 @@ window.addEventListener('mouseup', () => {
 window.addEventListener('resize', () => keyboardHUD.resize())
 window.addEventListener('mousemove', (e: MouseEvent) => {
   if (!isOrbitDragging) return
+  if (Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) <= DRAG_THRESHOLD) return
   const dx = e.clientX - lastDragX
   lastDragX = e.clientX
   camAngle -= dx * 0.01
@@ -201,6 +207,7 @@ function worldToCellFallback(wx: number, wz: number): { col: number; row: number
 // Patch the click handler to use the fallback directly
 canvas!.removeEventListener('click', onCanvasClick)
 canvas!.addEventListener('click', (e: MouseEvent) => {
+  if (Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) > DRAG_THRESHOLD) return
   if (state !== STATE.PLAYING || !selectedPiece || !grid) return
   getPointerNDC(e.clientX, e.clientY)
   raycaster.setFromCamera(pointer, camera)

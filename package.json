@@ -1,19 +1,23 @@
 {
   "name": "trainmania",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "author": "Gianni Ballerini",
   "license": "MIT",
-  "dependencies": {
-    "three": "^0.183.2",
-    "vite": "^8.0.8"
-  },
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "start": "vite --port 1234",
+    "dev": "vite --port 1234",
     "build": "vite build"
+  },
+  "dependencies": {
+    "three": "^0.183.2"
   },
   "devDependencies": {
     "@types/three": "^0.183.1",
+    "pug": "^3.0.3",
+    "sass": "^1.93.2",
+    "vite": "^8.0.8",
     "typescript": "^6.0.2"
   }
 }

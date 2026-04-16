@@ -1,0 +1,81 @@
+#settings-modal.hidden
+  #settings-box
+    button#settings-close ✕
+
+    //- Left tab rail
+    #settings-tabs
+      button.settings-tab.active(data-tab='help') Help
+      button.settings-tab(data-tab='sound') Sound
+      button.settings-tab(data-tab='credits') Credits
+
+    //- Tab content
+    #settings-content
+
+      //- HELP TAB
+      #tab-help.tab-panel.active
+        h2.settings-heading How to Play
+        p.settings-body.
+          Place track tiles on the grid before the train reaches a gap.
+          The train speeds up as it moves — plan ahead!
+
+        h2.settings-heading(style='margin-top:20px') Controls
+        table.key-table
+          tbody
+            tr
+              td: kbd W
+              td Straight track
+            tr
+              td: kbd S
+              td Curve track
+            tr
+              td: kbd A
+              td Rotate left
+            tr
+              td: kbd D
+              td Rotate right
+            tr
+              td: kbd Click
+              td Place tile
+            tr
+              td: kbd Middle / Right drag
+              td Orbit camera
+
+      //- SOUND TAB
+      #tab-sound.tab-panel
+        h2.settings-heading Sound
+
+        .sound-row
+          span.sound-label Mute all
+          button#btn-mute-all.toggle-btn 🔇 Off
+
+        .sound-row
+          span.sound-label Music
+          button#btn-mute-music.toggle-btn 🎵 On
+        .sound-row.indent
+          span.vol-label Volume
+          input#slider-music-vol.vol-slider(type='range' min='0' max='1' step='0.01' value='0.5')
+
+        .sound-row
+          span.sound-label Sound Effects
+          button#btn-mute-sfx.toggle-btn 🔊 On
+        .sound-row.indent
+          span.vol-label Volume
+          input#slider-sfx-vol.vol-slider(type='range' min='0' max='1' step='0.01' value='0.7')
+
+      //- CREDITS TAB
+      #tab-credits.tab-panel
+        h2.settings-heading Credits
+        table.key-table
+          tbody
+            tr
+              td: a(href='https://gianniballerini.dev/' target='_blank' rel='noopener noreferrer') Gianni Ballerini
+              td Game development
+            tr
+              td: a(href='https://kenney.nl/' target='_blank' rel='noopener noreferrer') Kenney.nl
+              td 3D &amp; game assets
+            tr
+              td: a(href='https://suno.com/' target='_blank' rel='noopener noreferrer') Suno
+              td Music
+            tr
+              td: a(href='https://santiagocolombo.com/' target='_blank' rel='noopener noreferrer') Santiago Colombo
+              td 3D asset support
