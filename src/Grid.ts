@@ -266,12 +266,12 @@ export class Grid {
     const CURVE_ROTATION: Record<string, number> = {
       'NE': 0,
       'EN': 0,
-      'SE': Math.PI / 2,
-      'ES': Math.PI / 2,
+      'SE': -Math.PI / 2,
+      'ES': -Math.PI / 2,
       'SW': Math.PI,
       'WS': Math.PI,
-      'NW': -Math.PI / 2,
-      'WN': -Math.PI / 2,
+      'NW': Math.PI / 2,
+      'WN': Math.PI / 2,
     }
 
     const addCurve = (fromDir: Direction, toDir: Direction) => {
