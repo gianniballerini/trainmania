@@ -43,7 +43,7 @@ yarn build          # production bundle → dist/
 yarn tsc --noEmit   # type-check only
 ```
 
-Entry point: `index.pug` (compiled at serve/build time via Vite plugin) → `main.ts` (project root, not `src/`).
+Entry point: `index.pug` (compiled at serve/build time via Vite plugin) → `main.ts` (project root, not `src/`) → `src/Game.ts`.
 
 ---
 
@@ -52,10 +52,21 @@ Entry point: `index.pug` (compiled at serve/build time via Vite plugin) → `mai
 ```
 index.pug              Root Pug template — includes all view partials
 index.html             Minimal Vite HTML shell (replaced by index.pug at runtime)
-main.ts                Game state machine, tick loop, render loop, input
+main.ts                Thin bootstrap: creates Game, calls game.boot()
 vite.config.ts         Vite config with custom Pug render plugin
 
 src/
+  Game.ts              Orchestrator — Three.js setup, level loading, tick, render loop
+  CameraController.ts  Orbit camera angle, drag handling
+  InputManager.ts      All DOM event listeners, raycasting, state delegation
+  SettingsUI.ts        Settings modal DOM, audio controls
+  states/
+    IGameState.ts      IGameState interface + BaseGameState base class
+    TitleState.ts      Title screen (overlay → PlayingState)
+    PlayingState.ts    Active gameplay — tick, placement, keyboard
+    PausedState.ts     Paused (stores previous state for resume)
+    DeadState.ts       Death animation + "Start Over" overlay
+    WinState.ts        "Next Level" / "Play Again" overlay
   views/
     _canvas.pug        .game__canvas
     _hud.pug           .hud block
@@ -82,11 +93,13 @@ src/
 
 ## Architecture
 
-1. **State machine** (`main.ts`): `TITLE → PLAYING → WIN | DEAD`
-2. **Each level**: `Grid` builds the board from a `LevelDef`; `Train` initialises at `rotation`; keyboard W/S/A/D changes type and rotation.
-3. **Tick loop** (rAF-driven): `doTick()` fires inside `animate()` whenever `train.lerpT >= 1` (previous lerp complete). `Train.step()` returns a `StepResult`; `main.ts` handles outcome and multiplies `lerpSpeed` by `SPEED_ACCEL` each step.
-4. **Render loop**: `requestAnimationFrame` — camera sway, `SmokeSystem.update(dt)`, Three.js render.
-5. **Input**: `mousemove` → `Grid.showGhost()`; `click` → `Grid.placeTrack()` via an invisible `PlaneGeometry(200,200)` raycasting plane at `y=0`.
+1. **Bootstrap** — `main.ts` is 5 lines: creates a `Game` and calls `game.boot()`.
+2. **State pattern** — `Game.currentState` holds an `IGameState`. `changeState(s)` calls `exit()` on the old state then `enter()` on the new one. Flow: `TitleState → PlayingState ↔ PausedState`, `PlayingState → DeadState | WinState`.
+3. **Game class** — owns all Three.js objects, game entities (`Grid`, `Train`, `SmokeSystem`, station), speed state, selection state, and `levelIndex`. Exposes `loadLevel()`, `doTick()`, `pause()`, `resume()`.
+4. **CameraController** — orbit angle + drag; works in all states.
+5. **InputManager** — binds all DOM events; raycasts the invisible ground plane; delegates to `currentState.handle*()` methods.
+6. **Tick loop** (rAF-driven): `Game.doTick()` fires whenever `train.lerpT >= 1`. `Train.step()` → `WinState` or `DeadState` on outcome; otherwise speed is multiplied by `SPEED_ACCEL = 1.05` (cap `MAX_SPEED = 4.0`).
+7. **Settings** — `SettingsUI.open()` calls `game.pause()`; `close()` calls `game.resume()`.
 
 ---
 

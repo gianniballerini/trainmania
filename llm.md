@@ -16,9 +16,20 @@ Stack: TypeScript · Three.js · Vite · Pug · SCSS. No framework.
 ```
 index.pug             Root Pug template — includes all view partials
 index.html            Minimal HTML shell (Vite entry); content is replaced by index.pug via plugin
-main.ts               Bootstrap, game state machine, tick/render loop, input, level loading
+main.ts               Thin bootstrap only: creates Game instance and calls game.boot()
 vite.config.ts        Vite config with custom Pug render plugin
 src/
+  Game.ts             Game orchestrator — Three.js setup, loadLevel(), doTick(), changeState(), render loop
+  CameraController.ts Orbit-camera angle, drag detection, threshold helper
+  InputManager.ts     All DOM event listeners, raycasting, delegates to currentState handlers
+  SettingsUI.ts       Settings modal DOM, audio controls, calls game.pause()/resume()
+  states/
+    IGameState.ts     IGameState interface + BaseGameState no-op base class
+    TitleState.ts     Shows "Start Game" overlay; transitions to PlayingState on click
+    PlayingState.ts   Train tick, track placement/removal, W/A/S/D keyboard shortcuts
+    PausedState.ts    Frozen state — stores previousState for resume
+    DeadState.ts      Starts fall/derail animation, shows "Start Over" overlay
+    WinState.ts       Shows "Next Level"/"Play Again" overlay
   views/
     _canvas.pug       .game__canvas element
     _hud.pug          .hud block: level label, speed bar, settings button
@@ -47,6 +58,16 @@ src/
 ## Key exports
 | Module | Exports |
 |---|---|
+| Game.ts | `class Game` — `boot()`, `loadLevel(idx)`, `doTick()`, `changeState(state)`, `pause()`, `resume()`, `updateSelectedPiece()`, `updateSpeedBar(t)` |
+| CameraController.ts | `class CameraController` — `updateOrbit(camera)`, `reset(camera)`, `startDrag(x,y)`, `onDrag(x,y,camera)`, `endDrag()`, `isPastThreshold(x,y)`, `dragging` |
+| InputManager.ts | `class InputManager` — constructor binds all DOM events |
+| SettingsUI.ts | `class SettingsUI` — `open()`, `close()` |
+| states/IGameState.ts | `IGameState` interface, `BaseGameState` no-op base class |
+| states/TitleState.ts | `class TitleState` |
+| states/PlayingState.ts | `class PlayingState` |
+| states/PausedState.ts | `class PausedState` — `previousState: IGameState` |
+| states/DeadState.ts | `class DeadState(derailed: boolean)` |
+| states/WinState.ts | `class WinState` |
 | Assets.ts | `loadModelAsset(options)`, `normalizeObject()`, `warnAssetLoadFailureOnce()`, `AssetLoadOptions` |
 | AudioManager.ts | `class AudioManager` — `init()`, `playMusic()`, `stopMusic()`, `playSfx()`, `muteAll/Music/Sfx()`, `setMusicVolume()`, `setSfxVolume()` |
 | Constants.ts | `Direction`, `PieceId`, `CellType`, `TileType`, `TrackPiece`, `LevelDef`, `CELL`, `DIR`, `DIR_NAMES`, `OPPOSITE`, `TRACK_PIECES`, `HAND_POOL`, `TILE_POOL`, `tileToPieceId()`, `LEVELS` |
@@ -71,14 +92,23 @@ interface TrackPiece { id, label, connections: Partial<Record<Direction,Directio
 ```
 
 ## Architecture
-1. `main.ts` owns the game state machine: `TITLE → PLAYING → (WIN | DEAD | PAUSED)`. On DEAD, always restarts from level 1 (`levelIndex = 0`).
-2. Each level: `Grid` builds the board from `LevelDef.grid`; `Train` initialises at `rotation`; keyboard W/S/A/D changes type and rotation).
-3. **Tick loop** (rAF-driven, not interval-based): `doTick()` is called inside `animate()` whenever `train.lerpT >= 1` (i.e. the previous lerp has completed). `Train.step()` returns a `StepResult`; `main.ts` handles WIN / DEAD / continue.
-4. **Speed model**: `lerpSpeed` (cells/sec) starts at `1000 / levelDef.baseSpeed` and is multiplied by `SPEED_ACCEL = 1.05` after every step, capped at `MAX_SPEED = 4.0`. `train.lerpSpeed` is updated live each tick.
-5. **Render loop**: `requestAnimationFrame` → `train.update(delta)`, `smoke.update(delta)`, `renderer.render(scene, camera)`, then `keyboardHUD.update(delta)` + `keyboardHUD.render(renderer)` via scissor viewport.
-6. **Input**: `mousemove` → `Grid.showGhost()`; `click` → `Grid.placeTrack()`. Raycasting uses an invisible `PlaneGeometry(200,200)` at `y=0`. Middle/right drag orbits the camera.
-7. **Audio**: `AudioManager.init()` called on first user gesture; background music via `playMusic([...webm])`, SFX via `playSfx(url)`. Settings modal exposes mute toggles + volume sliders.
-8. **KeyboardHUD**: loads 4 GLB key models (`w_key.glb` etc.), renders them in a bottom-left scissor viewport; keys animate down on press and light up gold.
+1. **Bootstrap**: `main.ts` (5 lines) creates a `Game` instance and calls `game.boot()`.
+2. **State pattern**: `Game.currentState` holds an `IGameState`. `game.changeState(s)` calls `currentState.exit()` then `s.enter()`. States: `TitleState → PlayingState ↔ PausedState`, `PlayingState → DeadState | WinState`.
+3. **Game class** (`src/Game.ts`): owns all Three.js objects (`renderer`, `scene`, `camera`), game entities (`grid`, `train`, `smoke`, `stationGroup`), speed state (`lerpSpeed`, `baseSpeed`, `stepCount`), selection state (`selectedPiece`, `currentTileType`, `currentRotation`, `lastHoveredCell`), and `levelIndex`. Methods: `loadLevel(idx)`, `doTick()`, `changeState()`, `pause()`, `resume()`, `updateSelectedPiece()`, `updateSpeedBar()`.
+4. **Level load**: `Game.loadLevel(idx)` tears down previous entities, recreates `Grid`/`Train`/`SmokeSystem`/station, resets camera. After load the state is unchanged — callers set the desired state with `changeState()`.
+5. **CameraController** (`src/CameraController.ts`): owns orbit angle, drag state, drag threshold. Works in all game states.
+6. **InputManager** (`src/InputManager.ts`): binds all mouse/keyboard/touch listeners; owns the invisible raycast `PlaneGeometry`. Converts pointer → col/row → delegates to `game.currentState.handle*()` methods.
+7. **State responsibilities**:
+   - `TitleState.enter()`: shows overlay; on click → `PlayingState` + audio init.
+   - `PlayingState.update()`: calls `game.doTick()` when `train.lerpT >= 1`. Input handlers place/remove track and update selection.
+   - `PausedState`: stores `previousState` for resume. All update/input methods are no-ops.
+   - `DeadState.enter()`: starts fall/derail animation, 1.2 s timeout → overlay → reload level 0 → `PlayingState`.
+   - `WinState.enter()`: 0.6 s timeout → overlay → load next level → `PlayingState` (or loop from 0).
+8. **SettingsUI** (`src/SettingsUI.ts`): opening calls `game.pause()`; closing calls `game.resume()` (no-op when already paused externally).
+9. **Tick loop** (rAF-driven): `doTick()` fires inside `Game.animate()` whenever `train.lerpT >= 1`. `Train.step()` returns a `StepResult`; `Game` transitions to `WinState` or `DeadState` accordingly, or accelerates speed.
+10. **Speed model**: `lerpSpeed` starts at `1000 / levelDef.baseSpeed`, multiplied by `SPEED_ACCEL = 1.05` each step, capped at `MAX_SPEED = 4.0`.
+11. **Audio**: `AudioManager.init()` called on first user gesture (inside `TitleState` callback).
+12. **KeyboardHUD**: loads 4 GLB key models, renders via scissor viewport; W/A/S/D key press animations fire from `InputManager`; tile selection only handled in `PlayingState.handleKeyDown()`.
 
 ## Grid cell encoding (LevelDef.grid)
 `V`=VOID `F`=FLOOR `R`=pre-built rail (STRAIGHT_NS) `S`=station `T`=train start
