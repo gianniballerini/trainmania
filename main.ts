@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { AudioManager } from './src/AudioManager.js'
-import { CELL, LEVELS, PieceId, TileType, tileToPieceId } from './src/Constants.js'
+import { CELL, LEVELS, PieceId, tileToPieceId, TileType } from './src/Constants.js'
 import { CELL_SIZE_EXPORT as CELL_SIZE, cellToWorld, Grid, loadTrackAssets, worldToCell } from './src/Grid.js'
 import { KeyboardHUD } from './src/KeyboardHUD.js'
 import { createScene } from './src/scene.js'
@@ -62,8 +62,13 @@ const speedBar = document.querySelector<HTMLElement>('.hud__speed-bar')!
 const levelNum = document.querySelector<HTMLElement>('.hud__level-num')!
 
 // ── Derive selectedPiece from tile type + rotation ───────────────────────────
+let lastHoveredCell: { col: number; row: number } | null = null
+
 function updateSelectedPiece(): void {
   selectedPiece = tileToPieceId(currentTileType, currentRotation)
+  if (grid && selectedPiece && lastHoveredCell) {
+    grid.showGhost(lastHoveredCell.col, lastHoveredCell.row, selectedPiece)
+  }
 }
 updateSelectedPiece()
 
@@ -127,8 +132,13 @@ function onMouseMove(e: MouseEvent): void {
   getPointerNDC(e.clientX, e.clientY)
   if (state !== STATE.PLAYING || !selectedPiece || !grid) { grid?.hideGhost(); return }
   const cell = raycastGrid(pointer)
-  if (cell) grid.showGhost(cell.col, cell.row, selectedPiece ?? undefined)
-  else grid.hideGhost()
+  if (cell) {
+    lastHoveredCell = { col: cell.col, row: cell.row }
+    grid.showGhost(cell.col, cell.row, selectedPiece ?? undefined)
+  } else {
+    lastHoveredCell = null
+    grid.hideGhost()
+  }
 }
 
 function onCanvasClick(e: MouseEvent): void {
@@ -241,16 +251,34 @@ canvas!.addEventListener('click', (e: MouseEvent) => {
 
 canvas!.removeEventListener('mousemove', onMouseMove)
 canvas!.addEventListener('mousemove', (e: MouseEvent) => {
+  if (isOrbitDragging) {
+    lastHoveredCell = null
+    grid?.hideGhost()
+    return
+  }
   getPointerNDC(e.clientX, e.clientY)
-  if (state !== STATE.PLAYING || !selectedPiece || !grid) { grid?.hideGhost(); return }
+  if (state !== STATE.PLAYING || !selectedPiece || !grid) {
+    lastHoveredCell = null
+    grid?.hideGhost()
+    return
+  }
   raycaster.setFromCamera(pointer, camera)
   const hits: THREE.Intersection[] = []
   raycaster.intersectObject(planeMesh, false, hits)
-  if (!hits.length) { grid.hideGhost(); return }
+  if (!hits.length) {
+    lastHoveredCell = null
+    grid.hideGhost()
+    return
+  }
   const { col, row } = worldToCellFallback(hits[0].point.x, hits[0].point.z)
   const cell = grid.getCell(col, row)
-  if (cell && cell.type !== CELL.VOID) grid.showGhost(col, row, selectedPiece ?? undefined)
-  else grid.hideGhost()
+  if (cell && cell.type !== CELL.VOID) {
+    lastHoveredCell = { col, row }
+    grid.showGhost(col, row, selectedPiece ?? undefined)
+  } else {
+    lastHoveredCell = null
+    grid.hideGhost()
+  }
 })
 
 // ── Game flow ─────────────────────────────────────────────────────────────────
