@@ -1,7 +1,8 @@
 import * as THREE from 'three'
-import { CardTray } from './src/Cards.js'
-import { CELL, LEVELS, PieceId } from './src/Constants.js'
+import { AudioManager } from './src/AudioManager.js'
+import { CELL, LEVELS, PieceId, TileType, tileToPieceId } from './src/Constants.js'
 import { CELL_SIZE_EXPORT as CELL_SIZE, Grid, loadTrackAssets, worldToCell } from './src/Grid.js'
+import { KeyboardHUD } from './src/KeyboardHUD.js'
 import { createScene } from './src/scene.js'
 import { SmokeSystem } from './src/Smoke.js'
 import { buildStarfield } from './src/Stars.js'
@@ -22,13 +23,16 @@ type GameState = typeof STATE[keyof typeof STATE]
 let state: GameState = STATE.TITLE
 let levelIndex = 0
 
+const audioManager = new AudioManager()
+
 let grid: Grid | undefined
 let train: Train | undefined
 let smoke: SmokeSystem | undefined
 let stationGroup: THREE.Group | undefined
 
 let selectedPiece: PieceId | null = null
-let cards: CardTray
+let currentTileType: TileType = 'STRAIGHT'
+let currentRotation = 0
 
 // Speed
 let lerpSpeed     = 1     // cells per second (lerp rate)
@@ -57,8 +61,11 @@ scene.add(planeMesh)
 const speedBar = document.getElementById('speed-bar')!
 const levelNum = document.getElementById('level-num')!
 
-// ── Card tray ─────────────────────────────────────────────────────────────────
-cards = new CardTray((pieceId) => { selectedPiece = pieceId })
+// ── Derive selectedPiece from tile type + rotation ───────────────────────────
+function updateSelectedPiece(): void {
+  selectedPiece = tileToPieceId(currentTileType, currentRotation)
+}
+updateSelectedPiece()
 
 // ── Camera orbit controls ─────────────────────────────────────────────────────
 const CAM_TARGET = new THREE.Vector3(0, 0, 0)
@@ -79,11 +86,27 @@ function updateCameraOrbit(): void {
 
 updateCameraOrbit()
 
+// ── Keyboard HUD ──────────────────────────────────────────────────────────────
+const keyboardHUD = new KeyboardHUD()
+
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'r' || e.key === 'R') {
-    cards.rotateSelected()
-    selectedPiece = cards.getSelected()
+  const k = e.key.toUpperCase()
+  if (k === 'W' || k === 'A' || k === 'S' || k === 'D') {
+    keyboardHUD.pressKey(k as 'W' | 'A' | 'S' | 'D')
+  }
+  if (state !== STATE.PLAYING) return
+  switch (k) {
+    case 'W': currentTileType = 'STRAIGHT'; updateSelectedPiece(); break
+    case 'S': currentTileType = 'CURVE';    updateSelectedPiece(); break
+    case 'A': currentRotation = (currentRotation + 3) % 4; updateSelectedPiece(); break
+    case 'D': currentRotation = (currentRotation + 1) % 4; updateSelectedPiece(); break
+  }
+})
+window.addEventListener('keyup', (e) => {
+  const k = e.key.toUpperCase()
+  if (k === 'W' || k === 'A' || k === 'S' || k === 'D') {
+    keyboardHUD.releaseKey(k as 'W' | 'A' | 'S' | 'D')
   }
 })
 
@@ -114,8 +137,6 @@ function onCanvasClick(e: MouseEvent): void {
 
   const placed = grid.placeTrack(cell.col, cell.row, selectedPiece)
   if (placed) {
-    cards.useSelected()
-    selectedPiece = null
     grid.hideGhost()
   }
 }
@@ -146,7 +167,7 @@ canvas!.addEventListener('click', onCanvasClick)
 canvas!.addEventListener('touchstart', onTouch, { passive: false })
 canvas!.addEventListener('contextmenu', (e) => e.preventDefault())
 canvas!.addEventListener('mousedown', (e: MouseEvent) => {
-  const canGrab = e.button === 1 || e.button === 2 || (e.button === 0 && !selectedPiece)
+  const canGrab = e.button === 1 || e.button === 2
   if (!canGrab) return
   isOrbitDragging = true
   lastDragX = e.clientX
@@ -157,6 +178,7 @@ window.addEventListener('mouseup', () => {
   isOrbitDragging = false
   canvas!.style.cursor = ''
 })
+window.addEventListener('resize', () => keyboardHUD.resize())
 window.addEventListener('mousemove', (e: MouseEvent) => {
   if (!isOrbitDragging) return
   const dx = e.clientX - lastDragX
@@ -190,8 +212,6 @@ canvas!.addEventListener('click', (e: MouseEvent) => {
   if (!cell || cell.type === CELL.VOID) return
   const placed = grid.placeTrack(cell.col, cell.row, selectedPiece)
   if (placed) {
-    cards.useSelected()
-    selectedPiece = null
     grid.hideGhost()
   }
 })
@@ -294,9 +314,9 @@ function doTick(): void {
     setTimeout(() => {
       showOverlay(
         result.derailed ? '💨 DERAILED' : '🌀 FELL OFF',
-        `level ${LEVELS[levelIndex].id} — try again`,
-        'Retry',
-        () => loadLevel(levelIndex)
+        `level ${LEVELS[levelIndex].id} — starting over`,
+        'Start Over',
+        () => { levelIndex = 0; loadLevel(0) }
       )
     }, 1200)
   }
@@ -327,17 +347,95 @@ function animate(): void {
   }
 
   renderer.render(scene, camera)
+
+  // Render keyboard HUD on top
+  keyboardHUD.update(delta)
+  keyboardHUD.render(renderer)
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-showOverlay(
-  'TrainMania',
-  'Place tracks before the train derails',
-  'Start Game',
-  () => {
-    levelIndex = 0
-    loadLevel(0)
-  }
-)
+// ── Settings modal ────────────────────────────────────────────────────────────
+const settingsModal = document.getElementById('settings-modal')!
+const btnSettings   = document.getElementById('btn-settings')!
+const settingsClose = document.getElementById('settings-close')!
+const settingsTabs  = document.querySelectorAll<HTMLButtonElement>('.settings-tab')
+const tabPanels     = document.querySelectorAll<HTMLElement>('.tab-panel')
 
-animate()
+const btnMuteAll   = document.getElementById('btn-mute-all')!
+const btnMuteMusic = document.getElementById('btn-mute-music')!
+const btnMuteSfx   = document.getElementById('btn-mute-sfx')!
+const sliderMusic  = document.getElementById('slider-music-vol') as HTMLInputElement
+const sliderSfx    = document.getElementById('slider-sfx-vol')   as HTMLInputElement
+
+function openSettings(): void { settingsModal.classList.remove('hidden') }
+function closeSettings(): void { settingsModal.classList.add('hidden') }
+
+btnSettings.addEventListener('click', openSettings)
+settingsClose.addEventListener('click', closeSettings)
+settingsModal.addEventListener('click', (e) => {
+  if (e.target === settingsModal) closeSettings()
+})
+
+settingsTabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    settingsTabs.forEach((t) => t.classList.remove('active'))
+    tabPanels.forEach((p) => p.classList.remove('active'))
+    tab.classList.add('active')
+    document.getElementById(`tab-${tab.dataset.tab}`)?.classList.add('active')
+  })
+})
+
+function syncMuteButtons(): void {
+  const allMuted   = audioManager.isAllMuted
+  const musicMuted = audioManager.isMusicMuted
+  const sfxMuted   = audioManager.isSfxMuted
+  btnMuteAll.textContent   = allMuted   ? '🔇 On'  : '🔇 Off'
+  btnMuteMusic.textContent = musicMuted ? '🎵 Off' : '🎵 On'
+  btnMuteSfx.textContent   = sfxMuted   ? '🔊 Off' : '🔊 On'
+  btnMuteAll.classList.toggle('muted', allMuted)
+  btnMuteMusic.classList.toggle('muted', musicMuted)
+  btnMuteSfx.classList.toggle('muted', sfxMuted)
+}
+
+btnMuteAll.addEventListener('click', () => {
+  audioManager.muteAll(!audioManager.isAllMuted)
+  syncMuteButtons()
+})
+
+btnMuteMusic.addEventListener('click', () => {
+  audioManager.muteMusic(!audioManager.isMusicMuted)
+  syncMuteButtons()
+})
+
+btnMuteSfx.addEventListener('click', () => {
+  audioManager.muteSfx(!audioManager.isSfxMuted)
+  syncMuteButtons()
+})
+
+sliderMusic.addEventListener('input', () => {
+  audioManager.setMusicVolume(parseFloat(sliderMusic.value))
+})
+
+sliderSfx.addEventListener('input', () => {
+  audioManager.setSfxVolume(parseFloat(sliderSfx.value))
+})
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+keyboardHUD.load().then(() => {
+  showOverlay(
+    'TrainMania',
+    'Place tracks before the train derails',
+    'Start Game',
+    () => {
+      // First user gesture — safe to start AudioContext + music
+      audioManager.init()
+      audioManager.playMusic([
+        '/assets/sound/background_01.webm',
+        '/assets/sound/background_02.webm',
+      ])
+      levelIndex = 0
+      loadLevel(0)
+    }
+  )
+
+  animate()
+})

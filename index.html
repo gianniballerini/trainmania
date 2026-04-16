@@ -16,12 +16,73 @@
         <div id="level-label">LEVEL <span id="level-num">1</span></div>
         <div id="speed-bar-wrap"><div id="speed-bar"></div></div>
       </div>
+      <div id="hud-right">
+        <button id="btn-settings" title="Settings">⚙️</button>
+      </div>
     </div>
 
-    <!-- Card tray -->
-    <div id="card-tray">
-      <div id="tray-label">TRACK PIECES</div>
-      <div id="cards"></div>
+    <!-- Settings modal -->
+    <div id="settings-modal" class="hidden">
+      <div id="settings-box">
+        <button id="settings-close">✕</button>
+
+        <!-- Left tabs -->
+        <div id="settings-tabs">
+          <button class="settings-tab active" data-tab="help">Help</button>
+          <button class="settings-tab" data-tab="sound">Sound</button>
+        </div>
+
+        <!-- Tab content -->
+        <div id="settings-content">
+
+          <!-- HELP TAB -->
+          <div class="tab-panel active" id="tab-help">
+            <h2 class="settings-heading">How to Play</h2>
+            <p class="settings-body">Place track tiles on the grid before the train reaches a gap. The train speeds up as it moves — plan ahead!</p>
+
+            <h2 class="settings-heading" style="margin-top:20px">Controls</h2>
+            <table class="key-table">
+              <tbody>
+                <tr><td><kbd>W</kbd></td><td>Straight track</td></tr>
+                <tr><td><kbd>S</kbd></td><td>Curve track</td></tr>
+                <tr><td><kbd>A</kbd></td><td>Rotate left</td></tr>
+                <tr><td><kbd>D</kbd></td><td>Rotate right</td></tr>
+                <tr><td><kbd>Click</kbd></td><td>Place tile</td></tr>
+                <tr><td><kbd>Middle / Right drag</kbd></td><td>Orbit camera</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- SOUND TAB -->
+          <div class="tab-panel" id="tab-sound">
+            <h2 class="settings-heading">Sound</h2>
+
+            <div class="sound-row">
+              <span class="sound-label">Mute all</span>
+              <button id="btn-mute-all" class="toggle-btn">🔇 Off</button>
+            </div>
+
+            <div class="sound-row">
+              <span class="sound-label">Music</span>
+              <button id="btn-mute-music" class="toggle-btn">🎵 On</button>
+            </div>
+            <div class="sound-row indent">
+              <span class="vol-label">Volume</span>
+              <input id="slider-music-vol" type="range" min="0" max="1" step="0.01" value="0.5" class="vol-slider" />
+            </div>
+
+            <div class="sound-row">
+              <span class="sound-label">Sound Effects</span>
+              <button id="btn-mute-sfx" class="toggle-btn">🔊 On</button>
+            </div>
+            <div class="sound-row indent">
+              <span class="vol-label">Volume</span>
+              <input id="slider-sfx-vol" type="range" min="0" max="1" step="0.01" value="0.7" class="vol-slider" />
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
     <!-- Overlay screens -->
