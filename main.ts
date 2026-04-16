@@ -42,7 +42,7 @@ const MAX_SPEED    = 4.0   // cells per second cap
 let baseSpeed      = 1     // initial lerpSpeed for this level
 
 // Three.js
-const canvas = document.getElementById('game-canvas')
+const canvas = document.querySelector('.game__canvas') as HTMLCanvasElement
 const { renderer, scene, camera } = createScene(canvas)
 
 buildStarfield(scene)
@@ -58,8 +58,8 @@ planeMesh.rotation.x = -Math.PI / 2
 scene.add(planeMesh)
 
 // HUD elements
-const speedBar = document.getElementById('speed-bar')!
-const levelNum = document.getElementById('level-num')!
+const speedBar = document.querySelector<HTMLElement>('.hud__speed-bar')!
+const levelNum = document.querySelector<HTMLElement>('.hud__level-num')!
 
 // ── Derive selectedPiece from tile type + rotation ───────────────────────────
 function updateSelectedPiece(): void {
@@ -168,7 +168,18 @@ function raycastGrid(ndc: THREE.Vector2): import('./src/Grid.js').CellData | nul
 canvas!.addEventListener('mousemove', onMouseMove)
 canvas!.addEventListener('click', onCanvasClick)
 canvas!.addEventListener('touchstart', onTouch, { passive: false })
-canvas!.addEventListener('contextmenu', (e) => e.preventDefault())
+canvas!.addEventListener('contextmenu', (e: MouseEvent) => {
+  e.preventDefault()
+  if (Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) > DRAG_THRESHOLD) return
+  if (state !== STATE.PLAYING || !grid) return
+  getPointerNDC(e.clientX, e.clientY)
+  raycaster.setFromCamera(pointer, camera)
+  const hits: THREE.Intersection[] = []
+  raycaster.intersectObject(planeMesh, false, hits)
+  if (!hits.length) return
+  const { col, row } = worldToCellFallback(hits[0].point.x, hits[0].point.z)
+  grid.removeTrack(col, row)
+})
 canvas!.addEventListener('mousedown', (e: MouseEvent) => {
   const canGrab = e.button === 0 || e.button === 1 || e.button === 2
   if (!canGrab) return
@@ -361,17 +372,17 @@ function animate(): void {
 }
 
 // ── Settings modal ────────────────────────────────────────────────────────────
-const settingsModal = document.getElementById('settings-modal')!
-const btnSettings   = document.getElementById('btn-settings')!
-const settingsClose = document.getElementById('settings-close')!
-const settingsTabs  = document.querySelectorAll<HTMLButtonElement>('.settings-tab')
-const tabPanels     = document.querySelectorAll<HTMLElement>('.tab-panel')
+const settingsModal = document.querySelector<HTMLElement>('.settings')!
+const btnSettings   = document.querySelector<HTMLElement>('.hud__settings-btn')!
+const settingsClose = document.querySelector<HTMLElement>('.settings__close')!
+const settingsTabs  = document.querySelectorAll<HTMLButtonElement>('.settings__tab')
+const tabPanels     = document.querySelectorAll<HTMLElement>('.settings__panel')
 
-const btnMuteAll   = document.getElementById('btn-mute-all')!
-const btnMuteMusic = document.getElementById('btn-mute-music')!
-const btnMuteSfx   = document.getElementById('btn-mute-sfx')!
-const sliderMusic  = document.getElementById('slider-music-vol') as HTMLInputElement
-const sliderSfx    = document.getElementById('slider-sfx-vol')   as HTMLInputElement
+const btnMuteAll   = document.querySelector<HTMLElement>('.settings__mute-all')!
+const btnMuteMusic = document.querySelector<HTMLElement>('.settings__mute-music')!
+const btnMuteSfx   = document.querySelector<HTMLElement>('.settings__mute-sfx')!
+const sliderMusic  = document.querySelector<HTMLInputElement>('.settings__music-slider')!
+const sliderSfx    = document.querySelector<HTMLInputElement>('.settings__sfx-slider')!
 
 function openSettings(): void { settingsModal.classList.remove('hidden') }
 function closeSettings(): void { settingsModal.classList.add('hidden') }
@@ -387,7 +398,7 @@ settingsTabs.forEach((tab) => {
     settingsTabs.forEach((t) => t.classList.remove('active'))
     tabPanels.forEach((p) => p.classList.remove('active'))
     tab.classList.add('active')
-    document.getElementById(`tab-${tab.dataset.tab}`)?.classList.add('active')
+    document.querySelector(`.settings__panel--${tab.dataset.tab}`)?.classList.add('active')
   })
 })
 

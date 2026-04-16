@@ -1,7 +1,7 @@
-const overlay = document.getElementById('overlay')!
-const title   = document.getElementById('overlay-title')!
-const sub     = document.getElementById('overlay-sub')!
-const btn     = document.getElementById('overlay-btn')!
+const overlay = document.querySelector<HTMLElement>('.overlay')!
+const title   = document.querySelector<HTMLElement>('.overlay__title')!
+const sub     = document.querySelector<HTMLElement>('.overlay__sub')!
+const btn     = document.querySelector<HTMLElement>('.overlay__btn')!
 
 export function showOverlay(
   titleText: string,
@@ -18,7 +18,7 @@ export function showOverlay(
   const newBtn = btn.cloneNode(true) as HTMLElement
   btn.replaceWith(newBtn)
   newBtn.textContent = btnText
-  document.getElementById('overlay-btn')!.addEventListener('click', () => {
+  document.querySelector<HTMLElement>('.overlay__btn')!.addEventListener('click', () => {
     hideOverlay()
     onBtn()
   })

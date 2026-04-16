@@ -39,31 +39,43 @@ yarn start          # dev server at localhost:1234
 ```
 
 ```bash
-yarn vite build     # production bundle → dist/
+yarn build          # production bundle → dist/
 yarn tsc --noEmit   # type-check only
 ```
 
-Entry point: `index.html` → `main.ts` (project root, not `src/`).
+Entry point: `index.pug` (compiled at serve/build time via Vite plugin) → `main.ts` (project root, not `src/`).
 
 ---
 
 ## Project structure
 
 ```
-index.html          HTML shell — #game-canvas, overlay divs, UI elements
-main.ts             Game state machine, tick loop, render loop, input
-vite.config.ts
+index.pug              Root Pug template — includes all view partials
+index.html             Minimal Vite HTML shell (replaced by index.pug at runtime)
+main.ts                Game state machine, tick loop, render loop, input
+vite.config.ts         Vite config with custom Pug render plugin
 
 src/
-  Constants.ts      Types, enums, TRACK_PIECES, LEVELS[]
-  Grid.ts           Board cells, track placement, ghost preview
-  Train.ts          Movement, interpolation, derail/win detection
-  Smoke.ts          Particle emitter (smoke puffs)
-  Station.ts        3-D station model + flag
-  Stars.ts          Background starfield
-  scene.ts          Renderer, camera, lighting setup
-  ui.ts             showOverlay() / hideOverlay()
-  style.css
+  views/
+    _canvas.pug        .game__canvas
+    _hud.pug           .hud block
+    _settings-modal.pug .settings block
+    _overlay.pug       .overlay block
+  style/
+    main.scss          SCSS entry — @use all partials
+    _variables.scss    CSS custom properties
+    _base.scss         Reset, .game, .game__canvas
+    _hud.scss          .hud block
+    _overlay.scss      .overlay block
+    _settings.scss     .settings block
+  Constants.ts         Types, enums, TRACK_PIECES, LEVELS[]
+  Grid.ts              Board cells, track placement, ghost preview
+  Train.ts             Movement, interpolation, derail/win detection
+  Smoke.ts             Particle emitter (smoke puffs)
+  Station.ts           3-D station model + flag
+  Stars.ts             Background starfield
+  scene.ts             Renderer, camera, lighting setup
+  ui.ts                showOverlay() / hideOverlay()
 ```
 
 ---
@@ -72,7 +84,7 @@ src/
 
 1. **State machine** (`main.ts`): `TITLE → PLAYING → WIN | DEAD`
 2. **Each level**: `Grid` builds the board from a `LevelDef`; `Train` initialises at `rotation`; keyboard W/S/A/D changes type and rotation.
-3. **Tick loop** (interval-based): `Train.step()` returns a `StepResult`; `main.ts` handles outcome and accelerates the interval.
+3. **Tick loop** (rAF-driven): `doTick()` fires inside `animate()` whenever `train.lerpT >= 1` (previous lerp complete). `Train.step()` returns a `StepResult`; `main.ts` handles outcome and multiplies `lerpSpeed` by `SPEED_ACCEL` each step.
 4. **Render loop**: `requestAnimationFrame` — camera sway, `SmokeSystem.update(dt)`, Three.js render.
 5. **Input**: `mousemove` → `Grid.showGhost()`; `click` → `Grid.placeTrack()` via an invisible `PlaneGeometry(200,200)` raycasting plane at `y=0`.
 

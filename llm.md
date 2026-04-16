@@ -1,35 +1,47 @@
 # TrainMania — LLM Reference
 
 Browser puzzle game: place rail pieces before the moving train derails.
-Stack: TypeScript · Three.js · Vite. No framework.
+Stack: TypeScript · Three.js · Vite · Pug · SCSS. No framework.
 
 ## Quick facts
-- Entry: `index.html` → `main.ts` (root, not src/)
-- Dev: `yarn start` (vite --port 1234)
+- Entry: `index.pug` (compiled to `index.html` via Vite plugin) → `main.ts` (root, not src/)
+- Dev: `yarn dev` or `yarn start` (vite --port 1234)
 - Type-check: `yarn tsc --noEmit`
-- Build: `yarn vite build`
+- Build: `yarn build` (vite build)
 - tsconfig: `moduleResolution: bundler`, `strict: true`, `noEmit: true`
-- Deps: `three ^0.183.2`, `vite ^8.0.8`; devDeps: `typescript ^6.0.2`, `@types/three ^0.183.1`
+- Deps: `three ^0.183.2`; devDeps: `vite ^8.0.8`, `pug ^3.0.3`, `sass ^1.x`, `typescript ^6.0.2`, `@types/three ^0.183.1`
 - Imports use `.js` extensions at runtime (Vite/bundler resolution)
 
 ## File map
 ```
-index.html       HTML shell: #game-canvas, #speed-bar, #level-num, overlay divs, settings modal
-main.ts          Bootstrap, game state machine, tick/render loop, input, level loading
-vite.config.ts   Vite config
+index.pug             Root Pug template — includes all view partials
+index.html            Minimal HTML shell (Vite entry); content is replaced by index.pug via plugin
+main.ts               Bootstrap, game state machine, tick/render loop, input, level loading
+vite.config.ts        Vite config with custom Pug render plugin
 src/
-  Assets.ts      loadModelAsset(), normalizeObject(), warnAssetLoadFailureOnce() — GLB + texture helpers
-  AudioManager.ts AudioManager — music playlist (HTMLAudioElement) + SFX (Web Audio API)
-  Constants.ts   Types, enums, TRACK_PIECES, TileType, tileToPieceId(), LEVELS[]
-  Grid.ts        Board cells, track placement, ghost preview, coord helpers
-  KeyboardHUD.ts KeyboardHUD — WASD 3-D key widgets rendered via scissor viewport
-  Smoke.ts       SmokeSystem particle emitter
-  Station.ts     buildStation() — 3-D station model + flag
-  Stars.ts       buildStarfield() — background points
-  Train.ts       Train movement, lerp animation, fall/derail/win detection
-  scene.ts       createScene() — renderer, camera, lighting (RectAreaLight included)
-  ui.ts          showOverlay() / hideOverlay()
-  style.css      All CSS
+  views/
+    _canvas.pug       .game__canvas element
+    _hud.pug          .hud block: level label, speed bar, settings button
+    _settings-modal.pug .settings block: tabs (help, sound, credits)
+    _overlay.pug      .overlay block: title/game-over screen
+  style/
+    main.scss         SCSS entry point — @use all partials + Google Fonts import
+    _variables.scss   CSS custom properties (:root)
+    _base.scss        Reset, html/body, .game block, .game__canvas
+    _hud.scss         .hud block and elements
+    _overlay.scss     .overlay block and elements
+    _settings.scss    .settings block, .key-table, kbd
+  Assets.ts           loadModelAsset(), normalizeObject(), warnAssetLoadFailureOnce() — GLB + texture helpers
+  AudioManager.ts     AudioManager — music playlist (HTMLAudioElement) + SFX (Web Audio API)
+  Constants.ts        Types, enums, TRACK_PIECES, TileType, tileToPieceId(), LEVELS[]
+  Grid.ts             Board cells, track placement, ghost preview, coord helpers
+  KeyboardHUD.ts      KeyboardHUD — WASD 3-D key widgets rendered via scissor viewport
+  Smoke.ts            SmokeSystem particle emitter
+  Station.ts          buildStation() — 3-D station model + flag
+  Stars.ts            buildStarfield() — background points
+  Train.ts            Train movement, lerp animation, fall/derail/win detection
+  scene.ts            createScene() — renderer, camera, lighting (RectAreaLight included)
+  ui.ts               showOverlay() / hideOverlay()
 ```
 
 ## Key exports
@@ -75,7 +87,12 @@ interface TrackPiece { id, label, connections: Partial<Record<Direction,Directio
 3 levels defined in `LEVELS[]`. Each adds complexity to the required path; `baseSpeed` (ms/step) decreases each level.
 
 ## Conventions
-- PascalCase `.ts` for all modules; lowercase for `scene.ts`, `ui.ts`, `style.css`.
+- **BEM naming** for all CSS classes: `.block`, `.block__element`, `.block--modifier`. No `id` selectors in CSS or JS; use `querySelector('.class')` instead of `getElementById`.
+- BEM blocks: `.game`, `.hud`, `.overlay`, `.settings`, `.key-table`.
+- State classes: `.hidden`, `.active`, `.muted` (toggled via JS).
+- Views: Pug partials in `src/views/`, prefixed with `_` (e.g. `_hud.pug`).
+- Styles: SCSS partials in `src/style/`, prefixed with `_`, composed via `@use` in `main.scss`.
+- PascalCase `.ts` for all modules; lowercase for `scene.ts`, `ui.ts`.
 - ES module imports only — no `require`.
 - `dist/` and `node_modules/` are generated; do not edit.
 - `CELL_SIZE = 2.0` world units per cell; board centered at origin.

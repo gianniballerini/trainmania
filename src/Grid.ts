@@ -68,6 +68,7 @@ export interface CellData {
   trackPiece: PieceId | null
   mesh: THREE.Mesh | null
   trackMesh?: THREE.Group | null
+  prebuilt?: boolean
 }
 
 export function cellToWorld(col: number, row: number, cols: number, rows: number): THREE.Vector3 {
@@ -145,6 +146,7 @@ export class Grid {
           col, row, type,
           trackPiece: isPrebuiltRail ? 'STRAIGHT_NS' : null,
           mesh: null,
+          prebuilt: isPrebuiltRail,
         }
         this.cells.push(cell)
 
@@ -190,6 +192,16 @@ export class Grid {
     cell.trackPiece = pieceId
     cell.type = CELL.RAIL
     this._buildTrackVisual(cell, pieceId)
+    return true
+  }
+
+  removeTrack(col: number, row: number): boolean {
+    const cell = this.getCell(col, row)
+    if (!cell || !cell.trackPiece || cell.prebuilt) return false
+    if (cell.type === CELL.STATION || cell.type === CELL.START) return false
+    this._removeTrackVisual(cell)
+    cell.trackPiece = null
+    cell.type = CELL.FLOOR
     return true
   }
 
