@@ -8,8 +8,6 @@ A browser-based puzzle game built for the **Three.js Journey Challenge 23 — Th
 
 ## Gameplay
 
-You're given a hand of 4 random rail cards. Lay them on the grid to build a path from the train's starting position to the station — before it gets there.
-
 The catch: the train doesn't wait. Every step it accelerates (`interval × 0.92`, floor 250 ms). Run out of track and you derail.
 
 **Controls**
@@ -17,7 +15,7 @@ The catch: the train doesn't wait. Every step it accelerates (`interval × 0.92`
 - `click` — place the selected card
 - Select a card from your hand before placing
 
-**Win** — guide the train into the station.  
+**Win** — guide the train into the station.
 **Lose** — train steps onto a void cell or a dead-end.
 
 ---
@@ -60,7 +58,6 @@ src/
   Constants.ts      Types, enums, TRACK_PIECES, LEVELS[]
   Grid.ts           Board cells, track placement, ghost preview
   Train.ts          Movement, interpolation, derail/win detection
-  Cards.ts          4-card hand UI + refill logic
   Smoke.ts          Particle emitter (smoke puffs)
   Station.ts        3-D station model + flag
   Stars.ts          Background starfield
@@ -74,7 +71,7 @@ src/
 ## Architecture
 
 1. **State machine** (`main.ts`): `TITLE → PLAYING → WIN | DEAD`
-2. **Each level**: `Grid` builds the board from a `LevelDef`; `Train` initialises at `trainStart`; `CardTray` deals 4 cards from `HAND_POOL`.
+2. **Each level**: `Grid` builds the board from a `LevelDef`; `Train` initialises at `rotation`; keyboard W/S/A/D changes type and rotation.
 3. **Tick loop** (interval-based): `Train.step()` returns a `StepResult`; `main.ts` handles outcome and accelerates the interval.
 4. **Render loop**: `requestAnimationFrame` — camera sway, `SmokeSystem.update(dt)`, Three.js render.
 5. **Input**: `mousemove` → `Grid.showGhost()`; `click` → `Grid.placeTrack()` via an invisible `PlaneGeometry(200,200)` raycasting plane at `y=0`.

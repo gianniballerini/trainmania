@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 export function buildStarfield(scene: THREE.Scene): THREE.Points {
-  const count = 800
+  const count = 2000
   const geo   = new THREE.BufferGeometry()
   const pos   = new Float32Array(count * 3)
 
@@ -15,7 +15,7 @@ export function buildStarfield(scene: THREE.Scene): THREE.Points {
   }
 
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
-  const mat   = new THREE.PointsMaterial({ color: 0xffeedd, size: 0.18, sizeAttenuation: true })
+  const mat   = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, sizeAttenuation: true, fog: false })
   const stars = new THREE.Points(geo, mat)
   scene.add(stars)
   return stars

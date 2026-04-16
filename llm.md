@@ -20,7 +20,6 @@ vite.config.ts   Vite config
 src/
   Assets.ts      loadModelAsset(), normalizeObject(), warnAssetLoadFailureOnce() — GLB + texture helpers
   AudioManager.ts AudioManager — music playlist (HTMLAudioElement) + SFX (Web Audio API)
-  Cards.ts       CardTray UI — 4-slot hand using TileType + rotation, right-click to rotate
   Constants.ts   Types, enums, TRACK_PIECES, TileType, tileToPieceId(), LEVELS[]
   Grid.ts        Board cells, track placement, ghost preview, coord helpers
   KeyboardHUD.ts KeyboardHUD — WASD 3-D key widgets rendered via scissor viewport
@@ -38,7 +37,6 @@ src/
 |---|---|
 | Assets.ts | `loadModelAsset(options)`, `normalizeObject()`, `warnAssetLoadFailureOnce()`, `AssetLoadOptions` |
 | AudioManager.ts | `class AudioManager` — `init()`, `playMusic()`, `stopMusic()`, `playSfx()`, `muteAll/Music/Sfx()`, `setMusicVolume()`, `setSfxVolume()` |
-| Cards.ts | `class CardTray` |
 | Constants.ts | `Direction`, `PieceId`, `CellType`, `TileType`, `TrackPiece`, `LevelDef`, `CELL`, `DIR`, `DIR_NAMES`, `OPPOSITE`, `TRACK_PIECES`, `HAND_POOL`, `TILE_POOL`, `tileToPieceId()`, `LEVELS` |
 | Grid.ts | `class Grid`, `CellData`, `cellToWorld()`, `worldToCell()`, `loadTrackAssets()`, `CELL_SIZE_EXPORT`, `CELL_H_EXPORT` |
 | KeyboardHUD.ts | `class KeyboardHUD` — `load()`, `pressKey()`, `releaseKey()`, `update(delta)`, `render(renderer)`, `resize()` |
@@ -62,7 +60,7 @@ interface TrackPiece { id, label, connections: Partial<Record<Direction,Directio
 
 ## Architecture
 1. `main.ts` owns the game state machine: `TITLE → PLAYING → (WIN | DEAD | PAUSED)`. On DEAD, always restarts from level 1 (`levelIndex = 0`).
-2. Each level: `Grid` builds the board from `LevelDef.grid`; `Train` initialises at `trainStart`; `CardTray` deals 4 cards from `TILE_POOL` (each slot is a `TileType` + `rotation`; keyboard W/S/A/D changes type and rotation).
+2. Each level: `Grid` builds the board from `LevelDef.grid`; `Train` initialises at `rotation`; keyboard W/S/A/D changes type and rotation).
 3. **Tick loop** (rAF-driven, not interval-based): `doTick()` is called inside `animate()` whenever `train.lerpT >= 1` (i.e. the previous lerp has completed). `Train.step()` returns a `StepResult`; `main.ts` handles WIN / DEAD / continue.
 4. **Speed model**: `lerpSpeed` (cells/sec) starts at `1000 / levelDef.baseSpeed` and is multiplied by `SPEED_ACCEL = 1.05` after every step, capped at `MAX_SPEED = 4.0`. `train.lerpSpeed` is updated live each tick.
 5. **Render loop**: `requestAnimationFrame` → `train.update(delta)`, `smoke.update(delta)`, `renderer.render(scene, camera)`, then `keyboardHUD.update(delta)` + `keyboardHUD.render(renderer)` via scissor viewport.
