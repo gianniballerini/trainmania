@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { AudioManager } from './src/AudioManager.js'
 import { CELL, LEVELS, PieceId, TileType, tileToPieceId } from './src/Constants.js'
-import { CELL_SIZE_EXPORT as CELL_SIZE, Grid, loadTrackAssets, worldToCell } from './src/Grid.js'
+import { CELL_SIZE_EXPORT as CELL_SIZE, cellToWorld, Grid, loadTrackAssets, worldToCell } from './src/Grid.js'
 import { KeyboardHUD } from './src/KeyboardHUD.js'
 import { createScene } from './src/scene.js'
 import { SmokeSystem } from './src/Smoke.js'
@@ -178,7 +178,12 @@ canvas!.addEventListener('contextmenu', (e: MouseEvent) => {
   raycaster.intersectObject(planeMesh, false, hits)
   if (!hits.length) return
   const { col, row } = worldToCellFallback(hits[0].point.x, hits[0].point.z)
-  grid.removeTrack(col, row)
+  const removed = grid.removeTrack(col, row)
+  if (removed && smoke) {
+    const pos = cellToWorld(col, row, grid.cols, grid.rows)
+    pos.y = 0.3
+    smoke.emitBurst(pos)
+  }
 })
 canvas!.addEventListener('mousedown', (e: MouseEvent) => {
   const canGrab = e.button === 0 || e.button === 1 || e.button === 2
