@@ -1,0 +1,205 @@
+import * as THREE from 'three'
+import { AudioManager } from './AudioManager.js'
+import { CameraController } from './CameraController.js'
+import { LEVELS, PieceId, tileToPieceId, TileType } from './Constants.js'
+import { Grid, loadTrackAssets } from './Grid.js'
+import { InputManager } from './InputManager.js'
+import { KeyboardHUD } from './KeyboardHUD.js'
+import { createScene } from './scene.js'
+import { SettingsUI } from './SettingsUI.js'
+import { SmokeSystem } from './Smoke.js'
+import { buildStarfield } from './Stars.js'
+import { DeadState } from './states/DeadState.js'
+import { BaseGameState } from './states/IGameState.js'
+import { PausedState } from './states/PausedState.js'
+import { PlayingState } from './states/PlayingState.js'
+import { TitleState } from './states/TitleState.js'
+import { WinState } from './states/WinState.js'
+import { buildStation } from './Station.js'
+import { Train } from './Train.js'
+
+// ── Speed constants ───────────────────────────────────────────────────────────
+const SPEED_ACCEL = 1.05
+const MAX_SPEED   = 4.0
+
+export class Game {
+  // ── Three.js ───────────────────────────────────────────────────────────────
+  readonly renderer: THREE.WebGLRenderer
+  readonly scene:    THREE.Scene
+  readonly camera:   THREE.Camera
+
+  // ── HUD DOM ────────────────────────────────────────────────────────────────
+  private readonly speedBar: HTMLElement
+  private readonly levelNum: HTMLElement
+
+  // ── Live game objects (replaced on each level load) ───────────────────────
+  grid:         Grid        | undefined
+  train:        Train       | undefined
+  smoke:        SmokeSystem | undefined
+  stationGroup: THREE.Group | undefined
+
+  // ── Speed ─────────────────────────────────────────────────────────────────
+  lerpSpeed = 1
+  baseSpeed = 1
+  stepCount = 0
+
+  // ── Track selection ───────────────────────────────────────────────────────
+  selectedPiece:   PieceId | null = null
+  currentTileType: TileType       = 'STRAIGHT'
+  currentRotation                 = 0
+  lastHoveredCell: { col: number; row: number } | null = null
+
+  // ── Level ─────────────────────────────────────────────────────────────────
+  levelIndex = 0
+
+  // ── Managers ──────────────────────────────────────────────────────────────
+  readonly audioManager:     AudioManager
+  readonly keyboardHUD:      KeyboardHUD
+  readonly cameraController: CameraController
+
+  // ── State machine ─────────────────────────────────────────────────────────
+  currentState: BaseGameState = new BaseGameState()
+
+  // ── Render loop ───────────────────────────────────────────────────────────
+  private lastTime = performance.now()
+
+  constructor(readonly canvas: HTMLCanvasElement) {
+    const { renderer, scene, camera } = createScene(canvas)
+    this.renderer = renderer
+    this.scene    = scene
+    this.camera   = camera
+
+    buildStarfield(scene)
+
+    this.speedBar = document.querySelector<HTMLElement>('.hud__speed-bar')!
+    this.levelNum = document.querySelector<HTMLElement>('.hud__level-num')!
+
+    this.audioManager     = new AudioManager()
+    this.keyboardHUD      = new KeyboardHUD()
+    this.cameraController = new CameraController()
+    this.cameraController.updateOrbit(camera)
+
+    this.updateSelectedPiece()
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  async boot(): Promise<void> {
+    await this.keyboardHUD.load()
+    this.levelIndex = 0
+    await this.loadLevel(0)
+
+    // InputManager and SettingsUI created after level is ready (scene/objects in place)
+    new InputManager(this.canvas, this, this.cameraController)
+    new SettingsUI(this.audioManager, this)
+
+    this.changeState(new TitleState())
+    this.startRenderLoop()
+  }
+
+  // ── State machine ─────────────────────────────────────────────────────────
+  changeState(newState: BaseGameState): void {
+    this.currentState.exit(this)
+    this.currentState = newState
+    this.currentState.enter(this)
+  }
+
+  pause(): void {
+    if (this.currentState instanceof PlayingState) {
+      this.changeState(new PausedState(this.currentState))
+    }
+  }
+
+  resume(): void {
+    if (this.currentState instanceof PausedState) {
+      this.changeState(this.currentState.previousState as BaseGameState)
+    }
+  }
+
+  // ── Level loading ─────────────────────────────────────────────────────────
+  async loadLevel(idx: number): Promise<void> {
+    this.grid?.dispose()
+    this.train?.dispose()
+    this.smoke?.dispose()
+    if (this.stationGroup) this.scene.remove(this.stationGroup)
+
+    const levelDef     = LEVELS[idx]
+    this.stepCount     = 0
+    this.baseSpeed     = 1000 / levelDef.baseSpeed
+    this.lerpSpeed     = this.baseSpeed
+    this.lastHoveredCell = null
+
+    this.levelNum.textContent = String(levelDef.id)
+    this.updateSpeedBar(0)
+
+    await loadTrackAssets()
+    this.grid         = new Grid(this.scene, levelDef)
+    this.train        = new Train(this.scene, this.grid)
+    this.train.lerpSpeed = this.lerpSpeed
+    this.smoke        = new SmokeSystem(this.scene)
+    this.stationGroup = buildStation(this.scene, this.grid)
+
+    this.cameraController.reset(this.camera)
+  }
+
+  // ── Tick (called by PlayingState.update when train lerp completes) ─────────
+  doTick(): void {
+    if (!this.train) return
+
+    const result = this.train.step()
+    this.stepCount++
+
+    this.lerpSpeed = Math.min(MAX_SPEED, this.lerpSpeed * SPEED_ACCEL)
+    this.train.lerpSpeed = this.lerpSpeed
+    const speedT = (this.lerpSpeed - this.baseSpeed) / (MAX_SPEED - this.baseSpeed)
+    this.updateSpeedBar(Math.min(1, speedT))
+
+    if (result.ok && result.won) {
+      this.changeState(new WinState())
+      return
+    }
+
+    if (!result.ok) {
+      this.changeState(new DeadState(!!result.derailed))
+    }
+  }
+
+  // ── HUD helpers ───────────────────────────────────────────────────────────
+  updateSelectedPiece(): void {
+    this.selectedPiece = tileToPieceId(this.currentTileType, this.currentRotation)
+    if (this.grid && this.selectedPiece && this.lastHoveredCell) {
+      this.grid.showGhost(this.lastHoveredCell.col, this.lastHoveredCell.row, this.selectedPiece)
+    }
+  }
+
+  updateSpeedBar(t: number): void {
+    const pct = t * 100
+    this.speedBar.style.width      = pct + '%'
+    this.speedBar.style.background = t < 0.5
+      ? `hsl(${30 + t * 40}, 80%, 55%)`
+      : `hsl(${70 - (t - 0.5) * 100}, 80%, 50%)`
+  }
+
+  // ── Render loop ───────────────────────────────────────────────────────────
+  private startRenderLoop(): void {
+    this.animate()
+  }
+
+  private animate = (): void => {
+    requestAnimationFrame(this.animate)
+    const now   = performance.now()
+    const delta = Math.min((now - this.lastTime) / 1000, 0.1)
+    this.lastTime = now
+
+    this.currentState.update(this, delta)
+
+    if (this.train) this.train.update(delta)
+    if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
+
+    const flag = this.stationGroup?.userData?.flag as THREE.Mesh | undefined
+    if (flag) flag.rotation.y = Math.sin(now * 0.003) * 0.3
+
+    this.renderer.render(this.scene, this.camera)
+    this.keyboardHUD.update(delta)
+    this.keyboardHUD.render(this.renderer)
+  }
+}
