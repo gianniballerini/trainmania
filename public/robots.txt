@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://trainmania.gianniballerini.dev/sitemap.xml
