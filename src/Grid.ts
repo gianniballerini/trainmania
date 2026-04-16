@@ -262,20 +262,22 @@ export class Grid {
       }
     }
 
-    // Curve model is authored as a top-to-right turn: CURVE_NE at rotationY = 0.
-    const CURVE_ROTATION: Record<PieceId, number> = {
-      STRAIGHT_NS: 0,
-      STRAIGHT_EW: 0,
-      CURVE_NE: 0,
-      CURVE_SE: -Math.PI / 2,
-      CURVE_SW: Math.PI,
-      CURVE_NW: Math.PI / 2,
+    // Curve model assumed to be oriented CURVE_NE (N→E) at rotationY=0
+    const CURVE_ROTATION: Record<string, number> = {
+      'NE': 0,
+      'EN': 0,
+      'SE': Math.PI / 2,
+      'ES': Math.PI / 2,
+      'SW': Math.PI,
+      'WS': Math.PI,
+      'NW': -Math.PI / 2,
+      'WN': -Math.PI / 2,
     }
 
-    const addCurve = (fromDir: Direction, toDir: Direction, curvePieceId: PieceId) => {
+    const addCurve = (fromDir: Direction, toDir: Direction) => {
       if (curveModel) {
         const clone = curveModel.clone()
-        clone.rotation.y = CURVE_ROTATION[curvePieceId]
+        clone.rotation.y = CURVE_ROTATION[fromDir + toDir] ?? 0
         group.add(clone)
         return
       }
@@ -320,10 +322,10 @@ export class Grid {
     switch (pieceId) {
       case 'STRAIGHT_NS': addStraightNS(); break
       case 'STRAIGHT_EW': addStraightEW(); break
-      case 'CURVE_NE':    addCurve('N', 'E', pieceId); break
-      case 'CURVE_NW':    addCurve('N', 'W', pieceId); break
-      case 'CURVE_SE':    addCurve('S', 'E', pieceId); break
-      case 'CURVE_SW':    addCurve('S', 'W', pieceId); break
+      case 'CURVE_NE':    addCurve('N', 'E'); break
+      case 'CURVE_NW':    addCurve('N', 'W'); break
+      case 'CURVE_SE':    addCurve('S', 'E'); break
+      case 'CURVE_SW':    addCurve('S', 'W'); break
     }
 
     this.railGroup.add(group)
