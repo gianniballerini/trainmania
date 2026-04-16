@@ -9,7 +9,8 @@
     "vite": "^8.0.8"
   },
   "scripts": {
-    "start": "vite --port 1234"
+    "start": "vite --port 1234",
+    "build": "vite build"
   },
   "devDependencies": {
     "@types/three": "^0.183.1",

@@ -31,11 +31,11 @@ let selectedPiece: PieceId | null = null
 let cards: CardTray
 
 // Speed
-let tickInterval   = 0     // ms between steps
-let lastTick       = 0
+let lerpSpeed     = 1     // cells per second (lerp rate)
 let stepCount      = 0
-const SPEED_ACCEL  = 0.92  // multiply interval every step (min 250ms)
-const MIN_INTERVAL = 250
+const SPEED_ACCEL  = 1.05  // multiply lerpSpeed every step
+const MAX_SPEED    = 4.0   // cells per second cap
+let baseSpeed      = 1     // initial lerpSpeed for this level
 
 // Three.js
 const canvas = document.getElementById('game-canvas')
@@ -219,9 +219,11 @@ async function loadLevel(idx: number): Promise<void> {
   if (stationGroup) { scene.remove(stationGroup) }
 
   const levelDef = LEVELS[idx]
-  tickInterval   = levelDef.baseSpeed
   stepCount      = 0
-  lastTick       = performance.now() + 900
+
+  // Compute initial lerpSpeed from baseSpeed (ms → cells/sec)
+  baseSpeed      = 1000 / levelDef.baseSpeed
+  lerpSpeed      = baseSpeed
 
   levelNum.textContent = String(levelDef.id)
   updateSpeedBar(0)
@@ -229,6 +231,7 @@ async function loadLevel(idx: number): Promise<void> {
   await loadTrackAssets()
   grid         = new Grid(scene, levelDef)
   train        = new Train(scene, grid)
+  train.lerpSpeed = lerpSpeed
   smoke        = new SmokeSystem(scene)
   stationGroup = buildStation(scene, grid)
 
@@ -254,8 +257,9 @@ function doTick(): void {
   stepCount++
 
   // Accelerate
-  tickInterval = Math.max(MIN_INTERVAL, tickInterval * SPEED_ACCEL)
-  const speedT = 1 - (tickInterval - MIN_INTERVAL) / (LEVELS[levelIndex].baseSpeed - MIN_INTERVAL)
+  lerpSpeed = Math.min(MAX_SPEED, lerpSpeed * SPEED_ACCEL)
+  if (train) train.lerpSpeed = lerpSpeed
+  const speedT = (lerpSpeed - baseSpeed) / (MAX_SPEED - baseSpeed)
   updateSpeedBar(Math.min(1, speedT))
 
   if (result.ok && result.won) {
@@ -307,12 +311,9 @@ function animate(): void {
   const delta = Math.min((now - lastTime) / 1000, 0.1)
   lastTime = now
 
-  // Train tick
-  if (state === STATE.PLAYING) {
-    if (now - lastTick >= tickInterval) {
-      lastTick = now
-      doTick()
-    }
+  // Train tick — trigger next step as soon as previous lerp completes
+  if (state === STATE.PLAYING && train && train.lerpT >= 1) {
+    doTick()
   }
 
   // Update train animation

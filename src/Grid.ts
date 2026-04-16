@@ -11,7 +11,17 @@ const TRACK_ASSET = {
   receiveShadow: true,
 }
 
+const TRACK_CURVE_ASSET = {
+  modelUrl: '/assets/models/track_curve_03.glb',
+  targetFootprint: 2.0,
+  yOffset: 0,
+  rotationY: 0,
+  castShadow: true,
+  receiveShadow: true,
+}
+
 let trackModel: THREE.Group | null = null
+let curveModel: THREE.Group | null = null
 let trackModelLoaded = false
 
 const CELL_SIZE  = 2.0   // world units per cell
@@ -43,6 +53,11 @@ export async function loadTrackAssets(): Promise<void> {
     trackModel = await loadModelAsset(TRACK_ASSET)
   } catch (error) {
     warnAssetLoadFailureOnce('track model', TRACK_ASSET.modelUrl, error)
+  }
+  try {
+    curveModel = await loadModelAsset(TRACK_CURVE_ASSET)
+  } catch (error) {
+    warnAssetLoadFailureOnce('curve track model', TRACK_CURVE_ASSET.modelUrl, error)
   }
 }
 
@@ -247,8 +262,25 @@ export class Grid {
       }
     }
 
-    // Approximate curves with 3-segment polyline rails
-    const addCurve = (fromDir: Direction, toDir: Direction) => {
+    // Curve model is authored as a top-to-right turn: CURVE_NE at rotationY = 0.
+    const CURVE_ROTATION: Record<PieceId, number> = {
+      STRAIGHT_NS: 0,
+      STRAIGHT_EW: 0,
+      CURVE_NE: 0,
+      CURVE_SE: -Math.PI / 2,
+      CURVE_SW: Math.PI,
+      CURVE_NW: Math.PI / 2,
+    }
+
+    const addCurve = (fromDir: Direction, toDir: Direction, curvePieceId: PieceId) => {
+      if (curveModel) {
+        const clone = curveModel.clone()
+        clone.rotation.y = CURVE_ROTATION[curvePieceId]
+        group.add(clone)
+        return
+      }
+
+      // Fallback: procedural rails
       const dirVec: Record<Direction, [number, number]> = {
         N: [0, -1], S: [0, 1], E: [1, 0], W: [-1, 0],
       }
@@ -257,11 +289,9 @@ export class Grid {
       const [ex, ez]   = dirVec[fromDir]
       const [ex2, ez2] = dirVec[toDir]
 
-      // Offset for two rails
       const OFFSETS = [-0.13, 0.13]
       OFFSETS.forEach(off => {
-        // Perpendicular to entry direction
-        const perpEntry: [number, number] = [ez * off, ex * off]    // rotate 90°
+        const perpEntry: [number, number] = [ez * off, ex * off]
         const perpExit:  [number, number] = [ez2 * off, ex2 * off]
 
         const pts = [
@@ -276,7 +306,6 @@ export class Grid {
         group.add(new THREE.Mesh(tubeGeo, RAIL_STEEL))
       })
 
-      // A few ties along the curve
       for (let i = 0; i <= 3; i++) {
         const t = i / 3
         const cx = (ex * s) * (1 - t) + (ex2 * s) * t
@@ -291,10 +320,10 @@ export class Grid {
     switch (pieceId) {
       case 'STRAIGHT_NS': addStraightNS(); break
       case 'STRAIGHT_EW': addStraightEW(); break
-      case 'CURVE_NE':    addCurve('N', 'E'); break
-      case 'CURVE_NW':    addCurve('N', 'W'); break
-      case 'CURVE_SE':    addCurve('S', 'E'); break
-      case 'CURVE_SW':    addCurve('S', 'W'); break
+      case 'CURVE_NE':    addCurve('N', 'E', pieceId); break
+      case 'CURVE_NW':    addCurve('N', 'W', pieceId); break
+      case 'CURVE_SE':    addCurve('S', 'E', pieceId); break
+      case 'CURVE_SW':    addCurve('S', 'W', pieceId); break
     }
 
     this.railGroup.add(group)

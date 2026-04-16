@@ -47,6 +47,7 @@ export class Train {
   lerpT: number
   fromRot: number
   toRot: number
+  lerpSpeed: number
 
   constructor(scene: Scene, grid: Grid) {
     this.scene   = scene
@@ -67,11 +68,12 @@ export class Train {
     this.derailTilt = 1
 
     // interpolation
-    this.fromPos = new Vector3()
-    this.toPos   = new Vector3()
-    this.lerpT   = 1
-    this.fromRot = 0
-    this.toRot   = 0
+    this.fromPos  = new Vector3()
+    this.toPos    = new Vector3()
+    this.lerpT    = 1
+    this.fromRot  = 0
+    this.toRot    = 0
+    this.lerpSpeed = 1
 
     this._addHeadlights()
     this._snapToCell()
@@ -202,7 +204,7 @@ export class Train {
     }
 
     if (this.lerpT < 1) {
-      this.lerpT = Math.min(1, this.lerpT + delta * 3.2)
+      this.lerpT = Math.min(1, this.lerpT + delta * this.lerpSpeed)
       const t = easeInOut(this.lerpT)
       this.group.position.lerpVectors(this.fromPos, this.toPos, t)
 

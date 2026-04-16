@@ -34,7 +34,7 @@ src/
 | Module | Exports |
 |---|---|
 | Constants.ts | `Direction`, `PieceId`, `CellType`, `TrackPiece`, `LevelDef`, `CELL`, `DIR`, `OPPOSITE`, `TRACK_PIECES`, `HAND_POOL`, `LEVELS` |
-| Grid.ts | `class Grid`, `CellData`, `cellToWorld()`, `worldToCell()`, `CELL_SIZE_EXPORT`, `CELL_H_EXPORT` |
+| Grid.ts | `class Grid`, `CellData`, `cellToWorld()`, `worldToCell()`, `loadTrackAssets()`, `CELL_SIZE_EXPORT`, `CELL_H_EXPORT` |
 | Train.ts | `class Train`, `StepResult`, `StepSuccess`, `StepFailure` |
 | Cards.ts | `class CardTray` |
 | Smoke.ts | `class SmokeSystem` |
