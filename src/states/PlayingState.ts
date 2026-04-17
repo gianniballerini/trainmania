@@ -29,7 +29,6 @@ export class PlayingState extends BaseGameState {
     if (!game.selectedPiece || !game.grid || !cell || cell.type === CELL.VOID || cell.type === CELL.STATION || cell.type === CELL.START) return
     const placed = game.grid.placeTrack(col, row, game.selectedPiece)
     if (placed) {
-      game.currentRotation = 0          // ← reset rotation
       game.updateSelectedPiece()        // ← refresh ghost/selected piece
       game.grid.hideGhost()
       game.showDefaultGhost()
