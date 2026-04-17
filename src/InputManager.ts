@@ -127,29 +127,33 @@ export class InputManager {
     // ── Hover ghost ───────────────────────────────────────────────────────
     canvas.addEventListener('mousemove', (e) => {
       if (cam.dragging) {
-        game.lastHoveredCell = null
-        game.grid?.hideGhost()
+        game.grid?.hideHover()
         return
       }
       this.setPointerNDC(e.clientX, e.clientY)
       const hit = this.hitTestGrid()
       if (!hit) {
-        game.lastHoveredCell = null
-        game.grid?.hideGhost()
+        game.grid?.hideHover()
         return
       }
-      const cell = game.grid?.getCell(hit.col, hit.row) ?? null
-      game.currentState.handlePointerMove(game, hit.col, hit.row, cell)
+      game.grid?.showHover(hit.col, hit.row)
     })
 
-    // ── Place track ───────────────────────────────────────────────────────
+    // ── Place track (two-click: first click focuses, second click places) ─
     canvas.addEventListener('click', (e) => {
       if (cam.isPastThreshold(e.clientX, e.clientY)) return
       this.setPointerNDC(e.clientX, e.clientY)
       const hit = this.hitTestGrid()
       if (!hit) return
       const cell = game.grid?.getCell(hit.col, hit.row) ?? null
-      game.currentState.handleClick(game, hit.col, hit.row, cell)
+      const prev = game.lastHoveredCell
+      if (prev && prev.col === hit.col && prev.row === hit.row) {
+        // Second click on focused tile → place
+        game.currentState.handleClick(game, hit.col, hit.row, cell)
+      } else {
+        // First click → focus the tile (show ghost)
+        game.currentState.handlePointerMove(game, hit.col, hit.row, cell)
+      }
     })
 
     // ── Middle click → rotate ─────────────────────────────────────────────
@@ -168,11 +172,47 @@ export class InputManager {
     })
 
     // ── Touch ─────────────────────────────────────────────────────────────
+    // First touch sets touch mode so Game can adapt behaviour.
+    window.addEventListener('touchstart', () => { game.isTouchMode = true }, { once: true, passive: true })
+
+    // Single-finger drag → orbit camera.
     canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return
+      const t = e.touches[0]
+      cam.startDrag(t.clientX, t.clientY)
+    }, { passive: true })
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 1) return
       e.preventDefault()
-      const touch = e.touches[0]
-      const synth = new MouseEvent('click', { clientX: touch.clientX, clientY: touch.clientY })
-      canvas.dispatchEvent(synth)
+      const t = e.touches[0]
+      cam.onDrag(t.clientX, t.clientY, game.camera)
+    }, { passive: false })
+
+    // Two-tap model: first tap focuses a tile (shows ghost), second tap places.
+    // If the finger moved past the drag threshold it was a drag, not a tap.
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault()
+      const touch = e.changedTouches[0]
+      if (cam.isPastThreshold(touch.clientX, touch.clientY)) {
+        cam.endDrag()
+        return
+      }
+      cam.endDrag()
+      this.setPointerNDC(touch.clientX, touch.clientY)
+      const hit = this.hitTestGrid()
+      if (!hit) return
+      const cell = game.grid?.getCell(hit.col, hit.row) ?? null
+      const prev = game.lastHoveredCell
+      if (prev && prev.col === hit.col && prev.row === hit.row) {
+        // Second tap on the focused tile → place
+        game.currentState.handleClick(game, hit.col, hit.row, cell)
+        game.lastHoveredCell = null
+        game.showDefaultGhost()
+      } else {
+        // First tap → focus the tile (shows ghost)
+        game.currentState.handlePointerMove(game, hit.col, hit.row, cell)
+      }
     }, { passive: false })
 
     // ── HTML action buttons ───────────────────────────────────────────────

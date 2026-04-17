@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { loadModelAsset, warnAssetLoadFailureOnce } from './Assets.js'
 import { CELL, CellType, Direction, LevelDef, PieceId } from './Constants.js'
+import hoverFrag from './shaders/hover.frag.glsl?raw'
+import hoverVert from './shaders/hover.vert.glsl?raw'
 
 const TRACK_ASSET = {
   modelUrl: '/assets/models/track.glb',
@@ -102,6 +104,8 @@ export class Grid {
   railGroup: THREE.Group
   ghostMesh: THREE.Mesh | null
   ghostTrackGroup: THREE.Group | null
+  hoverMesh: THREE.Mesh | null
+  private readonly hoverMat: THREE.ShaderMaterial
 
   constructor(scene: THREE.Scene, levelDef: LevelDef) {
     this.scene     = scene
@@ -113,6 +117,17 @@ export class Grid {
     this.railGroup = new THREE.Group()
     this.ghostMesh = null
     this.ghostTrackGroup = null
+    this.hoverMesh = null
+    this.hoverMat = new THREE.ShaderMaterial({
+      uniforms: {
+        time:  { value: 0 },
+        color: { value: new THREE.Color(0xffffff) },
+      },
+      transparent: true,
+      depthWrite: false,
+      vertexShader: hoverVert,
+      fragmentShader: hoverFrag,
+    })
 
     scene.add(this.meshes)
     scene.add(this.railGroup)
@@ -399,9 +414,36 @@ export class Grid {
     }
   }
 
+  /** Show a hover highlight on the given cell (follows the cursor on mousemove). */
+  showHover(col: number, row: number): void {
+    const cell = this.getCell(col, row)
+    if (!cell || cell.type === CELL.VOID) { this.hideHover(); return }
+    const pos = cellToWorld(col, row, this.cols, this.rows)
+    if (!this.hoverMesh) {
+      const geo = new THREE.PlaneGeometry(CELL_SIZE - GAP, CELL_SIZE - GAP)
+      this.hoverMesh = new THREE.Mesh(geo, this.hoverMat)
+      this.hoverMesh.rotation.x = -Math.PI / 2
+      this.scene.add(this.hoverMesh)
+    }
+    this.hoverMesh.position.set(pos.x, 0.02, pos.z)
+  }
+
+  hideHover(): void {
+    if (this.hoverMesh) {
+      this.scene.remove(this.hoverMesh)
+      this.hoverMesh.geometry.dispose()
+      this.hoverMesh = null
+    }
+  }
+
+  updateHover(time: number): void {
+    this.hoverMat.uniforms.time.value = time
+  }
+
   dispose(): void {
     this.scene.remove(this.meshes)
     this.scene.remove(this.railGroup)
     this.hideGhost()
+    this.hideHover()
   }
 }

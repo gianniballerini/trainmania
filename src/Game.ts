@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
-import { LEVELS, PieceId, tileToPieceId, TileType } from './Constants.js'
+import { CELL, LEVELS, PieceId, tileToPieceId, TileType } from './Constants.js'
 import { Grid, loadTrackAssets } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { createScene } from './scene.js'
@@ -50,6 +50,9 @@ export class Game {
 
   // ── Level ─────────────────────────────────────────────────────────────────
   levelIndex = 0
+
+  // ── Input ─────────────────────────────────────────────────────────────────
+  isTouchMode = false
 
   // ── Managers ──────────────────────────────────────────────────────────────
   readonly audioManager:     AudioManager
@@ -136,6 +139,8 @@ export class Game {
     this.stationGroup = buildStation(this.scene, this.grid)
 
     this.cameraController.reset(this.camera)
+    this.updateSelectedPiece()
+    this.showDefaultGhost()
   }
 
   // ── Tick (called by PlayingState.update when train lerp completes) ─────────
@@ -168,6 +173,17 @@ export class Game {
     }
   }
 
+  /** Place the ghost on the first available empty tile (used on mobile / after placement). */
+  showDefaultGhost(): void {
+    if (!this.grid || !this.selectedPiece) return
+    const cell = this.grid.cells.find(
+      c => c.type !== CELL.VOID && c.type !== CELL.STATION && c.type !== CELL.START && c.trackPiece === null,
+    )
+    if (!cell) return
+    this.lastHoveredCell = { col: cell.col, row: cell.row }
+    this.grid.showGhost(cell.col, cell.row, this.selectedPiece)
+  }
+
   updateSpeedBar(t: number): void {
     const pct = t * 100
     this.speedBar.style.width      = pct + '%'
@@ -191,6 +207,7 @@ export class Game {
 
     if (this.train) this.train.update(delta)
     if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
+    if (this.grid) this.grid.updateHover(now * 0.001)
 
     const flag = this.stationGroup?.userData?.flag as THREE.Mesh | undefined
     if (flag) flag.rotation.y = Math.sin(now * 0.003) * 0.3
