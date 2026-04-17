@@ -298,6 +298,14 @@ export class Game {
     if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
     if (this.grid) this.grid.updateHover(now * 0.001)
 
+    // Lerp camera look target toward ghost tile or grid center
+    const ghost = this.grid?.ghostMesh
+    const goalX = ghost ? ghost.position.x : 0
+    const goalZ = ghost ? ghost.position.z : 0
+    this.cameraController.setGoalTarget(new THREE.Vector3(goalX, 0, goalZ))
+    this.cameraController.tick(delta)
+    this.cameraController.updateOrbit(this.camera)
+
     const flag = this.stationGroup?.userData?.flag as THREE.Mesh | undefined
     if (flag) flag.rotation.y = Math.sin(now * 0.003) * 0.3
 

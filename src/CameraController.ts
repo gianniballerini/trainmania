@@ -1,29 +1,42 @@
 import * as THREE from 'three'
 
+const LERP_SPEED = 3.0
+
 export class CameraController {
-  private static readonly TARGET         = new THREE.Vector3(0, 0, 0)
   private static readonly RADIUS         = 14
   private static readonly HEIGHT         = 14
   private static readonly DRAG_THRESHOLD = 5
 
   angle = 0
 
-  private _dragging  = false
-  private _lastDragX = 0
-  private _startX    = 0
-  private _startY    = 0
+  private _dragging    = false
+  private _lastDragX   = 0
+  private _startX      = 0
+  private _startY      = 0
+  private _target      = new THREE.Vector3()
+  private _goalTarget  = new THREE.Vector3()
+
+  setGoalTarget(pos: THREE.Vector3): void {
+    this._goalTarget.copy(pos)
+  }
+
+  tick(delta: number): void {
+    this._target.lerp(this._goalTarget, 1 - Math.exp(-LERP_SPEED * delta))
+  }
 
   updateOrbit(camera: THREE.Camera): void {
     camera.position.set(
-      Math.sin(this.angle) * CameraController.RADIUS,
+      this._target.x + Math.sin(this.angle) * CameraController.RADIUS,
       CameraController.HEIGHT,
-      Math.cos(this.angle) * CameraController.RADIUS,
+      this._target.z + Math.cos(this.angle) * CameraController.RADIUS,
     )
-    camera.lookAt(CameraController.TARGET)
+    camera.lookAt(this._target)
   }
 
   reset(camera: THREE.Camera): void {
     this.angle = 0
+    this._target.set(0, 0, 0)
+    this._goalTarget.set(0, 0, 0)
     this.updateOrbit(camera)
   }
 
