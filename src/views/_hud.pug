@@ -3,21 +3,27 @@
     .hud__level LEVEL #[span.hud__level-num 1]
     .hud__speed-wrap
       .hud__speed-bar
+    button.hud__speed-btn(title='Speed Up')
+      .hud__speed-icon
+        img(src='/images/icons/fastForward.png', alt='Speed Up')
+      span.hud__speed-label chu-chu madafaka
   .hud__right
     button.hud__settings-btn(title='Settings')
       .hud__settings-icon
         img(src='/images/icons/gear.png', alt='Settings')
 
 .hud__actions
-  button.hud__action-btn.hud__rotate-btn--left(title='Rotate Left (A)')
-    .hud__action-btn-icon
-      img(src='/images/icons/arrow_counterclockwise.png', alt='Rotate Left')
-    .span Rotate
-  button.hud__action-btn.hud__swap-btn(title='Swap Track (S)')
-    .hud__action-btn-icon
-      img(src='/images/icons/arrow_reserve.png', alt='Swap Track')
-    .span Swap
-  button.hud__action-btn.hud__rotate-btn--right(title='Rotate Right (D)')
-    .hud__action-btn-icon
-      img(src='/images/icons/arrow_clockwise.png', alt='Rotate Right')
-    .span Rotate
+  .hud__actions-left
+    button.hud__action-btn.hud__action-btn--swap.hud__action-btn--left-up(title='Swap Track')
+      .hud__action-btn-icon
+        img(src='/images/icons/cards_flip.png', alt='Swap Track')
+      .span Swap
+    button.hud__action-btn.hud__action-btn--rotate.hud__action-btn--left-down(title='Rotate Track (S)')
+      .hud__action-btn-icon
+        img(src='/images/icons/card_flipdouble.png', alt='Rotate Track')
+      .span Rotate
+  .hud__actions-right
+    button.hud__action-btn.hud__action-btn--place.hud__action-btn--right(title='Place Track')
+      .hud__action-btn-icon
+        img(src='/images/icons/card_outline_place.png', alt='Place Track')
+      .span Place

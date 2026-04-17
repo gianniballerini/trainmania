@@ -81,6 +81,10 @@ export class Game {
     this.cameraController.updateOrbit(camera)
 
     this.updateSelectedPiece()
+
+    document.querySelector<HTMLElement>('.hud__speed-btn')?.addEventListener('click', () => {
+      this.boostSpeed()
+    })
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────
@@ -256,6 +260,17 @@ export class Game {
         && cell.type !== CELL.STATION
         && cell.type !== CELL.START
         && cell.trackPiece === null
+  }
+
+  boostSpeed(): void {
+    this.lerpSpeed = MAX_SPEED
+    if (this.train) this.train.lerpSpeed = MAX_SPEED
+    this.updateSpeedBar(1)
+    const btn = document.querySelector<HTMLElement>('.hud__speed-btn')
+    if (btn) {
+      btn.classList.add('is-active')
+      setTimeout(() => btn.classList.remove('is-active'), 300)
+    }
   }
 
   updateSpeedBar(t: number): void {

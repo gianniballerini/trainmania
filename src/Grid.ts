@@ -202,7 +202,7 @@ export class Grid {
 
   placeTrack(col: number, row: number, pieceId: PieceId): boolean {
     const cell = this.getCell(col, row)
-    if (!cell || cell.type === CELL.VOID) return false
+    if (!cell || cell.type === CELL.VOID || cell.type === CELL.STATION || cell.type === CELL.START) return false
     if (cell.trackPiece) this._removeTrackVisual(cell)
     cell.trackPiece = pieceId
     cell.type = CELL.RAIL

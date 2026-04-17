@@ -17,6 +17,10 @@
   &__left {
     display: flex;
     flex-direction: column;
+
+    align-items: center;
+
+    row-gap: 8 * $ptr;
   }
 
   &__right {
@@ -36,7 +40,6 @@
     height: 4 * $ptr;
     background: rgba(255, 255, 255, 0.12);
     border-radius: 2 * $ptr;
-    margin-top: 4 * $ptr;
     overflow: hidden;
   }
 
@@ -46,6 +49,55 @@
     background: var(--rust);
     border-radius: 2 * $ptr;
     transition: width 0.3s ease, background 0.3s ease;
+  }
+
+  &__speed-btn {
+    background: rgba(245, 237, 224, 0.08);
+    border: 1 * $ptr solid rgba(245, 237, 224, 0.2);
+    border-radius: 8 * $ptr;
+    color: var(--cream);
+    font-size: 18 * $ptr;
+    line-height: 1;
+    padding: 6 * $ptr 9 * $ptr;
+    cursor: pointer;
+    pointer-events: all;
+    transition: background 0.15s;
+    font-family: 'Josefin Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4 * $ptr;
+
+    &:hover {
+      background: rgba(245, 237, 224, 0.18);
+    }
+
+    &.is-active {
+      background: rgba(212, 168, 67, 0.4);
+      border-color: var(--gold);
+    }
+  }
+
+  &__speed-icon {
+    width: 20 * $ptr;
+    height: 20 * $ptr;
+    overflow: hidden;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__speed-label {
+    font-size: 9 * $ptr;
+    font-weight: 700;
+    letter-spacing: 1.5 * $ptr;
+    text-transform: uppercase;
+    color: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
   }
 
   &__settings-btn {
@@ -81,19 +133,40 @@
 
 .hud__actions {
   position: absolute;
-  bottom: 28 * $ptr;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 0;
+  // left: 50%;
+  // transform: translateX(-50%);
+
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   gap: 12 * $ptr;
-  pointer-events: all;
+
+  padding: 20 * $ptr;
+
+  width: 100%;
+
+  pointer-events: none;
+
+}
+
+.hud__actions-left {
+  display: flex;
+  flex-direction: column;
+  row-gap: 12 * $ptr;
+}
+
+.hud__actions-right {
+  display: flex;
+  flex-direction: column;
+  row-gap: 12 * $ptr;
 }
 
 .hud__action-btn {
   flex: 1;
   height: 100 * $ptr;
   padding: 12 * $ptr 18 * $ptr;
+  pointer-events: all;
 
   display: flex;
   flex-direction: column;
@@ -132,6 +205,7 @@
     min-width: 96 * $ptr;
   }
 }
+
 
 .hud__action-btn-icon {
   width: 24 * $ptr;
