@@ -46,7 +46,6 @@ src/
   AudioManager.ts     AudioManager — music playlist (HTMLAudioElement) + SFX (Web Audio API)
   Constants.ts        Types, enums, TRACK_PIECES, TileType, tileToPieceId(), LEVELS[]
   Grid.ts             Board cells, track placement, ghost preview, coord helpers
-  KeyboardHUD.ts      KeyboardHUD — WASD 3-D key widgets rendered via scissor viewport
   Smoke.ts            SmokeSystem particle emitter
   Station.ts          buildStation() — 3-D station model + flag
   Stars.ts            buildStarfield() — background points
@@ -72,7 +71,6 @@ src/
 | AudioManager.ts | `class AudioManager` — `init()`, `playMusic()`, `stopMusic()`, `playSfx()`, `muteAll/Music/Sfx()`, `setMusicVolume()`, `setSfxVolume()` |
 | Constants.ts | `Direction`, `PieceId`, `CellType`, `TileType`, `TrackPiece`, `LevelDef`, `CELL`, `DIR`, `DIR_NAMES`, `OPPOSITE`, `TRACK_PIECES`, `HAND_POOL`, `TILE_POOL`, `tileToPieceId()`, `LEVELS` |
 | Grid.ts | `class Grid`, `CellData`, `cellToWorld()`, `worldToCell()`, `loadTrackAssets()`, `CELL_SIZE_EXPORT`, `CELL_H_EXPORT` |
-| KeyboardHUD.ts | `class KeyboardHUD` — `load()`, `pressKey()`, `releaseKey()`, `update(delta)`, `render(renderer)`, `resize()` |
 | Train.ts | `class Train`, `StepResult`, `StepSuccess`, `StepFailure` |
 | Smoke.ts | `class SmokeSystem` |
 | scene.ts | `createScene(canvas)` → `{ renderer, scene, camera }` |
@@ -100,7 +98,7 @@ interface TrackPiece { id, label, connections: Partial<Record<Direction,Directio
 6. **InputManager** (`src/InputManager.ts`): binds all mouse/keyboard/touch listeners; owns the invisible raycast `PlaneGeometry`. Converts pointer → col/row → delegates to `game.currentState.handle*()` methods.
 7. **State responsibilities**:
    - `TitleState.enter()`: shows overlay; on click → `PlayingState` + audio init.
-   - `PlayingState.update()`: calls `game.doTick()` when `train.lerpT >= 1`. Input handlers place/remove track and update selection.
+   - `PlayingState.update()`: calls `game.doTick()` when `train.lerpT >= 1`. Input handlers place/remove track and update selection. Keyboard: `A`=rotate CCW, `D`=rotate CW, `S`=toggle STRAIGHT↔CURVE.
    - `PausedState`: stores `previousState` for resume. All update/input methods are no-ops.
    - `DeadState.enter()`: starts fall/derail animation, 1.2 s timeout → overlay → reload level 0 → `PlayingState`.
    - `WinState.enter()`: 0.6 s timeout → overlay → load next level → `PlayingState` (or loop from 0).
@@ -108,7 +106,7 @@ interface TrackPiece { id, label, connections: Partial<Record<Direction,Directio
 9. **Tick loop** (rAF-driven): `doTick()` fires inside `Game.animate()` whenever `train.lerpT >= 1`. `Train.step()` returns a `StepResult`; `Game` transitions to `WinState` or `DeadState` accordingly, or accelerates speed.
 10. **Speed model**: `lerpSpeed` starts at `1000 / levelDef.baseSpeed`, multiplied by `SPEED_ACCEL = 1.05` each step, capped at `MAX_SPEED = 4.0`.
 11. **Audio**: `AudioManager.init()` called on first user gesture (inside `TitleState` callback).
-12. **KeyboardHUD**: loads 4 GLB key models, renders via scissor viewport; W/A/S/D key press animations fire from `InputManager`; tile selection only handled in `PlayingState.handleKeyDown()`.
+12. **Action buttons**: Three HTML buttons rendered bottom-center via `.hud__actions` (in `_hud.pug` / `_hud.scss`). `↺ Rotate` (A) and `Rotate ↻` (D) cycle `currentRotation`; `⇄ Swap` (S) toggles `currentTileType` STRAIGHT↔CURVE and resets rotation. Buttons fire the same logic as their keyboard equivalents. `.is-active` CSS class applied on `mousedown`/`touchstart` for press feedback.
 
 ## Grid cell encoding (LevelDef.grid)
 `V`=VOID `F`=FLOOR `R`=pre-built rail (STRAIGHT_NS) `S`=station `T`=train start

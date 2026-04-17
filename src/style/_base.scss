@@ -1,3 +1,6 @@
+@use 'breakpoints' as *;
+@use 'mixins' as *;
+
 *,
 *::before,
 *::after {
@@ -9,17 +12,62 @@
 html,
 body {
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   background: var(--void);
   overflow: hidden;
   font-family: 'Josefin Sans', sans-serif;
   color: var(--cream);
+  font-size: 16px;
+
+  @include respond-to($wide-1300-breakpoint) {
+      font-size: 15px;
+  }
+
+  @include respond-to($wide-1600-breakpoint) {
+      font-size: 17px;
+  }
+
+  @include respond-to($wide-1800-breakpoint) {
+      font-size: 19px;
+  }
+
+  @include respond-to($wide-2000-breakpoint) {
+      font-size:22px;
+  }
+
+  @include respond-to($wide-2500-breakpoint) {
+      font-size: 28px;
+  }
+
+  @include respond-to($wide-3500-breakpoint) {
+      font-size: 40px;
+  }
+
+  @include respond-to-vertical($ultra-small-height-breakpoint) {
+      font-size: 9px;
+  }
+
+  @include respond-to-vertical($small-height-breakpoint) {
+      font-size: 11px;
+  }
+
+  @include respond-to-vertical($medium-height-breakpoint) {
+      font-size: 13px;
+  }
+
+  @include respond-to-vertical($high-height-breakpoint) {
+      font-size: 14px;
+  }
+
+  @include respond-to-vertical($ultra-high-height-breakpoint) {
+      font-size: 16px;
+  }
 }
 
 .game {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
 
   &__canvas {
     display: block;

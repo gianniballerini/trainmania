@@ -82,11 +82,14 @@ export class SettingsUI {
 
   private syncButtons(): void {
     const { audio } = this
-    this.btnMuteAll.textContent    = audio.isAllMuted   ? '🔇 On'  : '🔇 Off'
-    this.btnMuteMusic.textContent  = audio.isMusicMuted ? '🎵 Off' : '🎵 On'
-    this.btnMuteSfx.textContent    = audio.isSfxMuted   ? '🔊 Off' : '🔊 On'
-    this.btnMuteAll.classList.toggle('muted',   audio.isAllMuted)
-    this.btnMuteMusic.classList.toggle('muted', audio.isMusicMuted)
-    this.btnMuteSfx.classList.toggle('muted',   audio.isSfxMuted)
+    const toggle = (btn: HTMLElement, muted: boolean) => {
+      const [imgOn, imgOff] = btn.querySelectorAll<HTMLImageElement>('img')
+      imgOn.classList.toggle('hidden', muted)
+      imgOff.classList.toggle('hidden', !muted)
+      btn.classList.toggle('muted', muted)
+    }
+    toggle(this.btnMuteAll,   audio.isAllMuted)
+    toggle(this.btnMuteMusic, audio.isMusicMuted)
+    toggle(this.btnMuteSfx,   audio.isSfxMuted)
   }
 }

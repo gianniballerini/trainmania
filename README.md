@@ -11,8 +11,13 @@ A browser-based puzzle game built for the **Three.js Journey Challenge 23 — Th
 The catch: the train doesn't wait. Every step it accelerates (`interval × 0.92`, floor 250 ms). Run out of track and you derail.
 
 **Controls**
-- `hover` — ghost-preview a piece on the grid
-- `click` — place the selected card
+- `hover` — ghost-preview the selected piece on the grid
+- `click` — place the selected piece
+- `right-click` — remove a placed piece
+- `↺ Rotate` button (or `A`) — rotate piece counter-clockwise
+- `Rotate ↻` button (or `D`) — rotate piece clockwise
+- `⇄ Swap` button (or `S`) — toggle between Straight and Curve track
+- Drag canvas — orbit camera
 - Select a card from your hand before placing
 
 **Win** — guide the train into the station.
@@ -58,7 +63,7 @@ vite.config.ts         Vite config with custom Pug render plugin
 src/
   Game.ts              Orchestrator — Three.js setup, level loading, tick, render loop
   CameraController.ts  Orbit camera angle, drag handling
-  InputManager.ts      All DOM event listeners, raycasting, state delegation
+  InputManager.ts      All DOM event listeners, raycasting, HTML button wiring, state delegation
   SettingsUI.ts        Settings modal DOM, audio controls
   states/
     IGameState.ts      IGameState interface + BaseGameState base class
@@ -69,14 +74,14 @@ src/
     WinState.ts        "Next Level" / "Play Again" overlay
   views/
     _canvas.pug        .game__canvas
-    _hud.pug           .hud block
+    _hud.pug           .hud block (level, speed bar, settings) + .hud__actions (RotateL, Swap, RotateR buttons)
     _settings-modal.pug .settings block
     _overlay.pug       .overlay block
   style/
     main.scss          SCSS entry — @use all partials
     _variables.scss    CSS custom properties
     _base.scss         Reset, .game, .game__canvas
-    _hud.scss          .hud block
+    _hud.scss          .hud block + .hud__actions + .hud__action-btn
     _overlay.scss      .overlay block
     _settings.scss     .settings block
   Constants.ts         Types, enums, TRACK_PIECES, LEVELS[]
@@ -97,7 +102,7 @@ src/
 2. **State pattern** — `Game.currentState` holds an `IGameState`. `changeState(s)` calls `exit()` on the old state then `enter()` on the new one. Flow: `TitleState → PlayingState ↔ PausedState`, `PlayingState → DeadState | WinState`.
 3. **Game class** — owns all Three.js objects, game entities (`Grid`, `Train`, `SmokeSystem`, station), speed state, selection state, and `levelIndex`. Exposes `loadLevel()`, `doTick()`, `pause()`, `resume()`.
 4. **CameraController** — orbit angle + drag; works in all states.
-5. **InputManager** — binds all DOM events; raycasts the invisible ground plane; delegates to `currentState.handle*()` methods.
+5. **InputManager** — binds all DOM events; raycasts the invisible ground plane; delegates to `currentState.handle*()` methods. Also wires the three HTML action buttons (RotateL, RotateR, Swap) directly to game logic.
 6. **Tick loop** (rAF-driven): `Game.doTick()` fires whenever `train.lerpT >= 1`. `Train.step()` → `WinState` or `DeadState` on outcome; otherwise speed is multiplied by `SPEED_ACCEL = 1.05` (cap `MAX_SPEED = 4.0`).
 7. **Settings** — `SettingsUI.open()` calls `game.pause()`; `close()` calls `game.resume()`.
 

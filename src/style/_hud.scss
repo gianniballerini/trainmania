@@ -1,14 +1,18 @@
+@use 'variables' as *;
+@use 'breakpoints' as *;
+@use 'mixins' as *;
+
 .hud {
   position: absolute;
-  top: 18px;
-  left: 18px;
-  right: 18px;
+  top: 18 * $ptr;
+  left: 18 * $ptr;
+  right: 18 * $ptr;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 12 * $ptr;
   pointer-events: none;
-  width: calc(100% - 36px);
+  width: calc(100% - 36 * $ptr);
 
   &__left {
     display: flex;
@@ -20,19 +24,19 @@
   }
 
   &__level {
-    font-size: 11px;
+    font-size: 11 * $ptr;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 3 * $ptr;
     color: var(--gold);
     text-transform: uppercase;
   }
 
   &__speed-wrap {
-    width: 90px;
-    height: 4px;
+    width: 90 * $ptr;
+    height: 4 * $ptr;
     background: rgba(255, 255, 255, 0.12);
-    border-radius: 2px;
-    margin-top: 4px;
+    border-radius: 2 * $ptr;
+    margin-top: 4 * $ptr;
     overflow: hidden;
   }
 
@@ -40,18 +44,18 @@
     height: 100%;
     width: 0%;
     background: var(--rust);
-    border-radius: 2px;
+    border-radius: 2 * $ptr;
     transition: width 0.3s ease, background 0.3s ease;
   }
 
   &__settings-btn {
     background: rgba(245, 237, 224, 0.08);
-    border: 1px solid rgba(245, 237, 224, 0.2);
-    border-radius: 8px;
+    border: 1 * $ptr solid rgba(245, 237, 224, 0.2);
+    border-radius: 8 * $ptr;
     color: var(--cream);
-    font-size: 18px;
+    font-size: 18 * $ptr;
     line-height: 1;
-    padding: 6px 9px;
+    padding: 6 * $ptr 9 * $ptr;
     cursor: pointer;
     transition: background 0.15s;
     font-family: 'Josefin Sans', sans-serif;
@@ -59,5 +63,85 @@
     &:hover {
       background: rgba(245, 237, 224, 0.18);
     }
+  }
+}
+
+.hud__settings-icon {
+  width: 32 * $ptr;
+  height: 32 * $ptr;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.hud__actions {
+  position: absolute;
+  bottom: 28 * $ptr;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 12 * $ptr;
+  pointer-events: all;
+}
+
+.hud__action-btn {
+  flex: 1;
+  height: 100 * $ptr;
+  padding: 12 * $ptr 18 * $ptr;
+
+  display: flex;
+  flex-direction: column;
+  row-gap: 20 * $ptr;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(245, 237, 224, 0.2);
+  border: 1 * $ptr solid rgba(212, 168, 67, 0.45);
+  border-radius: 10 * $ptr;
+
+  color: var(--cream);
+  font-size: 14 * $ptr;
+  font-weight: 700;
+  letter-spacing: 1.5 * $ptr;
+  text-transform: uppercase;
+  font-family: 'Josefin Sans', sans-serif;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: background 0.12s, transform 0.08s, border-color 0.12s;
+
+  &:hover {
+    background: rgba(212, 168, 67, 0.18);
+    border-color: var(--gold);
+  }
+
+  &.is-active {
+    background: rgba(212, 168, 67, 0.5);
+    border-color: var(--gold);
+    transform: scale(0.93);
+  }
+
+  @include respond-to($medium-breakpoint) {
+    min-width: 96 * $ptr;
+  }
+}
+
+.hud__action-btn-icon {
+  width: 24 * $ptr;
+  height: 24 * $ptr;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 }

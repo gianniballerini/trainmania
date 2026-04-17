@@ -52,15 +52,8 @@ export class PlayingState extends BaseGameState {
   handleKeyDown(game: Game, key: string): void {
     let idx: number
     switch (key) {
-      case 'W':
-        game.currentTileType = 'STRAIGHT';
-        game.currentRotation = 0;
-        idx = Math.floor(Math.random() * 5) + 1
-        game.audioManager.playSfx(`toggle_0${idx}`)
-        game.updateSelectedPiece();
-        break
       case 'S':
-        game.currentTileType = 'CURVE';
+        game.currentTileType = game.currentTileType === 'STRAIGHT' ? 'CURVE' : 'STRAIGHT'
         game.currentRotation = 0;
         idx = Math.floor(Math.random() * 5) + 1
         game.audioManager.playSfx(`toggle_0${idx}`)

@@ -58,25 +58,57 @@ export class InputManager {
   private bindEvents(): void {
     const { canvas, game, cam } = this
 
+    // ── Action helpers (shared by keyboard, mouse, touch, HUD buttons) ────
+    const rotateL = document.querySelector<HTMLElement>('.hud__rotate-btn--left')
+    const rotateR = document.querySelector<HTMLElement>('.hud__rotate-btn--right')
+    const swapBtn = document.querySelector<HTMLElement>('.hud__swap-btn')
+
+    const withActive = (el: HTMLElement, fn: () => void) => {
+      el.classList.add('is-active')
+      fn()
+      const clear = () => el.classList.remove('is-active')
+      el.addEventListener('mouseup',    clear, { once: true })
+      el.addEventListener('mouseleave', clear, { once: true })
+      el.addEventListener('touchend',   clear, { once: true })
+    }
+
+    const doRotateL = () => {
+      game.currentRotation = (game.currentRotation + 3) % 4
+      game.updateSelectedPiece()
+      const idx = Math.floor(Math.random() * 3) + 1
+      game.audioManager.playSfx(`rotate_0${idx}`)
+    }
+    const doRotateR = () => {
+      game.currentRotation = (game.currentRotation + 1) % 4
+      game.updateSelectedPiece()
+      const idx = Math.floor(Math.random() * 3) + 1
+      game.audioManager.playSfx(`rotate_0${idx}`)
+    }
+    const doSwap = () => {
+      game.currentTileType = game.currentTileType === 'STRAIGHT' ? 'CURVE' : 'STRAIGHT'
+      game.currentRotation = 0
+      game.updateSelectedPiece()
+      const idx = Math.floor(Math.random() * 5) + 1
+      game.audioManager.playSfx(`toggle_0${idx}`)
+    }
+
     // ── Keyboard ─────────────────────────────────────────────────────────
+    const flashBtn = (el: HTMLElement | null) => {
+      if (!el) return
+      el.classList.add('is-active')
+      setTimeout(() => el.classList.remove('is-active'), 150)
+    }
+
     window.addEventListener('keydown', (e) => {
-      const k = e.key.toUpperCase()
-      if (k === 'W' || k === 'A' || k === 'S' || k === 'D') {
-        game.keyboardHUD.pressKey(k as 'W' | 'A' | 'S' | 'D')
-      }
-      game.currentState.handleKeyDown(game, k)
-    })
+      const key = e.key.toUpperCase()
+      game.currentState.handleKeyDown(game, key)
 
-    window.addEventListener('keyup', (e) => {
-      const k = e.key.toUpperCase()
-      if (k === 'W' || k === 'A' || k === 'S' || k === 'D') {
-        game.keyboardHUD.releaseKey(k as 'W' | 'A' | 'S' | 'D')
-      }
+      if (key === 'A') flashBtn(rotateL)
+      else if (key === 'D') flashBtn(rotateR)
+      else if (key === 'S') flashBtn(swapBtn)
     })
-
-    // ── Camera orbit ──────────────────────────────────────────────────────
     canvas.addEventListener('mousedown', (e) => {
-      if (e.button !== 0 && e.button !== 1 && e.button !== 2) return
+      if (e.button !== 0) return
       cam.startDrag(e.clientX, e.clientY)
       canvas.style.cursor = 'grabbing'
       e.preventDefault()
@@ -120,14 +152,19 @@ export class InputManager {
       game.currentState.handleClick(game, hit.col, hit.row, cell)
     })
 
-    // ── Remove track ──────────────────────────────────────────────────────
+    // ── Middle click → rotate ─────────────────────────────────────────────
+    canvas.addEventListener('mousedown', (e) => {
+      if (e.button !== 1) return
+      e.preventDefault()
+      doRotateR()
+      flashBtn(rotateR)
+    })
+
+    // ── Right click → swap ────────────────────────────────────────────────
     canvas.addEventListener('contextmenu', (e) => {
       e.preventDefault()
-      if (cam.isPastThreshold(e.clientX, e.clientY)) return
-      this.setPointerNDC(e.clientX, e.clientY)
-      const hit = this.hitTestGrid()
-      if (!hit) return
-      game.currentState.handleRightClick(game, hit.col, hit.row)
+      doSwap()
+      flashBtn(swapBtn)
     })
 
     // ── Touch ─────────────────────────────────────────────────────────────
@@ -138,7 +175,18 @@ export class InputManager {
       canvas.dispatchEvent(synth)
     }, { passive: false })
 
-    // ── Resize ────────────────────────────────────────────────────────────
-    window.addEventListener('resize', () => game.keyboardHUD.resize())
+    // ── HTML action buttons ───────────────────────────────────────────────
+    if (rotateL) {
+      rotateL.addEventListener('mousedown', () => withActive(rotateL, doRotateL))
+      rotateL.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(rotateL, doRotateL) }, { passive: false })
+    }
+    if (rotateR) {
+      rotateR.addEventListener('mousedown', () => withActive(rotateR, doRotateR))
+      rotateR.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(rotateR, doRotateR) }, { passive: false })
+    }
+    if (swapBtn) {
+      swapBtn.addEventListener('mousedown', () => withActive(swapBtn, doSwap))
+      swapBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(swapBtn, doSwap) }, { passive: false })
+    }
   }
 }

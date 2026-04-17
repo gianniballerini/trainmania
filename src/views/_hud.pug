@@ -4,4 +4,20 @@
     .hud__speed-wrap
       .hud__speed-bar
   .hud__right
-    button.hud__settings-btn(title='Settings') ⚙️
+    button.hud__settings-btn(title='Settings')
+      .hud__settings-icon
+        img(src='/images/icons/gear.png', alt='Settings')
+
+.hud__actions
+  button.hud__action-btn.hud__rotate-btn--left(title='Rotate Left (A)')
+    .hud__action-btn-icon
+      img(src='/images/icons/arrow_counterclockwise.png', alt='Rotate Left')
+    .span Rotate
+  button.hud__action-btn.hud__swap-btn(title='Swap Track (S)')
+    .hud__action-btn-icon
+      img(src='/images/icons/arrow_reserve.png', alt='Swap Track')
+    .span Swap
+  button.hud__action-btn.hud__rotate-btn--right(title='Rotate Right (D)')
+    .hud__action-btn-icon
+      img(src='/images/icons/arrow_clockwise.png', alt='Rotate Right')
+    .span Rotate

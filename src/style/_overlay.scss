@@ -1,3 +1,7 @@
+@use 'variables' as *;
+@use 'breakpoints' as *;
+@use 'mixins' as *;
+
 .overlay {
   position: absolute;
   inset: 0;
@@ -5,7 +9,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(14, 12, 24, 0.7);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(4 * $ptr);
   transition: opacity 0.3s;
 
   &.hidden {
@@ -15,41 +19,47 @@
   &__box {
     background: var(--cream);
     color: var(--brown);
-    border-radius: 16px;
-    padding: 40px 52px;
+    border-radius: 16 * $ptr;
+    width: 90%;
+    padding: 16 * $ptr 8 * $ptr;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    gap: 12 * $ptr;
+    box-shadow: 0 24 * $ptr 80 * $ptr rgba(0, 0, 0, 0.5);
+
+    @include respond-to($medium-breakpoint) {
+      padding: 16 * $ptr 8 * $ptr;
+      width: fit-content;
+    }
   }
 
   &__title {
-    font-size: 32px;
+    font-size: 32 * $ptr;
     font-weight: 700;
-    letter-spacing: 4px;
+    letter-spacing: 4 * $ptr;
     text-transform: uppercase;
   }
 
   &__sub {
-    font-size: 13px;
-    letter-spacing: 2px;
+    font-size: 13 * $ptr;
+    letter-spacing: 2 * $ptr;
     opacity: 0.6;
     text-transform: uppercase;
   }
 
   &__btn {
-    margin-top: 12px;
-    padding: 12px 36px;
+    margin-top: 12 * $ptr;
+    padding: 12 * $ptr 36 * $ptr;
     background: var(--rust);
     color: var(--cream);
     border: none;
-    border-radius: 8px;
+    border-radius: 8 * $ptr;
     font-family: 'Josefin Sans', sans-serif;
-    font-size: 12px;
+    font-size: 12 * $ptr;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 3 * $ptr;
     text-transform: uppercase;
     cursor: pointer;
     transition: background 0.15s, transform 0.1s;

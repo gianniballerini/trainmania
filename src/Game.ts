@@ -4,7 +4,6 @@ import { CameraController } from './CameraController.js'
 import { LEVELS, PieceId, tileToPieceId, TileType } from './Constants.js'
 import { Grid, loadTrackAssets } from './Grid.js'
 import { InputManager } from './InputManager.js'
-import { KeyboardHUD } from './KeyboardHUD.js'
 import { createScene } from './scene.js'
 import { SettingsUI } from './SettingsUI.js'
 import { SmokeSystem } from './Smoke.js'
@@ -54,7 +53,7 @@ export class Game {
 
   // ── Managers ──────────────────────────────────────────────────────────────
   readonly audioManager:     AudioManager
-  readonly keyboardHUD:      KeyboardHUD
+
   readonly cameraController: CameraController
 
   // ── State machine ─────────────────────────────────────────────────────────
@@ -75,7 +74,6 @@ export class Game {
     this.levelNum = document.querySelector<HTMLElement>('.hud__level-num')!
 
     this.audioManager     = new AudioManager()
-    this.keyboardHUD      = new KeyboardHUD()
     this.cameraController = new CameraController()
     this.cameraController.updateOrbit(camera)
 
@@ -84,7 +82,6 @@ export class Game {
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   async boot(): Promise<void> {
-    await this.keyboardHUD.load()
     this.levelIndex = 0
     await this.loadLevel(0)
 
@@ -199,7 +196,5 @@ export class Game {
     if (flag) flag.rotation.y = Math.sin(now * 0.003) * 0.3
 
     this.renderer.render(this.scene, this.camera)
-    this.keyboardHUD.update(delta)
-    this.keyboardHUD.render(this.renderer)
   }
 }
