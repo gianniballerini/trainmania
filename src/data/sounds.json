@@ -1,0 +1,22 @@
+[
+  { "name": "impactMining_000",      "path": "/assets/sound/impactMining_000.webm",      "volume": 1.0 },
+  { "name": "impactMining_001",      "path": "/assets/sound/impactMining_001.webm",      "volume": 1.0 },
+  { "name": "impactMining_002",      "path": "/assets/sound/impactMining_002.webm",      "volume": 1.0 },
+  { "name": "impactMining_003",      "path": "/assets/sound/impactMining_003.webm",      "volume": 1.0 },
+  { "name": "impactMining_004",      "path": "/assets/sound/impactMining_004.webm",      "volume": 1.0 },
+  { "name": "impactPlate_000",       "path": "/assets/sound/impactPlate_medium_000.webm","volume": 1.0 },
+  { "name": "impactPlate_001",       "path": "/assets/sound/impactPlate_medium_001.webm","volume": 1.0 },
+  { "name": "impactPlate_002",       "path": "/assets/sound/impactPlate_medium_002.webm","volume": 1.0 },
+  { "name": "impactPlate_003",       "path": "/assets/sound/impactPlate_medium_003.webm","volume": 1.0 },
+  { "name": "impactPlate_004",       "path": "/assets/sound/impactPlate_medium_004.webm","volume": 1.0 },
+  { "name": "whistle",               "path": "/assets/sound/whistle.webm",               "volume": 1.0 },
+  { "name": "loose",            "path": "/assets/sound/loose.webm",            "volume": 1.0 },
+  { "name": "rotate_01",            "path": "/assets/sound/creak1.webm",            "volume": 1.0 },
+  { "name": "rotate_02",            "path": "/assets/sound/creak2.webm",            "volume": 1.0 },
+  { "name": "rotate_03",            "path": "/assets/sound/creak3.webm",            "volume": 1.0 },
+  { "name": "toggle_00",            "path": "/assets/sound/impactGlass_medium_000.webm",            "volume": 1.0 },
+  { "name": "toggle_01",            "path": "/assets/sound/impactGlass_medium_001.webm",            "volume": 1.0 },
+  { "name": "toggle_02",            "path": "/assets/sound/impactGlass_medium_002.webm",            "volume": 1.0 },
+  { "name": "toggle_03",            "path": "/assets/sound/impactGlass_medium_003.webm",            "volume": 1.0 },
+  { "name": "toggle_04",            "path": "/assets/sound/impactGlass_medium_004.webm",            "volume": 1.0 }
+]

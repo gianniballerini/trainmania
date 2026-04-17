@@ -8,6 +8,7 @@ import { TitleState } from './TitleState.js'
 export class WinState extends BaseGameState {
   enter(game: Game): void {
     setTimeout(() => {
+      game.audioManager.playSfx('whistle')
       const hasNext = game.levelIndex + 1 < LEVELS.length
       showOverlay(
         '🚉 ARRIVED',

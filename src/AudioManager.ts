@@ -3,10 +3,19 @@
  *
  * Music: sequential playlist via HTMLAudioElement (streams efficiently).
  * SFX:   one-shot playback via Web Audio API (precise, low-latency).
+ *       Call `preloadSfx()` at startup to decode and cache all buffers.
+ *       Then call `playSfx(name)` for instant zero-latency playback.
  *
  * Browser autoplay policy: call `init()` from inside a user gesture handler
  * before attempting to play anything.
  */
+
+export interface SoundDef {
+  name:    string
+  path:    string
+  volume?: number
+}
+
 export class AudioManager {
   // ── State ──────────────────────────────────────────────────────────────────
   private _musicVolume = 0.5
@@ -24,6 +33,7 @@ export class AudioManager {
   // ── Web Audio (SFX) ───────────────────────────────────────────────────────
   private _ctx: AudioContext | null = null
   private _sfxGain: GainNode | null = null
+  private _sfxCache = new Map<string, { buffer: AudioBuffer; volume: number }>()
 
   // ── Init (call once from first user gesture) ───────────────────────────────
   init(): void {
@@ -60,6 +70,17 @@ export class AudioManager {
     this._audioEl.src = ''
   }
 
+  /**
+   * Immediately switch to a new playlist, replacing whatever is playing.
+   */
+  switchMusic(tracks: string[]): void {
+    this._musicStarted = false
+    this._audioEl.pause()
+    this._audioEl.src = ''
+    this._tracks       = []
+    this.playMusic(tracks)
+  }
+
   setMusicVolume(value: number): void {
     this._musicVolume        = clamp01(value)
     this._audioEl.volume     = this._effectiveMusicVolume()
@@ -76,23 +97,43 @@ export class AudioManager {
   // ── SFX ───────────────────────────────────────────────────────────────────
 
   /**
-   * Play a one-shot sound effect. Requires `init()` to have been called.
-   * @param url Path to the audio file (e.g. '/assets/sound/click.webm')
+   * Decode and cache all SFX buffers up-front. Call once at startup (after
+   * `init()`) so that `playSfx()` is instant and allocation-free at runtime.
    */
-  async playSfx(url: string): Promise<void> {
+  async preloadSfx(defs: SoundDef[]): Promise<void> {
+    if (!this._ctx) return
+    await Promise.all(defs.map(async (def) => {
+      try {
+        const response = await fetch(def.path)
+        const arrayBuf = await response.arrayBuffer()
+        const audioBuf = await this._ctx!.decodeAudioData(arrayBuf)
+        this._sfxCache.set(def.name, { buffer: audioBuf, volume: def.volume ?? 1 })
+      } catch {
+        // Non-critical — silently ignore missing SFX files
+      }
+    }))
+  }
+
+  /**
+   * Play a cached sound effect by name (see `preloadSfx`).
+   * Requires `init()` and `preloadSfx()` to have been called first.
+   */
+  playSfx(name: string): void {
     if (!this._ctx || !this._sfxGain) return
     if (this._mutedAll || this._mutedSfx) return
-    try {
-      const response = await fetch(url)
-      const arrayBuf = await response.arrayBuffer()
-      const audioBuf = await this._ctx.decodeAudioData(arrayBuf)
-      const source   = this._ctx.createBufferSource()
-      source.buffer  = audioBuf
+    const entry = this._sfxCache.get(name)
+    if (!entry) return
+    const source  = this._ctx.createBufferSource()
+    source.buffer = entry.buffer
+    if (entry.volume !== 1) {
+      const gain        = this._ctx.createGain()
+      gain.gain.value   = entry.volume
+      source.connect(gain)
+      gain.connect(this._sfxGain)
+    } else {
       source.connect(this._sfxGain)
-      source.start(0)
-    } catch {
-      // Non-critical — silently ignore missing SFX files
     }
+    source.start(0)
   }
 
   setSfxVolume(value: number): void {

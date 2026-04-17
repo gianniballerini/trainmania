@@ -1,6 +1,15 @@
 // Directions as vectors [col, row]
 export type Direction = 'N' | 'S' | 'E' | 'W'
 
+export const BACKGROUND_TRACKS = [
+  '/assets/sound/background_01.webm',
+  '/assets/sound/background_02.webm',
+]
+
+export const GAME_OVER_TRACKS = [
+  '/assets/sound/game_over.webm',
+]
+
 export type PieceId =
   | 'STRAIGHT_NS'
   | 'STRAIGHT_EW'

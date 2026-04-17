@@ -1,7 +1,7 @@
 const overlay = document.querySelector<HTMLElement>('.overlay')!
 const title   = document.querySelector<HTMLElement>('.overlay__title')!
 const sub     = document.querySelector<HTMLElement>('.overlay__sub')!
-const btn     = document.querySelector<HTMLElement>('.overlay__btn')!
+let   btn     = document.querySelector<HTMLElement>('.overlay__btn')!
 
 export function showOverlay(
   titleText: string,
@@ -11,17 +11,17 @@ export function showOverlay(
 ): void {
   title.textContent = titleText
   sub.textContent   = subText
-  btn.textContent   = btnText
   overlay.classList.remove('hidden')
 
-  // Remove previous listener
+  // Replace node to drop any previous click listener, then update live reference
   const newBtn = btn.cloneNode(true) as HTMLElement
-  btn.replaceWith(newBtn)
   newBtn.textContent = btnText
-  document.querySelector<HTMLElement>('.overlay__btn')!.addEventListener('click', () => {
+  btn.replaceWith(newBtn)
+  btn = newBtn
+  btn.addEventListener('click', () => {
     hideOverlay()
     onBtn()
-  })
+  }, { once: true })
 }
 
 export function hideOverlay(): void {

@@ -1,3 +1,5 @@
+import { BACKGROUND_TRACKS } from '../Constants.js'
+import soundDefs from '../data/sounds.json'
 import type { Game } from '../Game.js'
 import { showOverlay } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
@@ -11,10 +13,8 @@ export class TitleState extends BaseGameState {
       'Start Game',
       () => {
         game.audioManager.init()
-        game.audioManager.playMusic([
-          '/assets/sound/background_01.webm',
-          '/assets/sound/background_02.webm',
-        ])
+        game.audioManager.preloadSfx(soundDefs)
+        game.audioManager.playMusic(BACKGROUND_TRACKS)
         game.changeState(new PlayingState())
       },
     )
