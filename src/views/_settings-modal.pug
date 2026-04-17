@@ -24,15 +24,7 @@
             tr
               td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
                 .settings__icon.settings__icon--large
-                  img(src='/images/icons/key_a_black.png', alt='Mute All')
-                span /
-                .settings__icon
-                  img(src='/images/icons/arrow_counterclockwise.png', alt='Rotate Left')
-              td Rotate left
-            tr
-              td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
-                .settings__icon.settings__icon--large
-                  img(src='/images/icons/key_s_black.png', alt='Rotate Left')
+                  img(src='/images/icons/key_a_black.png', alt='Swap')
                 span /
                 .settings__icon
                   img(src='/images/icons/arrow_reserve.png', alt='Swap Track')
@@ -40,11 +32,14 @@
             tr
               td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
                 .settings__icon.settings__icon--large
-                  img(src='/images/icons/key_a_black.png', alt='Mute All')
+                  img(src='/images/icons/key_s_black.png', alt='Rotate')
                 span /
                 .settings__icon
-                  img(src='/images/icons/arrow_clockwise.png', alt='Rotate Right')
-              td Rotate right
+                  img(src='/images/icons/arrow_clockwise.png', alt='Rotate')
+              td Rotate tile
+            tr
+              td: kbd Enter
+              td Place tile
             tr
               td
                 .settings__icon.settings__icon--large
