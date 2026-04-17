@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
-import { CELL, LEVELS, PieceId, tileToPieceId, TileType } from './Constants.js'
+import { CELL, DIR, LEVELS, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
 import { Grid, loadTrackAssets } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { createScene } from './scene.js'
@@ -173,15 +173,89 @@ export class Game {
     }
   }
 
-  /** Place the ghost on the first available empty tile (used on mobile / after placement). */
+  /** Place the ghost on the next free tile along the track ahead of the train. */
   showDefaultGhost(): void {
     if (!this.grid || !this.selectedPiece) return
-    const cell = this.grid.cells.find(
-      c => c.type !== CELL.VOID && c.type !== CELL.STATION && c.type !== CELL.START && c.trackPiece === null,
-    )
+    const cell = this._findNextFreeTileAlongTrack()
     if (!cell) return
     this.lastHoveredCell = { col: cell.col, row: cell.row }
     this.grid.showGhost(cell.col, cell.row, this.selectedPiece)
+  }
+
+  /**
+   * Walk the laid track from the train's current position/direction until the
+   * path runs out, then return the first empty floor tile ahead.  If that tile
+   * is not placeable, BFS outward from the track-end for the closest free tile.
+   */
+  private _findNextFreeTileAlongTrack(): { col: number; row: number } | null {
+    if (!this.grid || !this.train) return null
+
+    let col = this.train.col
+    let row = this.train.row
+    let dir = this.train.dir
+
+    // Follow existing track pieces to find where the path ends
+    for (;;) {
+      const [dc, dr] = DIR[dir]
+      const nc = col + dc
+      const nr = row + dr
+      const cell = this.grid.getCell(nc, nr)
+
+      // Off-grid → stop
+      if (!cell) break
+
+      // Empty placeable floor → ideal target
+      if (this._isPlaceable(cell)) return { col: nc, row: nr }
+
+      // Cell has a track piece → traverse it and keep walking
+      if (cell.trackPiece) {
+        const piece = TRACK_PIECES[cell.trackPiece]
+        const entryFrom = OPPOSITE[dir]
+        const exitDir = piece.connections[entryFrom]
+        if (!exitDir) break // can't enter this piece from this side
+        col = nc
+        row = nr
+        dir = exitDir
+        continue
+      }
+
+      // Non-placeable cell (void / station / start) → stop walking
+      break
+    }
+
+    // BFS from the track-end position to find the closest placeable tile
+    return this._bfsClosestFree(col, row)
+  }
+
+  /** BFS outward from (startCol, startRow) returning the nearest placeable cell. */
+  private _bfsClosestFree(startCol: number, startRow: number): { col: number; row: number } | null {
+    if (!this.grid) return null
+    const visited = new Set<string>()
+    const queue: [number, number][] = [[startCol, startRow]]
+    visited.add(`${startCol},${startRow}`)
+
+    while (queue.length > 0) {
+      const [c, r] = queue.shift()!
+      const cell = this.grid.getCell(c, r)
+      if (cell && this._isPlaceable(cell)) return { col: c, row: r }
+
+      for (const [dc, dr] of Object.values(DIR)) {
+        const nc = c + dc
+        const nr = r + dr
+        const key = `${nc},${nr}`
+        if (visited.has(key)) continue
+        visited.add(key)
+        if (this.grid.getCell(nc, nr)) queue.push([nc, nr])
+      }
+    }
+    return null
+  }
+
+  private _isPlaceable(cell: { type: string; trackPiece: unknown }): boolean {
+    return cell.type !== CELL.VOID
+        && cell.type !== CELL.STATION
+        && cell.type !== CELL.START
+        && cell.trackPiece === null
   }
 
   updateSpeedBar(t: number): void {

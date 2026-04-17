@@ -32,6 +32,7 @@ export class PlayingState extends BaseGameState {
       game.currentRotation = 0          // ← reset rotation
       game.updateSelectedPiece()        // ← refresh ghost/selected piece
       game.grid.hideGhost()
+      game.showDefaultGhost()
       const idx = Math.floor(Math.random() * 5).toString().padStart(3, '0')
       game.audioManager.playSfx(`impactMining_${idx}`)
     }
