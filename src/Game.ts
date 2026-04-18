@@ -14,6 +14,7 @@ import { PausedState } from './states/PausedState.js'
 import { PlayingState } from './states/PlayingState.js'
 import { TitleState } from './states/TitleState.js'
 import { WinState } from './states/WinState.js'
+import { initUiSfx } from './ui.js'
 import { buildStation } from './Station.js'
 import { Train } from './Train.js'
 
@@ -96,6 +97,7 @@ export class Game {
     // InputManager and SettingsUI created after level is ready (scene/objects in place)
     new InputManager(this.canvas, this, this.cameraController)
     new SettingsUI(this.audioManager, this)
+    initUiSfx(this.audioManager)
 
     this.changeState(new TitleState())
     this.startRenderLoop()

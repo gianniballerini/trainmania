@@ -19,6 +19,7 @@ export class PlayingState extends BaseGameState {
     if (cell && cell.type !== CELL.VOID) {
       game.lastHoveredCell = { col, row }
       game.grid.showGhost(col, row, game.selectedPiece)
+      this._playGhostSfx(game)
     } else {
       game.lastHoveredCell = null
       game.grid.hideGhost()
@@ -65,6 +66,7 @@ export class PlayingState extends BaseGameState {
         idx = Math.floor(Math.random() * 3) + 1
         game.audioManager.playSfx(`rotate_0${idx}`)
         break
+      case " ":
       case 'ENTER': {
         const cell = game.lastHoveredCell
         if (cell) game.currentState.handleClick(game, cell.col, cell.row, game.grid?.getCell(cell.col, cell.row) ?? null)
@@ -93,6 +95,12 @@ export class PlayingState extends BaseGameState {
     const cell = game.grid.getCell(col, row)
     if (!cell || cell.type === CELL.VOID) return
     game.lastHoveredCell = { col, row }
+    this._playGhostSfx(game)
     game.grid.showGhost(col, row, game.selectedPiece)
+  }
+
+  private _playGhostSfx(game: Game): void {
+    const idx = Math.floor(Math.random() * 2)
+    game.audioManager.playSfx(`drop_0${idx}`)
   }
 }

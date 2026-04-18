@@ -18,5 +18,8 @@
   { "name": "toggle_01",            "path": "/assets/sound/impactGlass_medium_001.webm",            "volume": 1.0 },
   { "name": "toggle_02",            "path": "/assets/sound/impactGlass_medium_002.webm",            "volume": 1.0 },
   { "name": "toggle_03",            "path": "/assets/sound/impactGlass_medium_003.webm",            "volume": 1.0 },
-  { "name": "toggle_04",            "path": "/assets/sound/impactGlass_medium_004.webm",            "volume": 1.0 }
+  { "name": "toggle_04",            "path": "/assets/sound/impactGlass_medium_004.webm",            "volume": 1.0 },
+  { "name": "drop_00",            "path": "/assets/sound/drop_002.webm",            "volume": 1.0 },
+  { "name": "drop_01",            "path": "/assets/sound/drop_003.webm",            "volume": 1.0 },
+  { "name": "click",            "path": "/assets/sound/bong_001.webm",            "volume": 1.0 }
 ]

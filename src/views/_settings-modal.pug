@@ -1,12 +1,12 @@
 .settings.hidden
   .settings__box
-    button.settings__close ✕
+    button.settings__close(data-sfx-click) ✕
 
     //- Left tab rail
     .settings__tabs
-      button.settings__tab.active(data-tab='help') Help
-      button.settings__tab(data-tab='sound') Sound
-      button.settings__tab(data-tab='credits') Credits
+      button.settings__tab.active(data-tab='help' data-sfx-click) Help
+      button.settings__tab(data-tab='sound' data-sfx-click) Sound
+      button.settings__tab(data-tab='credits' data-sfx-click) Credits
 
     //- Tab content
     .settings__content

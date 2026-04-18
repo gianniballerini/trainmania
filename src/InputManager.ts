@@ -114,7 +114,7 @@ export class InputManager {
 
       if (key === 'A') flashBtn(swapBtn)
       else if (key === 'S') flashBtn(rotateBtn)
-      else if (key === 'ENTER') flashBtn(placeBtn)
+      else if (key === 'ENTER' || key === ' ') flashBtn(placeBtn)
     })
     canvas.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return
