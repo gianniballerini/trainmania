@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
 import { CELL, DIR, LEVELS, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
-import { Grid, loadTrackAssets } from './Grid.js'
+import { cellToWorld, Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { createScene } from './scene.js'
 import { SettingsUI } from './SettingsUI.js'
@@ -14,9 +14,9 @@ import { PausedState } from './states/PausedState.js'
 import { PlayingState } from './states/PlayingState.js'
 import { TitleState } from './states/TitleState.js'
 import { WinState } from './states/WinState.js'
-import { initUiSfx } from './ui.js'
-import { buildStation } from './Station.js'
+import { tileRegistry } from './tiles/index.js'
 import { Train } from './Train.js'
+import { hideLoadingScreen, initUiSfx, showLoadingScreen, updateLoadingProgress } from './ui.js'
 
 // ── Speed constants ───────────────────────────────────────────────────────────
 const SPEED_ACCEL = 1.05
@@ -91,6 +91,21 @@ export class Game {
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   async boot(): Promise<void> {
+    // Loading screen — shown immediately while assets load.
+    // Total = 1 tile per registered tile + 1 for the train model.
+    showLoadingScreen()
+    const totalAssets = tileRegistry.size + 1
+    let loadedAssets  = 0
+
+    await tileRegistry.preloadAll(() => {
+      loadedAssets++
+      updateLoadingProgress(loadedAssets, totalAssets)
+    })
+
+    await Train.preload()
+    loadedAssets++
+    updateLoadingProgress(loadedAssets, totalAssets)
+
     this.levelIndex = 0
     await this.loadLevel(0)
 
@@ -99,6 +114,7 @@ export class Game {
     new SettingsUI(this.audioManager, this)
     initUiSfx(this.audioManager)
 
+    hideLoadingScreen()
     this.changeState(new TitleState())
     this.startRenderLoop()
   }
@@ -138,12 +154,15 @@ export class Game {
     this.levelNum.textContent = String(levelDef.id)
     this.updateSpeedBar(0)
 
-    await loadTrackAssets()
     this.grid         = new Grid(this.scene, levelDef)
     this.train        = new Train(this.scene, this.grid)
     this.train.lerpSpeed = this.lerpSpeed
     this.smoke        = new SmokeSystem(this.scene)
-    this.stationGroup = buildStation(this.scene, this.grid)
+
+    const [sc, sr]    = levelDef.stationPos
+    const stationPos  = cellToWorld(sc, sr, LEVELS[idx].grid[0].length, LEVELS[idx].grid.length)
+    this.stationGroup = tileRegistry.get('STATION').build(stationPos)
+    this.scene.add(this.stationGroup)
 
     this.cameraController.reset(this.camera)
     this.updateSelectedPiece()

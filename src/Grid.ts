@@ -1,30 +1,8 @@
 import * as THREE from 'three'
-import { loadModelAsset, warnAssetLoadFailureOnce } from './Assets.js'
-import { CELL, CellType, Direction, LevelDef, PieceId } from './Constants.js'
+import { CELL, CellType, LevelDef, PieceId } from './Constants.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
 import hoverVert from './shaders/hover.vert.glsl?raw'
-
-const TRACK_ASSET = {
-  modelUrl: '/assets/models/track.glb',
-  targetFootprint: 2.0,  // fill the cell
-  yOffset: 0,
-  rotationY: 0,
-  castShadow: true,
-  receiveShadow: true,
-}
-
-const TRACK_CURVE_ASSET = {
-  modelUrl: '/assets/models/track_curve_03.glb',
-  targetFootprint: 2.0,
-  yOffset: 0,
-  rotationY: 0,
-  castShadow: true,
-  receiveShadow: true,
-}
-
-let trackModel: THREE.Group | null = null
-let curveModel: THREE.Group | null = null
-let trackModelLoaded = false
+import { tileRegistry } from './tiles/index.js'
 
 const CELL_SIZE  = 2.0   // world units per cell
 const CELL_H     = 0.5   // cube height
@@ -38,29 +16,6 @@ const MAT = {
   station: new THREE.MeshLambertMaterial({ color: 0xd4a843 }),   // gold
   start:   new THREE.MeshLambertMaterial({ color: 0x5a7aaa }),   // slate blue
   ghost:   new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false }),
-}
-
-// Rail track visual materials
-const RAIL_MAT     = new THREE.MeshLambertMaterial({ color: 0x5c3d2e }) // dark brown sleepers
-const RAIL_TIE_MAT = new THREE.MeshLambertMaterial({ color: 0x8b6040 }) // lighter wood ties
-const RAIL_STEEL   = new THREE.MeshLambertMaterial({ color: 0xaaaaaa }) // steel rail
-
-// Suppress unused warning – kept for potential future use
-void RAIL_MAT
-
-export async function loadTrackAssets(): Promise<void> {
-  if (trackModelLoaded) return
-  trackModelLoaded = true
-  try {
-    trackModel = await loadModelAsset(TRACK_ASSET)
-  } catch (error) {
-    warnAssetLoadFailureOnce('track model', TRACK_ASSET.modelUrl, error)
-  }
-  try {
-    curveModel = await loadModelAsset(TRACK_CURVE_ASSET)
-  } catch (error) {
-    warnAssetLoadFailureOnce('curve track model', TRACK_CURVE_ASSET.modelUrl, error)
-  }
 }
 
 export interface CellData {
@@ -232,127 +187,16 @@ export class Grid {
 
   _buildTrackVisual(cell: CellData, pieceId: PieceId): void {
     const pos = cellToWorld(cell.col, cell.row, this.cols, this.rows)
-    const group = new THREE.Group()
-    group.position.set(pos.x, 0.02, pos.z)
 
-    const TW = CELL_SIZE * 0.7  // track width region
-    const RAIL_W  = 0.08
-    const RAIL_H  = 0.06
-    const TIE_W   = 0.12
-    const TIE_H   = 0.04
-    const TIE_L   = CELL_SIZE * 0.36
-
-    const addStraightNS = () => {
-      if (trackModel) {
-        const clone = trackModel.clone()
-        clone.rotation.y = 0
-        group.add(clone)
-        return
-      }
-      // Fallback: procedural rails
-      const railGeo = new THREE.BoxGeometry(RAIL_W, RAIL_H, TW)
-      const r1 = new THREE.Mesh(railGeo, RAIL_STEEL)
-      r1.position.set(-CELL_SIZE * 0.13, RAIL_H / 2, 0)
-      const r2 = r1.clone()
-      r2.position.set( CELL_SIZE * 0.13, RAIL_H / 2, 0)
-      group.add(r1, r2)
-
-      // Ties
-      const tieGeo = new THREE.BoxGeometry(TIE_L, TIE_H, TIE_W * 0.5)
-      for (let i = -2; i <= 2; i++) {
-        const t = new THREE.Mesh(tieGeo, RAIL_TIE_MAT)
-        t.position.set(0, TIE_H / 2, i * (TW / 5))
-        group.add(t)
-      }
-    }
-
-    const addStraightEW = () => {
-      if (trackModel) {
-        const clone = trackModel.clone()
-        clone.rotation.y = Math.PI / 2
-        group.add(clone)
-        return
-      }
-      // Fallback: procedural rails
-      const railGeo = new THREE.BoxGeometry(TW, RAIL_H, RAIL_W)
-      const r1 = new THREE.Mesh(railGeo, RAIL_STEEL)
-      r1.position.set(0, RAIL_H / 2, -CELL_SIZE * 0.13)
-      const r2 = r1.clone()
-      r2.position.set(0, RAIL_H / 2,  CELL_SIZE * 0.13)
-      group.add(r1, r2)
-
-      const tieGeo = new THREE.BoxGeometry(TIE_W * 0.5, TIE_H, TIE_L)
-      for (let i = -2; i <= 2; i++) {
-        const t = new THREE.Mesh(tieGeo, RAIL_TIE_MAT)
-        t.position.set(i * (TW / 5), TIE_H / 2, 0)
-        group.add(t)
-      }
-    }
-
-    // Curve model assumed to be oriented CURVE_NE (N→E) at rotationY=0
-    const CURVE_ROTATION: Record<string, number> = {
-      'NE': 0,
-      'EN': 0,
-      'SE': -Math.PI / 2,
-      'ES': -Math.PI / 2,
-      'SW': Math.PI,
-      'WS': Math.PI,
-      'NW': Math.PI / 2,
-      'WN': Math.PI / 2,
-    }
-
-    const addCurve = (fromDir: Direction, toDir: Direction) => {
-      if (curveModel) {
-        const clone = curveModel.clone()
-        clone.rotation.y = CURVE_ROTATION[fromDir + toDir] ?? 0
-        group.add(clone)
-        return
-      }
-
-      // Fallback: procedural rails
-      const dirVec: Record<Direction, [number, number]> = {
-        N: [0, -1], S: [0, 1], E: [1, 0], W: [-1, 0],
-      }
-      const s = CELL_SIZE / 2
-
-      const [ex, ez]   = dirVec[fromDir]
-      const [ex2, ez2] = dirVec[toDir]
-
-      const OFFSETS = [-0.13, 0.13]
-      OFFSETS.forEach(off => {
-        const perpEntry: [number, number] = [ez * off, ex * off]
-        const perpExit:  [number, number] = [ez2 * off, ex2 * off]
-
-        const pts = [
-          new THREE.Vector3((ex * s) + perpEntry[0] * CELL_SIZE, RAIL_H, (ez * s) + perpEntry[1] * CELL_SIZE),
-          new THREE.Vector3(perpEntry[0] * CELL_SIZE * 0.5, RAIL_H, perpEntry[1] * CELL_SIZE * 0.5),
-          new THREE.Vector3(perpExit[0] * CELL_SIZE * 0.5, RAIL_H, perpExit[1] * CELL_SIZE * 0.5),
-          new THREE.Vector3((ex2 * s) + perpExit[0] * CELL_SIZE, RAIL_H, (ez2 * s) + perpExit[1] * CELL_SIZE),
-        ]
-
-        const curve = new THREE.CatmullRomCurve3(pts)
-        const tubeGeo = new THREE.TubeGeometry(curve, 8, RAIL_W / 2, 4, false)
-        group.add(new THREE.Mesh(tubeGeo, RAIL_STEEL))
-      })
-
-      for (let i = 0; i <= 3; i++) {
-        const t = i / 3
-        const cx = (ex * s) * (1 - t) + (ex2 * s) * t
-        const cz = (ez * s) * (1 - t) + (ez2 * s) * t
-        const tieGeo = new THREE.BoxGeometry(TIE_L * 0.8, TIE_H, TIE_W * 0.5)
-        const tie = new THREE.Mesh(tieGeo, RAIL_TIE_MAT)
-        tie.position.set(cx * 0.5, TIE_H / 2, cz * 0.5)
-        group.add(tie)
-      }
-    }
-
+    let group: THREE.Group
     switch (pieceId) {
-      case 'STRAIGHT_NS': addStraightNS(); break
-      case 'STRAIGHT_EW': addStraightEW(); break
-      case 'CURVE_NE':    addCurve('N', 'E'); break
-      case 'CURVE_NW':    addCurve('N', 'W'); break
-      case 'CURVE_SE':    addCurve('S', 'E'); break
-      case 'CURVE_SW':    addCurve('S', 'W'); break
+      case 'STRAIGHT_NS': group = tileRegistry.get('STRAIGHT').build(pos, 0);             break
+      case 'STRAIGHT_EW': group = tileRegistry.get('STRAIGHT').build(pos, Math.PI / 2);  break
+      case 'CURVE_NE':    group = tileRegistry.get('CURVE').build(pos, 0);                break
+      case 'CURVE_SE':    group = tileRegistry.get('CURVE').build(pos, -Math.PI / 2);    break
+      case 'CURVE_SW':    group = tileRegistry.get('CURVE').build(pos, Math.PI);          break
+      case 'CURVE_NW':    group = tileRegistry.get('CURVE').build(pos, Math.PI / 2);     break
+      default:            group = new THREE.Group(); break
     }
 
     this.railGroup.add(group)

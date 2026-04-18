@@ -11,6 +11,9 @@ const TRAIN_ASSET = {
   rotationY: 0,
 }
 
+// Cached after Train.preload() resolves.
+let _preloadedModel: import('three').Group | null = null
+
 export interface StepSuccess {
   ok: true
   won?: true
@@ -78,7 +81,23 @@ export class Train {
     this._addHeadlights()
     this._snapToCell()
     this.group.scale.setScalar(1.5)
-    void this._tryLoadAssetVisual()
+
+    // Use the preloaded model if available (synchronous clone); fall back to
+    // async load for cases where Train.preload() was not called first.
+    if (_preloadedModel) {
+      this.group.add(_preloadedModel.clone())
+    } else {
+      void this._tryLoadAssetVisual()
+    }
+  }
+
+  /** Call once before constructing any Train instances to warm the asset cache. */
+  static async preload(): Promise<void> {
+    try {
+      _preloadedModel = await loadModelAsset(TRAIN_ASSET)
+    } catch (err) {
+      warnAssetLoadFailureOnce('train asset', TRAIN_ASSET.modelUrl, err)
+    }
   }
 
   _addHeadlights(): void {
@@ -102,7 +121,8 @@ export class Train {
   async _tryLoadAssetVisual(): Promise<void> {
     try {
       const assetModel = await loadModelAsset(TRAIN_ASSET)
-      this.group.add(assetModel)
+      _preloadedModel = assetModel
+      this.group.add(assetModel.clone())
     } catch (error) {
       warnAssetLoadFailureOnce('train asset', TRAIN_ASSET.modelUrl, error)
     }
