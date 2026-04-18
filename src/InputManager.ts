@@ -43,6 +43,15 @@ export class InputManager {
     }
   }
 
+  /** Raycast against the train group → true if hit. */
+  private hitTestTrain(): boolean {
+    if (!this.game.train) return false
+    this.raycaster.setFromCamera(this.pointer, this.game.camera)
+    const hits: THREE.Intersection[] = []
+    this.raycaster.intersectObject(this.game.train.group, true, hits)
+    return hits.length > 0
+  }
+
   /** Raycast the invisible ground plane → col/row, or null on miss. */
   private hitTestGrid(): { col: number; row: number } | null {
     if (!this.game.grid) return null
@@ -143,6 +152,19 @@ export class InputManager {
     canvas.addEventListener('click', (e) => {
       if (cam.isPastThreshold(e.clientX, e.clientY)) return
       this.setPointerNDC(e.clientX, e.clientY)
+
+      // Click on train → toggle follow, deselect ghost
+      if (this.hitTestTrain()) {
+        game.followTrain = !game.followTrain
+        if (game.followTrain) {
+          game.lastHoveredCell = null
+          game.grid?.hideGhost()
+        }
+        return
+      }
+
+      // Click on grid → cancel train follow
+      game.followTrain = false
       const hit = this.hitTestGrid()
       if (!hit) return
       const cell = game.grid?.getCell(hit.col, hit.row) ?? null
@@ -200,6 +222,19 @@ export class InputManager {
       }
       cam.endDrag()
       this.setPointerNDC(touch.clientX, touch.clientY)
+
+      // Tap on train → toggle follow, deselect ghost
+      if (this.hitTestTrain()) {
+        game.followTrain = !game.followTrain
+        if (game.followTrain) {
+          game.lastHoveredCell = null
+          game.grid?.hideGhost()
+        }
+        return
+      }
+
+      // Tap on grid → cancel train follow
+      game.followTrain = false
       const hit = this.hitTestGrid()
       if (!hit) return
       const cell = game.grid?.getCell(hit.col, hit.row) ?? null

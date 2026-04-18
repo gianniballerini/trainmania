@@ -53,6 +53,7 @@ export class Game {
 
   // ── Input ─────────────────────────────────────────────────────────────────
   isTouchMode = false
+  followTrain = false
 
   // ── Managers ──────────────────────────────────────────────────────────────
   readonly audioManager:     AudioManager
@@ -298,10 +299,16 @@ export class Game {
     if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
     if (this.grid) this.grid.updateHover(now * 0.001)
 
-    // Lerp camera look target toward ghost tile or grid center
-    const ghost = this.grid?.ghostMesh
-    const goalX = ghost ? ghost.position.x : 0
-    const goalZ = ghost ? ghost.position.z : 0
+    // Lerp camera look target: train follow > ghost tile > grid center
+    let goalX = 0
+    let goalZ = 0
+    if (this.followTrain && this.train) {
+      goalX = this.train.group.position.x
+      goalZ = this.train.group.position.z
+    } else {
+      const ghost = this.grid?.ghostMesh
+      if (ghost) { goalX = ghost.position.x; goalZ = ghost.position.z }
+    }
     this.cameraController.setGoalTarget(new THREE.Vector3(goalX, 0, goalZ))
     this.cameraController.tick(delta)
     this.cameraController.updateOrbit(this.camera)
