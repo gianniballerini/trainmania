@@ -15,6 +15,7 @@ const MAT = {
   rail:    new THREE.MeshLambertMaterial({ color: 0xc8a86a }),   // sandy track bed
   station: new THREE.MeshLambertMaterial({ color: 0xd4a843 }),   // gold
   start:   new THREE.MeshLambertMaterial({ color: 0x5a7aaa }),   // slate blue
+  rock:    new THREE.MeshLambertMaterial({ color: 0x8a7a6a }),   // grey-brown rock base
   ghost:   new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false }),
 }
 
@@ -103,6 +104,7 @@ export class Grid {
         const raw = grid[row][col]
         const isVoid        = raw === 'V'
         const isPrebuiltRail = raw === 'R'
+        const isRock        = raw === 'X'
         const isStation     = stationPos[0] === col && stationPos[1] === row
         const isStart       = trainStart[0] === col && trainStart[1] === row
 
@@ -110,6 +112,7 @@ export class Grid {
                              : isStation ? CELL.STATION
                              : isStart   ? CELL.START
                              : isPrebuiltRail ? CELL.RAIL
+                             : isRock    ? CELL.ROCK
                              : CELL.FLOOR
 
         const cell: CellData = {
@@ -125,6 +128,7 @@ export class Grid {
         const mat = isStation ? MAT.station
                   : isStart   ? MAT.start
                   : isPrebuiltRail ? MAT.rail
+                  : isRock    ? MAT.rock
                   : (col + row) % 2 === 0 ? MAT.floor : MAT.floor2
 
         const mesh = new THREE.Mesh(geo, mat)
@@ -140,6 +144,11 @@ export class Grid {
 
         if (isPrebuiltRail && cell.trackPiece) {
           this._buildTrackVisual(cell, cell.trackPiece)
+        }
+
+        if (isRock && tileRegistry.has('ROCK')) {
+          const rockGroup = tileRegistry.get('ROCK').build(pos)
+          this.meshes.add(rockGroup)
         }
       }
     }
@@ -157,7 +166,7 @@ export class Grid {
 
   placeTrack(col: number, row: number, pieceId: PieceId): boolean {
     const cell = this.getCell(col, row)
-    if (!cell || cell.type === CELL.VOID || cell.type === CELL.STATION || cell.type === CELL.START) return false
+    if (!this._trackPlaceable(col, row)) return false
     if (cell.trackPiece) this._removeTrackVisual(cell)
     cell.trackPiece = pieceId
     cell.type = CELL.RAIL
@@ -173,6 +182,20 @@ export class Grid {
     cell.trackPiece = null
     cell.type = CELL.FLOOR
     return true
+  }
+
+  _trackPlaceable(col: number, row: number): boolean {
+    const cell = this.getCell(col, row)
+    if (!cell) return false
+    switch (cell.type) {
+      case CELL.VOID:
+      case CELL.STATION:
+      case CELL.START:
+      case CELL.ROCK:
+        return false
+      default:
+        return true
+    }
   }
 
   _removeTrackVisual(cell: CellData): void {

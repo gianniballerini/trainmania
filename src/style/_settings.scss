@@ -27,8 +27,26 @@
     min-height: 50vh;
 
     display: flex;
+    flex-direction: column;
     overflow: hidden;
     box-shadow: 0 24 * $ptr 80 * $ptr rgba(0, 0, 0, 0.6);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1 * $ptr solid rgba(245, 237, 224, 0.12);
+
+    min-height: 50 * $ptr;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+  }
+
+  &__body {
+    display: flex;
   }
 
   &__close {

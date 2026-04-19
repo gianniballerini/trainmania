@@ -61,6 +61,8 @@ export class Game {
 
   readonly cameraController: CameraController
 
+  settingsUI: SettingsUI | undefined
+
   // ── State machine ─────────────────────────────────────────────────────────
   currentState: BaseGameState = new BaseGameState()
 
@@ -111,7 +113,7 @@ export class Game {
 
     // InputManager and SettingsUI created after level is ready (scene/objects in place)
     new InputManager(this.canvas, this, this.cameraController)
-    new SettingsUI(this.audioManager, this)
+    this.settingsUI = new SettingsUI(this.audioManager, this)
     initUiSfx(this.audioManager)
 
     hideLoadingScreen()

@@ -9,6 +9,10 @@ export class TileRegistry {
     this.tiles.set(tile.id, tile)
   }
 
+  has(id: string): boolean {
+    return this.tiles.has(id)
+  }
+
   get(id: string): TileBase {
     const tile = this.tiles.get(id)
     if (!tile) throw new Error(`[TileRegistry] No tile registered for id "${id}"`)

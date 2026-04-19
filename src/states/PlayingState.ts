@@ -72,6 +72,9 @@ export class PlayingState extends BaseGameState {
         if (cell) game.currentState.handleClick(game, cell.col, cell.row, game.grid?.getCell(cell.col, cell.row) ?? null)
         break
       }
+      case 'ESCAPE':
+        game.settingsUI?.open()
+        break
       case 'ARROWUP':
         this._moveGhost(game, 0, -1)
         break

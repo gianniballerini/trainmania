@@ -18,7 +18,7 @@ export type PieceId =
   | 'CURVE_SE'
   | 'CURVE_SW'
 
-export type CellType = 'VOID' | 'FLOOR' | 'RAIL' | 'STATION' | 'START'
+export type CellType = 'VOID' | 'FLOOR' | 'RAIL' | 'STATION' | 'START' | 'ROCK'
 
 export const DIR: Record<Direction, [number, number]> = {
   N: [0, -1],
@@ -109,6 +109,7 @@ export const CELL = {
   RAIL:    'RAIL',
   STATION: 'STATION',
   START:   'START',
+  ROCK:   'ROCK'
 } as const
 
 // Level definitions: grid (row array of col strings), trainStart [col,row], trainDir
@@ -124,6 +125,7 @@ export interface LevelDef {
 
 const _ = 'F' // floor shorthand
 const R = 'R' // prebuilt straight rail
+const X = 'X' // rock (unbuildable obstacle)
 export const LEVELS: LevelDef[] = [
   {
     // Level 1 — simple 7×7 square island
@@ -132,7 +134,7 @@ export const LEVELS: LevelDef[] = [
       [_, _, _, _, _, _, _],
       [_, _, _, R, _, _, _],
       [_, _, _, R, _, _, _],
-      [_, _, _, R, _, _, _],
+      [_, _, _, _, _, _, _],
       [_, _, _, _, _, _, _],
       [_, _, _, _, _, _, _],
       [_, _, _, _, _, _, _],
@@ -143,8 +145,24 @@ export const LEVELS: LevelDef[] = [
     baseSpeed: 5000,       // ms between steps
   },
   {
-    // Level 2 — L-shaped island
     id: 2,
+    grid: [
+      [_, _, _, _, _, _, _],
+      [_, _, _, R, _, _, _],
+      [_, _, _, R, _, _, _],
+      [_, _, _, _, _, _, _],
+      [_, _, _, X, _, _, _],
+      [_, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _],
+    ],
+    trainStart: [3, 0],   // col 3, row 0
+    trainDir:   'S',      // heading south
+    stationPos: [3, 6],
+    baseSpeed: 5000,       // ms between steps
+  },
+  {
+    // Level 2 — L-shaped island
+    id: 3,
     grid: [
       [_, _, _, _, 'V', 'V', 'V'],
       [_, R, _, _, 'V', 'V', 'V'],
@@ -161,7 +179,7 @@ export const LEVELS: LevelDef[] = [
   },
   {
     // Level 3 — cross-shaped island, narrower paths
-    id: 3,
+    id: 4,
     grid: [
       ['V', 'V', _, _, _, 'V', 'V'],
       ['V', 'V', _, R, _, 'V', 'V'],

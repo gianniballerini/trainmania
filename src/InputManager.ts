@@ -109,7 +109,7 @@ export class InputManager {
 
     window.addEventListener('keydown', (e) => {
       const key = e.key.toUpperCase()
-      if (['ARROWUP', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT'].includes(key)) e.preventDefault()
+      if (['ARROWUP', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ESCAPE'].includes(key)) e.preventDefault()
       game.currentState.handleKeyDown(game, key)
 
       if (key === 'A') flashBtn(swapBtn)

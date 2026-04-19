@@ -8,7 +8,6 @@
   left: 18 * $ptr;
   right: 18 * $ptr;
   display: flex;
-  align-items: center;
   justify-content: space-between;
   gap: 12 * $ptr;
   pointer-events: none;
@@ -24,7 +23,6 @@
   }
 
   &__right {
-    pointer-events: all;
   }
 
   &__level {
@@ -104,13 +102,10 @@
     background: rgba(245, 237, 224, 0.08);
     border: 1 * $ptr solid rgba(245, 237, 224, 0.2);
     border-radius: 8 * $ptr;
-    color: var(--cream);
-    font-size: 18 * $ptr;
-    line-height: 1;
-    padding: 6 * $ptr 9 * $ptr;
+    padding: 5 * $ptr;
     cursor: pointer;
+    pointer-events: all;
     transition: background 0.15s;
-    font-family: 'Josefin Sans', sans-serif;
 
     &:hover {
       background: rgba(245, 237, 224, 0.18);

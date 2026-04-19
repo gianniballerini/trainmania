@@ -1,109 +1,112 @@
 .settings.hidden
   .settings__box
     button.settings__close(data-sfx-click) ✕
+    .settings__header
+      .settings__title Paused
+    .settings__body
 
-    //- Left tab rail
-    .settings__tabs
-      button.settings__tab.active(data-tab='help' data-sfx-click) Help
-      button.settings__tab(data-tab='sound' data-sfx-click) Sound
-      button.settings__tab(data-tab='credits' data-sfx-click) Credits
+      //- Left tab rail
+      .settings__tabs
+        button.settings__tab.active(data-tab='help' data-sfx-click) Help
+        button.settings__tab(data-tab='sound' data-sfx-click) Sound
+        button.settings__tab(data-tab='credits' data-sfx-click) Credits
 
-    //- Tab content
-    .settings__content
+      //- Tab content
+      .settings__content
 
-      //- HELP TAB
-      .settings__panel.settings__panel--help.active
-        h2.settings__heading How to Play
-        p.settings__body.
-          Place track tiles on the grid before the train reaches a gap.
-          The train speeds up as it moves — plan ahead!
+        //- HELP TAB
+        .settings__panel.settings__panel--help.active
+          h2.settings__heading How to Play
+          p.settings__body.
+            Place track tiles on the grid before the train reaches a gap.
+            The train speeds up as it moves — plan ahead!
 
-        h2.settings__heading(style='margin-top:20px') Controls
-        table.key-table
-          tbody
-            tr
-              td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
-                .settings__icon.settings__icon--large
-                  img(src='/images/icons/key_a_black.png', alt='Swap')
-                span /
-                .settings__icon
-                  img(src='/images/icons/arrow_reserve.png', alt='Swap Track')
-              td Swap (Straight/Curve)
-            tr
-              td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
-                .settings__icon.settings__icon--large
-                  img(src='/images/icons/key_s_black.png', alt='Rotate')
-                span /
-                .settings__icon
-                  img(src='/images/icons/arrow_clockwise.png', alt='Rotate')
-              td Rotate tile
-            tr
-              td: kbd Enter
-              td Place tile
-            tr
-              td
-                .settings__icon.settings__icon--large
-                  img(src='/images/icons/mouse_left.png', alt='Rotate Right')
-              td Place tile
-            tr
-              td
-                .settings__icon.settings__icon--large
-                  img(src='/images/icons/mouse_right.png', alt='Rotate Right')
-              td Swap tile
-            tr
-              td
-                .settings__icon.settings__icon--large
-                  img(src='/images/icons/mouse_middle.png', alt='Rotate Right')
-              td Rotate tile
-            tr
-              td: kbd Click + Drag
-              td Orbit camera
+          h2.settings__heading(style='margin-top:20px') Controls
+          table.key-table
+            tbody
+              tr
+                td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
+                  .settings__icon.settings__icon--large
+                    img(src='/images/icons/key_a_black.png', alt='Swap')
+                  span /
+                  .settings__icon
+                    img(src='/images/icons/arrow_reserve.png', alt='Swap Track')
+                td Swap (Straight/Curve)
+              tr
+                td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
+                  .settings__icon.settings__icon--large
+                    img(src='/images/icons/key_s_black.png', alt='Rotate')
+                  span /
+                  .settings__icon
+                    img(src='/images/icons/arrow_clockwise.png', alt='Rotate')
+                td Rotate tile
+              tr
+                td: kbd Enter
+                td Place tile
+              tr
+                td
+                  .settings__icon.settings__icon--large
+                    img(src='/images/icons/mouse_left.png', alt='Rotate Right')
+                td Place tile
+              tr
+                td
+                  .settings__icon.settings__icon--large
+                    img(src='/images/icons/mouse_right.png', alt='Rotate Right')
+                td Swap tile
+              tr
+                td
+                  .settings__icon.settings__icon--large
+                    img(src='/images/icons/mouse_middle.png', alt='Rotate Right')
+                td Rotate tile
+              tr
+                td: kbd Click + Drag
+                td Orbit camera
 
-      //- SOUND TAB
-      .settings__panel.settings__panel--sound
-        h2.settings__heading Sound
+        //- SOUND TAB
+        .settings__panel.settings__panel--sound
+          h2.settings__heading Sound
 
-        .settings__sound-row
-          span.settings__sound-label Mute all
-          button.settings__mute-all.settings__toggle
-            .settings__icon
-              img(src='/images/icons/audioOn.png', alt='Mute All')
-              img.hidden(src='/images/icons/audioOff.png', alt='Unmute All')
+          .settings__sound-row
+            span.settings__sound-label Mute all
+            button.settings__mute-all.settings__toggle
+              .settings__icon
+                img(src='/images/icons/audioOn.png', alt='Mute All')
+                img.hidden(src='/images/icons/audioOff.png', alt='Unmute All')
 
-        .settings__sound-row
-          span.settings__sound-label Music
-          button.settings__mute-music.settings__toggle
-            .settings__icon
-              img(src='/images/icons/musicOn.png', alt='Music On')
-              img.hidden(src='/images/icons/musicOff.png', alt='Music Off')
-        .settings__sound-row.settings__sound-row--indent
-          span.settings__vol-label Volume
-          input.settings__music-slider.settings__vol-slider(type='range' min='0' max='1' step='0.01' value='0.5')
+          .settings__sound-row
+            span.settings__sound-label Music
+            button.settings__mute-music.settings__toggle
+              .settings__icon
+                img(src='/images/icons/musicOn.png', alt='Music On')
+                img.hidden(src='/images/icons/musicOff.png', alt='Music Off')
+          .settings__sound-row.settings__sound-row--indent
+            span.settings__vol-label Volume
+            input.settings__music-slider.settings__vol-slider(type='range' min='0' max='1' step='0.01' value='0.5')
 
-        .settings__sound-row
-          span.settings__sound-label Sound Effects
-          button.settings__mute-sfx.settings__toggle
-            .settings__icon
-              img(src='/images/icons/audioOn.png', alt='Sound Effects On')
-              img.hidden(src='/images/icons/audioOff.png', alt='Sound Effects Off')
-        .settings__sound-row.settings__sound-row--indent
-          span.settings__vol-label Volume
-          input.settings__sfx-slider.settings__vol-slider(type='range' min='0' max='1' step='0.01' value='0.7')
+          .settings__sound-row
+            span.settings__sound-label Sound Effects
+            button.settings__mute-sfx.settings__toggle
+              .settings__icon
+                img(src='/images/icons/audioOn.png', alt='Sound Effects On')
+                img.hidden(src='/images/icons/audioOff.png', alt='Sound Effects Off')
+          .settings__sound-row.settings__sound-row--indent
+            span.settings__vol-label Volume
+            input.settings__sfx-slider.settings__vol-slider(type='range' min='0' max='1' step='0.01' value='0.7')
 
-      //- CREDITS TAB
-      .settings__panel.settings__panel--credits
-        h2.settings__heading Credits
-        table.key-table
-          tbody
-            tr
-              td: a(href='https://gianniballerini.dev/' target='_blank' rel='noopener noreferrer') Gianni Ballerini
-              td Game development
-            tr
-              td: a(href='https://kenney.nl/' target='_blank' rel='noopener noreferrer') Kenney.nl
-              td 3D &amp; game assets
-            tr
-              td: a(href='https://suno.com/' target='_blank' rel='noopener noreferrer') Suno
-              td Music
-            tr
-              td: a(href='https://santiagocolombo.com/' target='_blank' rel='noopener noreferrer') Santiago Colombo
-              td 3D asset support
+        //- CREDITS TAB
+        .settings__panel.settings__panel--credits
+          h2.settings__heading Credits
+          table.key-table
+            tbody
+              tr
+                td: a(href='https://gianniballerini.dev/' target='_blank' rel='noopener noreferrer') Gianni Ballerini
+                td Game development
+              tr
+                td: a(href='https://kenney.nl/' target='_blank' rel='noopener noreferrer') Kenney.nl
+                td 3D &amp; game assets
+              tr
+                td: a(href='https://suno.com/' target='_blank' rel='noopener noreferrer') Suno
+                td Music
+              tr
+                td: a(href='https://santiagocolombo.com/' target='_blank' rel='noopener noreferrer') Santiago Colombo
+                td 3D asset support
