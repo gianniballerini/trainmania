@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
-import { CELL, DIR, LEVELS, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
+import { CELL, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
 import { cellToWorld, Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
+import { LEVELS } from './levels/Level.js'
 import { createScene } from './scene.js'
 import { SettingsUI } from './SettingsUI.js'
 import { SmokeSystem } from './Smoke.js'
@@ -41,7 +42,6 @@ export class Game {
   // ── Speed ─────────────────────────────────────────────────────────────────
   lerpSpeed = 1
   baseSpeed = 1
-  stepCount = 0
 
   // ── Track selection ───────────────────────────────────────────────────────
   selectedPiece:   PieceId | null = null
@@ -148,7 +148,6 @@ export class Game {
     if (this.stationGroup) this.scene.remove(this.stationGroup)
 
     const levelDef     = LEVELS[idx]
-    this.stepCount     = 0
     this.baseSpeed     = 1000 / levelDef.baseSpeed
     this.lerpSpeed     = this.baseSpeed
     this.lastHoveredCell = null
@@ -176,7 +175,6 @@ export class Game {
     if (!this.train) return
 
     const result = this.train.step()
-    this.stepCount++
 
     this.lerpSpeed = Math.min(MAX_SPEED, this.lerpSpeed * SPEED_ACCEL)
     this.train.lerpSpeed = this.lerpSpeed

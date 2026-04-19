@@ -1,5 +1,6 @@
-import { BACKGROUND_TRACKS, GAME_OVER_TRACKS, LEVELS } from '../Constants.js'
+import { BACKGROUND_TRACKS, GAME_OVER_TRACKS } from '../Constants.js'
 import type { Game } from '../Game.js'
+import { LEVELS } from '../levels/Level.js'
 import { showOverlay } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
 import { PlayingState } from './PlayingState.js'
@@ -20,7 +21,7 @@ export class DeadState extends BaseGameState {
 
     setTimeout(() => {
       showOverlay(
-        this.derailed ? '💨 DERAILED' : '🌀 FELL OFF',
+        this.derailed ? 'DERAILED' : 'FELL OFF',
         `level ${LEVELS[game.levelIndex].id} — starting over`,
         'Restart',
         async () => {

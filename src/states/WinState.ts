@@ -1,5 +1,5 @@
-import { LEVELS } from '../Constants.js'
 import type { Game } from '../Game.js'
+import { LEVELS } from '../levels/Level.js'
 import { showOverlay } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
 import { PlayingState } from './PlayingState.js'

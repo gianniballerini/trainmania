@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { CELL, CellType, LevelDef, PieceId } from './Constants.js'
+import { CELL, CellType, PieceId } from './Constants.js'
+import type { Level } from './levels/Level.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
 import hoverVert from './shaders/hover.vert.glsl?raw'
 import { tileRegistry } from './tiles/index.js'
@@ -52,7 +53,7 @@ export const CELL_H_EXPORT    = CELL_H
 
 export class Grid {
   scene: THREE.Scene
-  level: LevelDef
+  level: Level
   cols: number
   rows: number
   cells: CellData[]
@@ -63,7 +64,7 @@ export class Grid {
   hoverMesh: THREE.Mesh | null
   private readonly hoverMat: THREE.ShaderMaterial
 
-  constructor(scene: THREE.Scene, levelDef: LevelDef) {
+  constructor(scene: THREE.Scene, levelDef: Level) {
     this.scene     = scene
     this.level     = levelDef
     this.cols      = levelDef.grid[0].length
@@ -101,10 +102,10 @@ export class Grid {
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        const raw = grid[row][col]
-        const isVoid        = raw === 'V'
-        const isPrebuiltRail = raw === 'R'
-        const isRock        = raw === 'X'
+        const gridCell     = grid[row][col]
+        const isVoid        = gridCell.type === CELL.VOID
+        const isPrebuiltRail = gridCell.type === CELL.RAIL
+        const isRock        = gridCell.type === CELL.ROCK
         const isStation     = stationPos[0] === col && stationPos[1] === row
         const isStart       = trainStart[0] === col && trainStart[1] === row
 
@@ -117,7 +118,7 @@ export class Grid {
 
         const cell: CellData = {
           col, row, type,
-          trackPiece: isPrebuiltRail ? 'STRAIGHT_NS' : null,
+          trackPiece: isPrebuiltRail ? (gridCell.prebuiltPiece ?? null) : null,
           mesh: null,
           prebuilt: isPrebuiltRail,
         }
