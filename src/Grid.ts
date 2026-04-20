@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { CELL, CellType, PieceId } from './Constants.js'
 import type { Level } from './levels/Level.js'
+import { Settings } from './Settings.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
 import hoverVert from './shaders/hover.vert.glsl?raw'
 import { tileRegistry } from './tiles/index.js'
@@ -11,13 +12,13 @@ const GAP        = 0.06  // gap between cells
 
 // Materials
 const MAT = {
-  floor:   new THREE.MeshLambertMaterial({ color: 0x7a9e6a }),   // moss green
-  floor2:  new THREE.MeshLambertMaterial({ color: 0x6b8f5a }),   // alt moss
-  rail:    new THREE.MeshLambertMaterial({ color: 0xc8a86a }),   // sandy track bed
-  station: new THREE.MeshLambertMaterial({ color: 0xd4a843 }),   // gold
-  start:   new THREE.MeshLambertMaterial({ color: 0x5a7aaa }),   // slate blue
-  rock:    new THREE.MeshLambertMaterial({ color: 0x8a7a6a }),   // grey-brown rock base
-  ghost:   new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false }),
+  floor:   new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.floor) }),   // moss green
+  floor2:  new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.floor2) }),   // alt moss
+  rail:    new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.rail) }),   // sandy track bed
+  station: new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.station) }),   // gold
+  start:   new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.start) }),   // slate blue
+  rock:    new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.rock) }),   // grey-brown rock base
+  ghost:   new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.ghost), transparent: true, opacity: 0.25, depthWrite: false }),
 }
 
 export interface CellData {
@@ -306,6 +307,16 @@ export class Grid {
 
   updateHover(time: number): void {
     this.hoverMat.uniforms.time.value = time
+  }
+
+  updateColors(): void {
+    MAT.floor.color.set(Settings.colors.floor)
+    MAT.floor2.color.set(Settings.colors.floor2)
+    MAT.rail.color.set(Settings.colors.rail)
+    MAT.station.color.set(Settings.colors.station)
+    MAT.start.color.set(Settings.colors.start)
+    MAT.rock.color.set(Settings.colors.rock)
+    MAT.ghost.color.set(Settings.colors.ghost)
   }
 
   dispose(): void {

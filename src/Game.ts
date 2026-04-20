@@ -6,7 +6,7 @@ import { cellToWorld, Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { LEVELS } from './levels/Level.js'
 import { createScene } from './scene.js'
-// import { SceneController } from './SceneController.js'
+import { SceneController } from './SceneController.js'
 import { SettingsUI } from './SettingsUI.js'
 import { SmokeSystem } from './Smoke.js'
 import { buildStarfield } from './Stars.js'
@@ -65,7 +65,7 @@ export class Game {
 
   readonly audioManager!:     AudioManager
   readonly cameraController!: CameraController
-  // readonly sceneController!:  SceneController
+  readonly sceneController!:  SceneController
 
   settingsUI: SettingsUI | undefined
 
@@ -84,7 +84,7 @@ export class Game {
     this.scene    = scene
     this.camera   = camera
 
-    // this.sceneController = new SceneController(scene)
+    this.sceneController = new SceneController(scene)
 
     buildStarfield(scene)
 

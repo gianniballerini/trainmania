@@ -53,10 +53,10 @@ export function createScene(canvas: HTMLElement | null): {
   scene.add(fill)
 
   // Rect area light — pointing down from y=5
-  const rectLight = new THREE.RectAreaLight(0xffeedd, 4, 6, 6)
-  rectLight.position.set(0, 5, 0)
-  rectLight.rotation.x = -Math.PI / 2
-  scene.add(rectLight)
+  // const rectLight = new THREE.RectAreaLight(0xffeedd, 7, 6, 6)
+  // rectLight.position.set(0, 4, 0)
+  // rectLight.rotation.x = -Math.PI / 2
+  // scene.add(rectLight)
 
   // Resize handler
   window.addEventListener('resize', () => {
