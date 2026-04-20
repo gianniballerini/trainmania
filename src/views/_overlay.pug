@@ -11,4 +11,13 @@
     .overlay__sub
     .overlay__train-picker.hidden
       .overlay__train-picker__strip
-    button.overlay__btn(data-sfx-click)
+    .button.overlay__btn(data-sfx-click)
+      span
+
+.train-picker-modal.hidden
+  .train-picker-modal__box
+    button.train-picker-modal__close(data-sfx-click) ✕
+    h2.train-picker-modal__title Choose Train
+    .train-picker-modal__strip
+    .button.train-picker-modal__confirm(data-sfx-click)
+      span Change

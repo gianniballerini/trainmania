@@ -7,15 +7,21 @@
 
       //- Left tab rail
       .settings__tabs
-        button.settings__tab.active(data-tab='help' data-sfx-click) Help
+        button.settings__tab.active(data-tab='gameplay' data-sfx-click) Gameplay
         button.settings__tab(data-tab='sound' data-sfx-click) Sound
+        button.settings__tab(data-tab='help' data-sfx-click) Help
         button.settings__tab(data-tab='credits' data-sfx-click) Credits
 
       //- Tab content
       .settings__content
 
+        .settings__panel.settings__panel--gameplay.active
+          h2.settings__heading Gameplay
+          .button.settings__btn.settings__change-train(data-sfx-click)
+            span Change Train
+
         //- HELP TAB
-        .settings__panel.settings__panel--help.active
+        .settings__panel.settings__panel--help
           h2.settings__heading How to Play
           p.settings__body.
             Place track tiles on the grid before the train reaches a gap.

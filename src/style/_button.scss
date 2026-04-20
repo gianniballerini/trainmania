@@ -1,4 +1,11 @@
+@use 'variables' as *;
+
 .button {
     pointer-events: all;
     cursor: pointer;
+
+    span {
+      display: block;
+      margin-bottom: -4 * $ptr;
+    }
 }
