@@ -12,6 +12,15 @@
       .hud__settings-icon
         img(src='/images/icons/gear.png', alt='Settings')
 
+.hud__countdown-container.hidden
+  .hud__countdown
+    .hud__countdown-text
+      | Train will depart in:
+      span.hud__countdown-val
+      | s
+  .button.hud__countdown-button
+    img(src='/images/icons/fastForward.png', alt='Skip Countdown')
+
 .hud__actions
   .hud__actions-left
     button.hud__action-btn.hud__action-btn--swap.hud__action-btn--left-up(title='Swap Track')

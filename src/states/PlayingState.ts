@@ -5,10 +5,41 @@ import { cellToWorld } from '../Grid.js'
 import { BaseGameState } from './IGameState.js'
 
 export class PlayingState extends BaseGameState {
-  update(game: Game): void {
-    if (game.train && game.train.lerpT >= 1) {
-      game.doTick()
+  private countdown = 10;
+  private countdownActive = true;
+
+  enter(game: Game): void {
+    game.updateCountdown(this.countdown);
+    game.setSpeedBtnEnabled(this.countdownActive);
+  }
+
+  update(game: Game, delta: number): void {
+    if (this.countdownActive) {
+
+      this.countdown -= delta;
+      if (this.countdown > 0)
+      {
+        game.updateCountdown(Math.ceil(this.countdown));
+        game.setSpeedBtnEnabled(false);
+        return;
+      } else {
+        this.countdownActive = false;
+        game.updateCountdown(null);
+        game.setSpeedBtnEnabled(true);
+      }
     }
+    if (game.train && game.train.lerpT >= 1) {
+      game.doTick();
+    }
+  }
+
+  skipCountdown(game: Game): void {
+    this.countdown = 0
+  }
+
+  exit(game: Game): void {
+    game.updateCountdown(null);
+    game.setSpeedBtnEnabled(true);
   }
 
   handlePointerMove(game: Game, col: number, row: number, cell: CellData | null): void {

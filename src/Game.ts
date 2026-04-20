@@ -32,6 +32,10 @@ export class Game {
   // ── HUD DOM ────────────────────────────────────────────────────────────────
   private readonly speedBar: HTMLElement
   private readonly levelNum: HTMLElement
+  private readonly speedBtn: HTMLElement
+  private readonly countdownBtn: HTMLElement
+  private readonly countdownContainer: HTMLElement
+  private readonly countdownValue: HTMLElement
 
   // ── Live game objects (replaced on each level load) ───────────────────────
   grid:         Grid        | undefined
@@ -57,9 +61,9 @@ export class Game {
   followTrain = false
 
   // ── Managers ──────────────────────────────────────────────────────────────
-  readonly audioManager:     AudioManager
 
-  readonly cameraController: CameraController
+  readonly audioManager!:     AudioManager
+  readonly cameraController!: CameraController
 
   settingsUI: SettingsUI | undefined
 
@@ -70,6 +74,9 @@ export class Game {
   private lastTime = performance.now()
 
   constructor(readonly canvas: HTMLCanvasElement) {
+    this.audioManager     = new AudioManager();
+    this.cameraController = new CameraController();
+
     const { renderer, scene, camera } = createScene(canvas)
     this.renderer = renderer
     this.scene    = scene
@@ -79,15 +86,15 @@ export class Game {
 
     this.speedBar = document.querySelector<HTMLElement>('.hud__speed-bar')!
     this.levelNum = document.querySelector<HTMLElement>('.hud__level-num')!
+    this.speedBtn = document.querySelector<HTMLElement>('.hud__speed-btn')!
+    this.countdownContainer = document.querySelector<HTMLElement>('.hud__countdown-container')!
+    this.countdownValue = this.countdownContainer.querySelector<HTMLElement>('.hud__countdown-val')!
+    this.countdownBtn = document.querySelector<HTMLElement>('.hud__countdown-button')!
 
-    this.audioManager     = new AudioManager()
-    this.cameraController = new CameraController()
-    this.cameraController.updateOrbit(camera)
-
-    this.updateSelectedPiece()
-
-    document.querySelector<HTMLElement>('.hud__speed-btn')?.addEventListener('click', () => {
-      this.boostSpeed()
+    this.countdownBtn.addEventListener('click', () => {
+      if (this.currentState instanceof PlayingState) {
+        this.currentState.skipCountdown(this)
+      }
     })
   }
 
@@ -198,6 +205,24 @@ export class Game {
       this.grid.showGhost(this.lastHoveredCell.col, this.lastHoveredCell.row, this.selectedPiece)
     }
   }
+
+  // -- Start of the Game --
+  updateCountdown(seconds: number | null): void {
+    if (seconds) {
+      this.countdownContainer.classList.remove('hidden')
+      this.countdownValue.textContent = seconds.toString()
+    } else {
+      this.countdownContainer.classList.add('hidden')
+    }
+  }
+  setSpeedBtnEnabled(enabled: boolean): void {
+    if (enabled) {
+      this.speedBtn.classList.remove('hud__speed-btn--disabled')
+    } else {
+      this.speedBtn.classList.add('hud__speed-btn--disabled')
+    }
+  }
+
 
   /** Place the ghost on the next free tile along the track ahead of the train. */
   showDefaultGhost(): void {
@@ -339,4 +364,6 @@ export class Game {
 
     this.renderer.render(this.scene, this.camera)
   }
+
+
 }
