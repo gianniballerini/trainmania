@@ -96,6 +96,12 @@ export class Game {
         this.currentState.skipCountdown(this)
       }
     })
+
+    this.speedBtn.addEventListener('click', () => {
+      if (this.currentState instanceof PlayingState) {
+        this.boostSpeed()
+      }
+    })
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────
@@ -317,10 +323,9 @@ export class Game {
     this.lerpSpeed = MAX_SPEED
     if (this.train) this.train.lerpSpeed = MAX_SPEED
     this.updateSpeedBar(1)
-    const btn = document.querySelector<HTMLElement>('.hud__speed-btn')
-    if (btn) {
-      btn.classList.add('is-active')
-      setTimeout(() => btn.classList.remove('is-active'), 300)
+    if (this.speedBtn) {
+      this.speedBtn.classList.add('is-active')
+      setTimeout(() => this.speedBtn.classList.remove('is-active'), 300)
     }
   }
 
