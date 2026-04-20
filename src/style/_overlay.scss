@@ -77,7 +77,7 @@
   &__box {
     background: var(--background-color);
     color: var(--text-color);
-    border-radius: 16 * $ptr;
+    border-radius: 0 16 * $ptr 16 * $ptr 0;
     width: 90%;
     padding: 16 * $ptr 8 * $ptr;
     text-align: center;
@@ -86,10 +86,27 @@
     align-items: center;
     gap: 12 * $ptr;
     box-shadow: 0 24 * $ptr 80 * $ptr rgba(45, 53, 97, 0.18);
+    position: relative;
+    border-left: 2 * $ptr dashed var(--perforation-color);
 
     @include respond-to($medium-breakpoint) {
       padding: 16 * $ptr 8 * $ptr;
       width: fit-content;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -22 * $ptr;
+      width: 20 * $ptr;
+      height: 100%;
+      background: var(--accent-color);
+      border-radius: 16 * $ptr 0 0 16 * $ptr;
+    }
+
+    &::after {
+
     }
   }
 
@@ -221,7 +238,8 @@
     position: relative;
     background: var(--background-color);
     color: var(--text-color);
-    border-radius: 16 * $ptr;
+    border-radius: 0 16 * $ptr 16 * $ptr 0;
+    border-left: 2 * $ptr dashed var(--perforation-color);
     padding: 28 * $ptr 20 * $ptr 20 * $ptr;
     width: min(560 * $ptr, calc(100vw - 32 * $ptr));
     display: flex;
@@ -229,6 +247,22 @@
     align-items: center;
     gap: 16 * $ptr;
     box-shadow: 0 24 * $ptr 80 * $ptr rgba(45, 53, 97, 0.18);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -22 * $ptr;
+      width: 20 * $ptr;
+      height: 100%;
+      background: var(--accent-color);
+      border-radius: 16 * $ptr 0 0 16 * $ptr;
+    }
+
+
+    &::after {
+
+    }
   }
 
   &__close {
