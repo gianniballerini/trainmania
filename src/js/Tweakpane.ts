@@ -63,6 +63,8 @@ class Tweakpane {
             expanded: false
         });
 
+        sceneFolder.addBinding(Settings.scene, 'background', {label: 'Background'}).on('change', this.updateSceneLights.bind(this));
+        sceneFolder.addBinding(Settings.scene, 'fog', {label: 'Fog Color'}).on('change', this.updateSceneLights.bind(this));
         sceneFolder.addBinding(Settings.scene.ambient, 'color', {label: 'Amb Color'}).on('change', this.updateSceneLights.bind(this));
         sceneFolder.addBinding(Settings.scene.ambient, 'intensity', { min: 0, max: 2, label: 'Amb Int' }).on('change', this.updateSceneLights.bind(this));
         sceneFolder.addBinding(Settings.scene.sun, 'color', {label: 'Sun Color'}).on('change', this.updateSceneLights.bind(this));

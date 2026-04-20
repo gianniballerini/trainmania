@@ -16,13 +16,13 @@ export function createScene(canvas: HTMLElement | null): {
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFShadowMap
   renderer.toneMapping = THREE.ACESFilmicToneMapping
-  renderer.toneMappingExposure = 1.1
+  renderer.toneMappingExposure = 1.5
 
   RectAreaLightUniformsLib.init()
 
   const scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x0e0c18)
-  scene.fog = new THREE.FogExp2(0x0e0c18, 0.045)
+  scene.background = new THREE.Color(0x87ceeb)
+  scene.fog = new THREE.FogExp2(0xb8dff5, 0.02)
 
   // Camera — isometric-ish perspective
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200)
@@ -30,11 +30,11 @@ export function createScene(canvas: HTMLElement | null): {
   camera.lookAt(0, 0, 0)
 
   // Ambient
-  const ambient = new THREE.AmbientLight(0xffeedd, 0.6)
+  const ambient = new THREE.AmbientLight(0xffffff, 1.2)
   scene.add(ambient)
 
   // Key light — warm sun from NW
-  const sun = new THREE.DirectionalLight(0xffd580, 1.6)
+  const sun = new THREE.DirectionalLight(0xfff8e0, 2.8)
   sun.position.set(-8, 18, 10)
   sun.castShadow = true
   sun.shadow.mapSize.set(2048, 2048)
@@ -48,7 +48,7 @@ export function createScene(canvas: HTMLElement | null): {
   scene.add(sun)
 
   // Fill — cool from opposite
-  const fill = new THREE.DirectionalLight(0x8090cc, 0.4)
+  const fill = new THREE.DirectionalLight(0xaad4ff, 0.8)
   fill.position.set(10, 8, -8)
   scene.add(fill)
 

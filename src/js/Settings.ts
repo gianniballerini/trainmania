@@ -40,19 +40,19 @@ class Settings {
         }
 
         this.scene = {
-            background: '#0e0c18', // near-black purple
-            fog: '#0e0c18',        // same as background
+            background: '#87ceeb', // sky blue
+            fog: '#b8dff5',        // light sky blue fog
             ambient: {
-                color: '#ffeedd', // warm off-white
-                intensity: 0.6,
+                color: '#ffffff', // pure white
+                intensity: 1.2,
             },
             sun: {
-                color: '#ffd580', // warm light orange
-                intensity: 1.6,
+                color: '#fff8e0', // bright warm white
+                intensity: 2.8,
             },
             fill: {
-                color: '#8090cc', // cool periwinkle
-                intensity: 0.4,
+                color: '#aad4ff', // light sky blue
+                intensity: 0.8,
             },
             rectLight: {
                 color: '#ffeedd', // warm off-white

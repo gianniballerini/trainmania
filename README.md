@@ -8,7 +8,11 @@ A browser-based puzzle game built for the **Three.js Journey Challenge 23 — Th
 
 ## Gameplay
 
-The catch: the train doesn't wait. Every step it accelerates (`interval × 0.92`, floor 250 ms). Run out of track and you derail.
+The train doesn't wait.
+Run out of track and you derail.
+Avoid dead-ends and guide the train into the station to win.
+Pick up passengers along the way for extra points.
+Fastest runs with more points win a spot on the leaderboard.
 
 **Controls**
 - `hover` — ghost-preview the selected piece on the grid

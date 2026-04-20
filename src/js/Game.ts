@@ -9,7 +9,6 @@ import { createScene } from './scene.js'
 import { SceneController } from './SceneController.js'
 import { SettingsUI } from './SettingsUI.js'
 import { SmokeSystem } from './Smoke.js'
-import { buildStarfield } from './Stars.js'
 import { DeadState } from './states/DeadState.js'
 import { BaseGameState } from './states/IGameState.js'
 import { PausedState } from './states/PausedState.js'
@@ -85,8 +84,6 @@ export class Game {
     this.camera   = camera
 
     this.sceneController = new SceneController(scene)
-
-    buildStarfield(scene)
 
     this.speedBar = document.querySelector<HTMLElement>('.hud__speed-bar')!
     this.levelNum = document.querySelector<HTMLElement>('.hud__level-num')!

@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(14, 12, 24, 0.65);
+  background: rgba(245, 240, 232, 0.6);
   backdrop-filter: blur(4 * $ptr);
   z-index: 50;
 
@@ -18,8 +18,8 @@
 
   &__box {
     position: relative;
-    background: var(--void);
-    border: 1 * $ptr solid rgba(245, 237, 224, 0.12);
+    background: var(--background-color);
+    border: 1 * $ptr solid rgba(45, 53, 97, 0.15);
     border-radius: 16 * $ptr;
     width: 520 * $ptr;
     max-width: calc(100vw - 40 * $ptr);
@@ -29,17 +29,17 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 24 * $ptr 80 * $ptr rgba(0, 0, 0, 0.6);
+    box-shadow: 0 24 * $ptr 80 * $ptr rgba(45, 53, 97, 0.18);
   }
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1 * $ptr solid rgba(245, 237, 224, 0.12);
+    border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.12);
 
     min-height: 50 * $ptr;
-    color: var(--gold);
+    color: var(--accent-color);
     font-weight: 700;
     letter-spacing: 2 * $ptr;
     text-transform: uppercase;
@@ -55,7 +55,7 @@
     right: 14 * $ptr;
     background: none;
     border: none;
-    color: rgba(245, 237, 224, 0.4);
+    color: rgba(45, 53, 97, 0.4);
     font-size: 16 * $ptr;
     cursor: pointer;
     line-height: 1;
@@ -63,7 +63,7 @@
     z-index: 1;
 
     &:hover {
-      color: var(--cream);
+      color: var(--accent-color);
     }
   }
 
@@ -71,7 +71,7 @@
     display: flex;
     flex-direction: column;
     padding: 20 * $ptr 0;
-    border-right: 1 * $ptr solid rgba(245, 237, 224, 0.08);
+    border-right: 1 * $ptr solid rgba(45, 53, 97, 0.1);
     min-width: 110 * $ptr;
     gap: 4 * $ptr;
   }
@@ -79,7 +79,7 @@
   &__tab {
     background: none;
     border: none;
-    color: rgba(245, 237, 224, 0.45);
+    color: var(--label-color);
     font-family: 'Josefin Sans', sans-serif;
     font-size: 11 * $ptr;
     font-weight: 700;
@@ -92,14 +92,14 @@
     transition: color 0.15s, border-color 0.15s, background 0.15s;
 
     &:hover {
-      color: var(--cream);
-      background: rgba(245, 237, 224, 0.04);
+      color: var(--text-color);
+      background: rgba(45, 53, 97, 0.06);
     }
 
     &.active {
-      color: var(--gold);
-      border-left-color: var(--gold);
-      background: rgba(212, 168, 67, 0.06);
+      color: var(--accent-color);
+      border-left-color: var(--accent-color);
+      background: rgba(45, 53, 97, 0.08);
     }
   }
 
@@ -117,7 +117,7 @@
     }
 
     &--credits a {
-      color: #f0c040;
+      color: var(--accent-color);
       text-decoration: none;
 
       &:hover {
@@ -131,14 +131,14 @@
     font-weight: 700;
     letter-spacing: 3 * $ptr;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--accent-color);
     margin-bottom: 10 * $ptr;
   }
 
   &__body {
     font-size: 12 * $ptr;
     letter-spacing: 1 * $ptr;
-    color: rgba(245, 237, 224, 0.65);
+    color: var(--label-color);
     line-height: 1.7;
   }
 
@@ -147,7 +147,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 9 * $ptr 0;
-    border-bottom: 1 * $ptr solid rgba(245, 237, 224, 0.06);
+    border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.1);
 
     &--indent {
       padding-left: 12 * $ptr;
@@ -160,24 +160,24 @@
     font-weight: 700;
     letter-spacing: 2 * $ptr;
     text-transform: uppercase;
-    color: var(--cream);
+    color: var(--text-color);
   }
 
   &__toggle {
-    background: rgba(245, 237, 224, 0.08);
-    border: 1 * $ptr solid rgba(245, 237, 224, 0.2);
+    background: rgba(45, 53, 97, 0.07);
+    border: 1 * $ptr solid rgba(45, 53, 97, 0.2);
     border-radius: 6 * $ptr;
     padding: 5 * $ptr 12 * $ptr;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
 
     &:hover {
-      background: rgba(245, 237, 224, 0.16);
+      background: rgba(45, 53, 97, 0.14);
     }
 
     &.muted {
-      background: rgba(192, 82, 42, 0.18);
-      border-color: rgba(192, 82, 42, 0.45);
+      background: rgba(192, 82, 42, 0.1);
+      border-color: rgba(192, 82, 42, 0.4);
       color: var(--rust);
     }
   }
@@ -186,7 +186,7 @@
     font-size: 9 * $ptr;
     font-weight: 700;
     letter-spacing: 2 * $ptr;
-    color: rgba(245, 237, 224, 0.4);
+    color: var(--label-color);
     text-transform: uppercase;
   }
 
@@ -196,7 +196,7 @@
     width: 130 * $ptr;
     height: 3 * $ptr;
     border-radius: 2 * $ptr;
-    background: rgba(245, 237, 224, 0.15);
+    background: rgba(45, 53, 97, 0.15);
     outline: none;
     cursor: pointer;
 
@@ -206,7 +206,7 @@
       width: 12 * $ptr;
       height: 12 * $ptr;
       border-radius: 50%;
-      background: var(--gold);
+      background: var(--accent-color);
       cursor: pointer;
       transition: transform 0.1s;
 
@@ -220,7 +220,7 @@
       height: 12 * $ptr;
       border: none;
       border-radius: 50%;
-      background: var(--gold);
+      background: var(--accent-color);
       cursor: pointer;
     }
   }
@@ -267,8 +267,8 @@
     padding: 6 * $ptr 4 * $ptr;
     font-size: 11 * $ptr;
     letter-spacing: 1 * $ptr;
-    color: rgba(245, 237, 224, 0.65);
-    border-bottom: 1 * $ptr solid rgba(245, 237, 224, 0.06);
+    color: var(--label-color);
+    border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.1);
 
     &:first-child {
       white-space: nowrap;
@@ -289,15 +289,15 @@
 }
 
 kbd {
-  background: rgba(245, 237, 224, 0.1);
-  border: 1 * $ptr solid rgba(245, 237, 224, 0.2);
+  background: rgba(45, 53, 97, 0.08);
+  border: 1 * $ptr solid rgba(45, 53, 97, 0.2);
   border-radius: 4 * $ptr;
   padding: 2 * $ptr 5 * $ptr;
   font-family: 'Josefin Sans', sans-serif;
   font-size: 10 * $ptr;
   font-weight: 700;
   letter-spacing: 1 * $ptr;
-  color: var(--cream);
+  color: var(--text-color);
   height: fit-content;
 
   span {
@@ -312,11 +312,11 @@ kbd {
 }
 
 .settings__btn {
-    background: var(--rust);
+    background: var(--accent-color);
 
     font-weight: 700;
     font-size: 11 * $ptr;
-    color: var(--cream);
+    color: var(--background-color);
     letter-spacing: 2 * $ptr;
     text-transform: uppercase;
     text-align: center;
@@ -327,6 +327,6 @@ kbd {
     transition: background 0.15s;
 
     &:hover {
-      background: #a83d1a;
+      background: #1e2447;
     }
 }

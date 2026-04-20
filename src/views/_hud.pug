@@ -4,13 +4,13 @@
     .hud__speed-wrap
       .hud__speed-bar
     button.button.hud__speed-btn(title='Speed Up')
-      .hud__speed-icon
-        img(src='/images/icons/fastForward.png', alt='Speed Up')
+      .hud__speed-icon.hud__icon
+        img(src='/images/icons/fastForward_dark.png', alt='Speed Up')
       span.hud__speed-label max speed
   .hud__right
     button.hud__settings-btn(title='Settings' data-sfx-click)
-      .hud__settings-icon
-        img(src='/images/icons/gear.png', alt='Settings')
+      .hud__settings-icon.hud__icon
+        img(src='/images/icons/gear_dark.png', alt='Settings')
 
 .hud__countdown-container.hidden
   .hud__countdown
@@ -19,20 +19,21 @@
       span.hud__countdown-val
       | s
   .button.hud__countdown-button
-    img(src='/images/icons/fastForward.png', alt='Skip Countdown')
+    .hud__icon
+      img(src='/images/icons/fastForward_dark.png', alt='Skip Countdown')
 
 .hud__actions
   .hud__actions-left
     button.hud__action-btn.hud__action-btn--swap.hud__action-btn--left-up(title='Swap Track')
-      .hud__action-btn-icon
-        img(src='/images/icons/cards_flip.png', alt='Swap Track')
+      .hud__action-btn-icon.hud__icon
+        img(src='/images/icons/cards_flip_dark.png', alt='Swap Track')
       .span Swap
     button.hud__action-btn.hud__action-btn--rotate.hud__action-btn--left-down(title='Rotate Track (S)')
-      .hud__action-btn-icon
-        img(src='/images/icons/card_flipdouble.png', alt='Rotate Track')
+      .hud__action-btn-icon.hud__icon
+        img(src='/images/icons/card_flipdouble_dark.png', alt='Rotate Track')
       .span Rotate
   .hud__actions-right
     button.hud__action-btn.hud__action-btn--place.hud__action-btn--right(title='Place Track')
-      .hud__action-btn-icon
-        img(src='/images/icons/card_outline_place.png', alt='Place Track')
+      .hud__action-btn-icon.hud__icon
+        img(src='/images/icons/card_outline_place_dark.png', alt='Place Track')
       .span Place

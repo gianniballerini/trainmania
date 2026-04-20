@@ -26,6 +26,11 @@ class SceneController {
         this.fill_light.intensity = Settings.scene.fill.intensity
         // this.rect_light.color.set(Settings.scene.rectLight.color)
         // this.rect_light.intensity = Settings.scene.rectLight.intensity
+
+        ;(this.scene.background as THREE.Color).set(Settings.scene.background)
+        if (this.scene.fog instanceof THREE.FogExp2) {
+            this.scene.fog.color.set(Settings.scene.fog)
+        }
     }
 }
 

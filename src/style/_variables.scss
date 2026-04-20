@@ -1,12 +1,20 @@
 :root {
-  --cream:   #f5ede0;
-  --brown:   #5c3d2e;
-  --rust:    #c0522a;
-  --moss:    #5a7a4a;
-  --gold:    #d4a843;
-  --void:    #0e0c18;
-  --card-bg: rgba(245, 237, 224, 0.92);
-  --card-sel: #c0522a;
+  --cream:     #f5ede0;
+  --brown:     #5c3d2e;
+  --rust:      #c0522a;
+  --moss:      #5a7a4a;
+  --gold:      #d4a843;
+  --void:      #0e0c18;
+  --card-bg:   rgba(245, 237, 224, 0.92);
+  --card-sel:  #c0522a;
+  --hud-panel:  rgba(245, 240, 232, 0.88);
+  --hud-border: rgba(45, 53, 97, 0.2);
+
+  --accent-color: #2d3561;
+  --background-color: #f5f0e8;
+  --text-color: #1a1a2e;
+  --label-color: #888;
+  --stub-color: #f0c060;
 }
 
 $ptr: 0.0625rem;
