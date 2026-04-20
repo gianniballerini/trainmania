@@ -5,6 +5,18 @@ import { cellToWorld, Grid } from './Grid.js'
 
 let _selectedModelId = 'train-diesel-b'
 
+// Only models in this set will emit smoke.
+const SMOKE_MODELS = new Set<string>([
+  'train-diesel-a',
+  'train-diesel-b',
+  'train-diesel-box-a',
+  'train-diesel-c',
+  'train-steam',
+  'train-locomotive-a',
+  'train-locomotive-b',
+  'train-locomotive-c'
+])
+
 function _trainAsset() {
   return {
     modelUrl: `/assets/models/${_selectedModelId}.glb`,
@@ -93,6 +105,13 @@ export class Train {
     } else {
       void this._tryLoadAssetVisual()
     }
+  }
+
+  /** Returns true if the currently selected model should emit smoke. */
+  static hasSmoke(): boolean {
+    console.log(_selectedModelId);
+
+    return SMOKE_MODELS.has(_selectedModelId)
   }
 
   /** Returns the currently active model id. */

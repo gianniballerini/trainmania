@@ -167,7 +167,7 @@ export class Game {
     this.grid         = new Grid(this.scene, levelDef)
     this.train        = new Train(this.scene, this.grid)
     this.train.lerpSpeed = this.lerpSpeed
-    this.smoke        = new SmokeSystem(this.scene)
+    this.smoke        = Train.hasSmoke() ? new SmokeSystem(this.scene) : undefined
 
     const [sc, sr]    = levelDef.stationPos
     const stationPos  = cellToWorld(sc, sr, LEVELS[idx].grid[0].length, LEVELS[idx].grid.length)
@@ -185,6 +185,10 @@ export class Game {
     this.train?.dispose()
     this.train = new Train(this.scene, this.grid)
     this.train.lerpSpeed = this.lerpSpeed
+
+    this.smoke?.dispose()
+    this.smoke = Train.hasSmoke() ? new SmokeSystem(this.scene) : undefined
+
     this.showDefaultGhost()
   }
 
