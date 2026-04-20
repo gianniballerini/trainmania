@@ -11,7 +11,7 @@ function _trainAsset() {
     colorMapUrl: '/assets/textures/colormap.png',
     targetFootprint: 1.35,
     yOffset: 0.02,
-    rotationY: 0,
+    rotationY: Math.PI, // Flip model 180° to face correct direction
   }
 }
 
