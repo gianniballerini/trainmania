@@ -6,6 +6,7 @@ import { cellToWorld, Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { LEVELS } from './levels/Level.js'
 import { createScene } from './scene.js'
+// import { SceneController } from './SceneController.js'
 import { SettingsUI } from './SettingsUI.js'
 import { SmokeSystem } from './Smoke.js'
 import { buildStarfield } from './Stars.js'
@@ -64,6 +65,7 @@ export class Game {
 
   readonly audioManager!:     AudioManager
   readonly cameraController!: CameraController
+  // readonly sceneController!:  SceneController
 
   settingsUI: SettingsUI | undefined
 
@@ -81,6 +83,8 @@ export class Game {
     this.renderer = renderer
     this.scene    = scene
     this.camera   = camera
+
+    // this.sceneController = new SceneController(scene)
 
     buildStarfield(scene)
 
@@ -256,6 +260,7 @@ export class Game {
     let dir = this.train.dir
 
     // Follow existing track pieces to find where the path ends
+    const visited = new Set<string>()
     for (;;) {
       const [dc, dr] = DIR[dir]
       const nc = col + dc
@@ -270,6 +275,9 @@ export class Game {
 
       // Cell has a track piece → traverse it and keep walking
       if (cell.trackPiece) {
+        const key = `${nc},${nr}`
+        if (visited.has(key)) break // closed loop detected — stop
+        visited.add(key)
         const piece = TRACK_PIECES[cell.trackPiece]
         const entryFrom = OPPOSITE[dir]
         const exitDir = piece.connections[entryFrom]
