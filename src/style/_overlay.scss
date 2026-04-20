@@ -156,48 +156,146 @@
       gap: 8 * $ptr;
       padding: 4 * $ptr 2 * $ptr;
     }
+  }
+}
 
-    &__card {
-      flex: 0 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4 * $ptr;
-      cursor: pointer;
-      border: 2 * $ptr solid transparent;
-      border-radius: 8 * $ptr;
-      padding: 4 * $ptr;
-      transition: border-color 0.15s, transform 0.1s;
-      background: rgba(92, 61, 46, 0.06);
+// ── Shared train card (used in title picker + choose-train modal) ────────────
+.train-card {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4 * $ptr;
+  cursor: pointer;
+  border: 2 * $ptr solid transparent;
+  border-radius: 8 * $ptr;
+  padding: 4 * $ptr;
+  margin-bottom: 3 * $ptr; // room for scrollbar
+  transition: border-color 0.15s, transform 0.1s;
+  background: rgba(92, 61, 46, 0.06);
 
-      margin-bottom: 3 * $ptr; // to create space for the scrollbar
+  &:hover {
+    transform: scale(1.05);
+    border-color: rgba(192, 82, 42, 0.4);
+  }
 
-      &:hover {
-        transform: scale(1.05);
-        border-color: rgba(192, 82, 42, 0.4);
-      }
+  &.is-selected {
+    border-color: var(--rust);
+    background: rgba(192, 82, 42, 0.1);
+  }
 
-      &.is-selected {
-        border-color: var(--rust);
-        background: rgba(192, 82, 42, 0.1);
-      }
+  img {
+    width: 164 * $ptr;
+    height: 164 * $ptr;
+    object-fit: contain;
+    border-radius: 4 * $ptr;
+    pointer-events: none;
+  }
 
-      img {
-        width: 164 * $ptr;
-        height: 164 * $ptr;
-        object-fit: contain;
-        border-radius: 4 * $ptr;
-        pointer-events: none;
-      }
+  span {
+    font-size: 9 * $ptr;
+    font-weight: 600;
+    letter-spacing: 1 * $ptr;
+    text-transform: uppercase;
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+}
 
-      span {
-        font-size: 9 * $ptr;
-        font-weight: 600;
-        letter-spacing: 1 * $ptr;
-        text-transform: uppercase;
-        opacity: 0.7;
-        white-space: nowrap;
-      }
+// ── Choose Train modal ───────────────────────────────────────────────────────
+.train-picker-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 12, 24, 0.75);
+  backdrop-filter: blur(6 * $ptr);
+
+  &.hidden {
+    display: none;
+  }
+
+  &__box {
+    position: relative;
+    background: var(--cream);
+    color: var(--brown);
+    border-radius: 16 * $ptr;
+    padding: 28 * $ptr 20 * $ptr 20 * $ptr;
+    width: min(560 * $ptr, calc(100vw - 32 * $ptr));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16 * $ptr;
+    box-shadow: 0 24 * $ptr 80 * $ptr rgba(0, 0, 0, 0.55);
+  }
+
+  &__close {
+    position: absolute;
+    top: 10 * $ptr;
+    right: 14 * $ptr;
+    background: none;
+    border: none;
+    font-size: 16 * $ptr;
+    color: rgba(92, 61, 46, 0.45);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+
+    &:hover { color: var(--brown); }
+  }
+
+  &__title {
+    font-size: 14 * $ptr;
+    font-weight: 700;
+    letter-spacing: 3 * $ptr;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  &__strip {
+    display: flex;
+    gap: 8 * $ptr;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(92, 61, 46, 0.3) transparent;
+    max-width: 100%;
+    padding: 4 * $ptr 2 * $ptr;
+
+    &::-webkit-scrollbar {
+      height: 4 * $ptr;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(92, 61, 46, 0.3);
+      border-radius: 99 * $ptr;
+    }
+  }
+
+  &__confirm {
+    padding: 11 * $ptr 40 * $ptr;
+    background: var(--rust);
+    color: var(--cream);
+    border: none;
+    border-radius: 8 * $ptr;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12 * $ptr;
+    font-weight: 700;
+    letter-spacing: 3 * $ptr;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+
+    &:hover {
+      background: #a83d1a;
+      transform: scale(1.03);
     }
   }
 }

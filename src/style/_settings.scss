@@ -282,3 +282,23 @@ kbd {
 .grid-highlight {
   pointer-events: none;
 }
+
+.settings__btn {
+    background: var(--rust);
+
+    font-weight: 700;
+    font-size: 11 * $ptr;
+    color: var(--cream);
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    text-align: center;
+
+    padding: 10 * $ptr 20 * $ptr;
+    border: none;
+    border-radius: 6 * $ptr;
+    transition: background 0.15s;
+
+    &:hover {
+      background: #a83d1a;
+    }
+}

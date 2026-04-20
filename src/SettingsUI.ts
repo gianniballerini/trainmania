@@ -1,5 +1,8 @@
 import type { AudioManager } from './AudioManager.js'
+import { TRAIN_OPTIONS } from './Constants.js'
 import type { Game } from './Game.js'
+import { Train } from './Train.js'
+import { showTrainPickerModal } from './ui.js'
 
 export class SettingsUI {
   private readonly modal:       HTMLElement
@@ -52,6 +55,9 @@ export class SettingsUI {
     closeBtn.addEventListener('click', () => this.close())
     modal.addEventListener('click', (e) => { if (e.target === modal) this.close() })
 
+    document.querySelector<HTMLElement>('.settings__change-train')!
+      .addEventListener('click', () => this.changeTrain())
+
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         tabs.forEach((t)  => t.classList.remove('active'))
@@ -78,6 +84,16 @@ export class SettingsUI {
       this.audio.setMusicVolume(parseFloat(this.sliderMusic.value)))
     this.sliderSfx.addEventListener('input', () =>
       this.audio.setSfxVolume(parseFloat(this.sliderSfx.value)))
+  }
+
+  changeTrain(): void {
+    const currentId = Train.getModelId()
+    showTrainPickerModal(TRAIN_OPTIONS, currentId, async (id) => {
+      if (id === currentId) return
+      Train.setModel(id)
+      await Train.preload()
+      this.game.rebuildTrain()
+    })
   }
 
   private syncButtons(): void {

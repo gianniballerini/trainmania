@@ -9,6 +9,10 @@ let   btn     = document.querySelector<HTMLElement>('.overlay__btn')!
 const trainPicker = document.querySelector<HTMLElement>('.overlay__train-picker')!
 const trainStrip  = document.querySelector<HTMLElement>('.overlay__train-picker__strip')!
 
+const trainPickerModal      = document.querySelector<HTMLElement>('.train-picker-modal')!
+const trainPickerModalStrip = document.querySelector<HTMLElement>('.train-picker-modal__strip')!
+let   trainPickerModalConfirmBtn = document.querySelector<HTMLElement>('.train-picker-modal__confirm')!
+
 const loadingScreen  = document.querySelector<HTMLElement>('.loading-screen')!
 const loadingBarFill = document.querySelector<HTMLElement>('.loading-screen__bar-fill')!
 const loadingLabel   = document.querySelector<HTMLElement>('.loading-screen__label')!
@@ -51,7 +55,8 @@ export function showOverlay(
 
   // Replace node to drop any previous click listener, then update live reference
   const newBtn = btn.cloneNode(true) as HTMLElement
-  newBtn.textContent = btnText
+  const btnSpan = newBtn.querySelector('span')!
+  btnSpan.textContent = btnText
   btn.replaceWith(newBtn)
   btn = newBtn
   btn.addEventListener('click', () => {
@@ -64,17 +69,18 @@ export function hideOverlay(): void {
   overlay.classList.add('hidden')
 }
 
-// ── Train picker ──────────────────────────────────────────────────────────────
+// ── Train picker (shared) ─────────────────────────────────────────────────────
 
-export function showTrainPicker(
+function renderTrainStrip(
+  strip: HTMLElement,
   trains: TrainOption[],
   defaultId: string,
   onSelect: (id: string) => void,
 ): void {
-  trainStrip.innerHTML = ''
+  strip.innerHTML = ''
   trains.forEach((t) => {
     const card = document.createElement('div')
-    card.className = 'overlay__train-picker__card'
+    card.className = 'train-card'
     if (t.id === defaultId) card.classList.add('is-selected')
     card.dataset.trainId = t.id
 
@@ -88,16 +94,72 @@ export function showTrainPicker(
     card.appendChild(label)
 
     card.addEventListener('click', () => {
-      trainStrip.querySelectorAll('.is-selected').forEach((el) => el.classList.remove('is-selected'))
+      strip.querySelectorAll('.is-selected').forEach((el) => el.classList.remove('is-selected'))
       card.classList.add('is-selected')
       onSelect(t.id)
     })
 
-    trainStrip.appendChild(card)
+    strip.appendChild(card)
   })
+
+  // Scroll to selected card
+  const selected = strip.querySelector<HTMLElement>('.is-selected')
+  if (selected) selected.scrollIntoView({ block: 'nearest', inline: 'center' })
+}
+
+// ── Title-screen inline picker ────────────────────────────────────────────────
+
+export function showTrainPicker(
+  trains: TrainOption[],
+  defaultId: string,
+  onSelect: (id: string) => void,
+): void {
+  renderTrainStrip(trainStrip, trains, defaultId, onSelect)
   trainPicker.classList.remove('hidden')
 }
 
 export function hideTrainPicker(): void {
   trainPicker.classList.add('hidden')
+}
+
+// ── Standalone "Choose Train" modal ───────────────────────────────────────────
+
+export function showTrainPickerModal(
+  trains: TrainOption[],
+  currentId: string,
+  onConfirm: (id: string) => void,
+): void {
+  let selectedId = currentId
+  renderTrainStrip(trainPickerModalStrip, trains, currentId, (id) => { selectedId = id })
+  trainPickerModal.classList.remove('hidden')
+
+  // Backdrop click closes without applying
+  const backdropHandler = (e: MouseEvent) => {
+    if (e.target === trainPickerModal) {
+      hideTrainPickerModal()
+      trainPickerModal.removeEventListener('click', backdropHandler)
+    }
+  }
+  trainPickerModal.addEventListener('click', backdropHandler)
+
+  // Close button
+  const closeBtn = trainPickerModal.querySelector<HTMLElement>('.train-picker-modal__close')!
+  const closeBtnHandler = () => {
+    hideTrainPickerModal()
+    closeBtn.removeEventListener('click', closeBtnHandler)
+  }
+  closeBtn.addEventListener('click', closeBtnHandler)
+
+  // Swap confirm button node to drop any stale listener
+  const newBtn = trainPickerModalConfirmBtn.cloneNode(true) as HTMLElement
+  trainPickerModalConfirmBtn.replaceWith(newBtn)
+  trainPickerModalConfirmBtn = newBtn
+  trainPickerModalConfirmBtn.addEventListener('click', () => {
+    hideTrainPickerModal()
+    onConfirm(selectedId)
+  }, { once: true })
+}
+
+export function hideTrainPickerModal(): void {
+  trainPickerModal.classList.add('hidden')
 }

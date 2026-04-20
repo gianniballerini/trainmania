@@ -95,6 +95,11 @@ export class Train {
     }
   }
 
+  /** Returns the currently active model id. */
+  static getModelId(): string {
+    return _selectedModelId
+  }
+
   /** Set the model id (filename without extension) to use for all future trains. */
   static setModel(id: string): void {
     _selectedModelId = id
