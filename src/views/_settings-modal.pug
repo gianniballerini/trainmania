@@ -16,7 +16,6 @@
       .settings__content
 
         .settings__panel.settings__panel--gameplay.active
-          h2.settings__heading Gameplay
           .button.settings__btn.settings__change-train(data-sfx-click)
             span Change Train
 
@@ -31,42 +30,53 @@
           table.key-table
             tbody
               tr
-                td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
-                  .settings__icon.settings__icon--large
-                    img(src='/images/icons/key_a_black.png', alt='Swap')
+                td.key-table__key
+                  kbd: span A
                   span /
                   .settings__icon
                     img(src='/images/icons/arrow_reserve.png', alt='Swap Track')
-                td Swap (Straight/Curve)
+                td.key-table__value Swap (Straight/Curve)
               tr
-                td(style='font-size:1.2em; display:flex; flex-direction:row; gap:4px; align-items:center')
-                  .settings__icon.settings__icon--large
-                    img(src='/images/icons/key_s_black.png', alt='Rotate')
+                td.key-table__key
+                  kbd: span S
                   span /
                   .settings__icon
                     img(src='/images/icons/arrow_clockwise.png', alt='Rotate')
-                td Rotate tile
+                td.key-table__value Rotate tile
               tr
-                td: kbd Enter
-                td Place tile
+                td.key-table__key
+                  kbd: span Enter
+                  span /
+                  kbd: span Space
+
+                td.key-table__value Place tile
               tr
-                td
-                  .settings__icon.settings__icon--large
-                    img(src='/images/icons/mouse_left.png', alt='Rotate Right')
-                td Place tile
+                td.key-table__key
+                  kbd: span Left Click
+                td.key-table__value Place tile
               tr
-                td
-                  .settings__icon.settings__icon--large
-                    img(src='/images/icons/mouse_right.png', alt='Rotate Right')
-                td Swap tile
+                td.key-table__key
+                  kbd: span Right Click
+                td.key-table__value Swap tile
               tr
-                td
-                  .settings__icon.settings__icon--large
-                    img(src='/images/icons/mouse_middle.png', alt='Rotate Right')
-                td Rotate tile
+                td.key-table__key
+                  kbd: span Middle Click
+                td.key-table__value Rotate tile
               tr
-                td: kbd Click + Drag
-                td Orbit camera
+                td.key-table__key
+                  kbd: span Click + Drag
+                td.key-table__value Orbit camera
+              tr
+                td.key-table__key
+                  kbd: span Click on Train
+                td.key-table__value Follow Train
+              tr
+                td.key-table__key
+                  kbd: span ←
+                  kbd: span ↑
+                  kbd: span →
+                  kbd: span ↓
+                td.key-table__value Move ghost tile
 
         //- SOUND TAB
         .settings__panel.settings__panel--sound

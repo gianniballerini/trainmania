@@ -1,5 +1,5 @@
+import soundDefs from '../../data/sounds.json'
 import { BACKGROUND_TRACKS, DEFAULT_TRAIN_ID, TRAIN_OPTIONS } from '../Constants.js'
-import soundDefs from '../data/sounds.json'
 import type { Game } from '../Game.js'
 import { Train } from '../Train.js'
 import { hideTrainPicker, showOverlay, showTrainPicker } from '../ui.js'

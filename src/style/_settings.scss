@@ -253,7 +253,17 @@
   border-collapse: collapse;
   width: 100%;
 
+  tr {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
   td {
+    display: flex;
+    align-items: center;
+    column-gap: 5 * $ptr;
+
     padding: 6 * $ptr 4 * $ptr;
     font-size: 11 * $ptr;
     letter-spacing: 1 * $ptr;
@@ -265,18 +275,36 @@
       padding-right: 16 * $ptr;
     }
   }
+
+  // &__key {
+  //   font-weight: 700;
+  //   color: var(--cream);
+  // }
+
+  &__value {
+    flex: 1;
+    text-align: right;
+    justify-content: right;
+  }
 }
 
 kbd {
   background: rgba(245, 237, 224, 0.1);
   border: 1 * $ptr solid rgba(245, 237, 224, 0.2);
   border-radius: 4 * $ptr;
-  padding: 5 * $ptr 7 * $ptr;
+  padding: 2 * $ptr 5 * $ptr;
   font-family: 'Josefin Sans', sans-serif;
   font-size: 10 * $ptr;
   font-weight: 700;
   letter-spacing: 1 * $ptr;
   color: var(--cream);
+  height: fit-content;
+
+  span {
+    position: relative;
+    display: block;
+    margin-bottom: -2 * $ptr;
+  }
 }
 
 .grid-highlight {
