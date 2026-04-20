@@ -3,12 +3,16 @@ import { loadModelAsset, warnAssetLoadFailureOnce } from './Assets.js'
 import { DIR, Direction, OPPOSITE, TRACK_PIECES } from './Constants.js'
 import { cellToWorld, Grid } from './Grid.js'
 
-const TRAIN_ASSET = {
-  modelUrl: '/assets/models/train-diesel-b.glb',
-  colorMapUrl: '/assets/textures/colormap.png',
-  targetFootprint: 1.35,
-  yOffset: 0.02,
-  rotationY: 0,
+let _selectedModelId = 'train-diesel-b'
+
+function _trainAsset() {
+  return {
+    modelUrl: `/assets/models/${_selectedModelId}.glb`,
+    colorMapUrl: '/assets/textures/colormap.png',
+    targetFootprint: 1.35,
+    yOffset: 0.02,
+    rotationY: 0,
+  }
 }
 
 // Cached after Train.preload() resolves.
@@ -91,12 +95,19 @@ export class Train {
     }
   }
 
+  /** Set the model id (filename without extension) to use for all future trains. */
+  static setModel(id: string): void {
+    _selectedModelId = id
+    _preloadedModel = null
+  }
+
   /** Call once before constructing any Train instances to warm the asset cache. */
   static async preload(): Promise<void> {
     try {
-      _preloadedModel = await loadModelAsset(TRAIN_ASSET)
+      _preloadedModel = await loadModelAsset(_trainAsset())
     } catch (err) {
-      warnAssetLoadFailureOnce('train asset', TRAIN_ASSET.modelUrl, err)
+      const asset = _trainAsset()
+      warnAssetLoadFailureOnce('train asset', asset.modelUrl, err)
     }
   }
 
@@ -120,11 +131,13 @@ export class Train {
 
   async _tryLoadAssetVisual(): Promise<void> {
     try {
-      const assetModel = await loadModelAsset(TRAIN_ASSET)
+      const asset = _trainAsset()
+      const assetModel = await loadModelAsset(asset)
       _preloadedModel = assetModel
       this.group.add(assetModel.clone())
     } catch (error) {
-      warnAssetLoadFailureOnce('train asset', TRAIN_ASSET.modelUrl, error)
+      const asset = _trainAsset()
+      warnAssetLoadFailureOnce('train asset', asset.modelUrl, error)
     }
   }
 

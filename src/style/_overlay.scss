@@ -127,4 +127,77 @@
       transform: scale(1.03);
     }
   }
+
+  // ── Train picker ────────────────────────────────────────────────────────
+  &__train-picker {
+    width: 100%;
+    max-width: 520 * $ptr;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(92, 61, 46, 0.3) transparent;
+
+    &::-webkit-scrollbar {
+      height: 4 * $ptr;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(92, 61, 46, 0.3);
+      border-radius: 99 * $ptr;
+    }
+
+    &__strip {
+      display: flex;
+      gap: 8 * $ptr;
+      padding: 4 * $ptr 2 * $ptr;
+    }
+
+    &__card {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4 * $ptr;
+      cursor: pointer;
+      border: 2 * $ptr solid transparent;
+      border-radius: 8 * $ptr;
+      padding: 4 * $ptr;
+      transition: border-color 0.15s, transform 0.1s;
+      background: rgba(92, 61, 46, 0.06);
+
+      margin-bottom: 3 * $ptr; // to create space for the scrollbar
+
+      &:hover {
+        transform: scale(1.05);
+        border-color: rgba(192, 82, 42, 0.4);
+      }
+
+      &.is-selected {
+        border-color: var(--rust);
+        background: rgba(192, 82, 42, 0.1);
+      }
+
+      img {
+        width: 164 * $ptr;
+        height: 164 * $ptr;
+        object-fit: contain;
+        border-radius: 4 * $ptr;
+        pointer-events: none;
+      }
+
+      span {
+        font-size: 9 * $ptr;
+        font-weight: 600;
+        letter-spacing: 1 * $ptr;
+        text-transform: uppercase;
+        opacity: 0.7;
+        white-space: nowrap;
+      }
+    }
+  }
 }

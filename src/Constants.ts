@@ -103,6 +103,29 @@ export function tileToPieceId(type: TileType, rotation: number): PieceId {
   return curveMap[r]
 }
 
+// ── Train selector options ──────────────────────────────────────────────────
+export interface TrainOption { id: string; label: string }
+
+export const TRAIN_OPTIONS: TrainOption[] = [
+  { id: 'train-diesel-a',           label: 'Diesel A' },
+  { id: 'train-diesel-b',           label: 'Diesel B' },
+  { id: 'train-diesel-box-a',       label: 'Diesel Box' },
+  { id: 'train-diesel-c',           label: 'Diesel C' },
+  { id: 'train-electric-bullet-a',  label: 'Bullet' },
+  { id: 'train-electric-city-a',    label: 'City' },
+  { id: 'train-electric-double-a',  label: 'Double Deck' },
+  { id: 'train-electric-square-a',  label: 'Square' },
+  { id: 'train-electric-subway-a',  label: 'Subway' },
+  { id: 'train-locomotive-a',       label: 'Locomotive A' },
+  { id: 'train-locomotive-b',       label: 'Locomotive B' },
+  { id: 'train-locomotive-c',       label: 'Locomotive C' },
+  { id: 'train-tram-classic',       label: 'Tram Classic' },
+  { id: 'train-tram-modern',        label: 'Tram Modern' },
+  { id: 'train-tram-round',         label: 'Tram Round' },
+]
+
+export const DEFAULT_TRAIN_ID = 'train-diesel-b'
+
 export const CELL = {
   VOID:    'VOID',
   FLOOR:   'FLOOR',

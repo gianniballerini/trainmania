@@ -101,19 +101,14 @@ export class Game {
   // ── Boot ──────────────────────────────────────────────────────────────────
   async boot(): Promise<void> {
     // Loading screen — shown immediately while assets load.
-    // Total = 1 tile per registered tile + 1 for the train model.
     showLoadingScreen()
-    const totalAssets = tileRegistry.size + 1
+    const totalAssets = tileRegistry.size
     let loadedAssets  = 0
 
     await tileRegistry.preloadAll(() => {
       loadedAssets++
       updateLoadingProgress(loadedAssets, totalAssets)
     })
-
-    await Train.preload()
-    loadedAssets++
-    updateLoadingProgress(loadedAssets, totalAssets)
 
     this.levelIndex = 0
     await this.loadLevel(0)
@@ -174,6 +169,15 @@ export class Game {
 
     this.cameraController.reset(this.camera)
     this.updateSelectedPiece()
+    this.showDefaultGhost()
+  }
+
+  rebuildTrain(): void {
+    if (!this.grid) return
+
+    this.train?.dispose()
+    this.train = new Train(this.scene, this.grid)
+    this.train.lerpSpeed = this.lerpSpeed
     this.showDefaultGhost()
   }
 
