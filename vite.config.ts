@@ -13,6 +13,17 @@ export default defineConfig({
           return renderFile(resolve(__dirname, 'index.pug'))
         },
       },
+      configureServer(server) {
+        // Watch all .pug files
+        server.watcher.add(resolve(__dirname, 'src/views/*.pug'))
+        server.watcher.add(resolve(__dirname, 'index.pug'))
+      },
+      handleHotUpdate({ file, server }) {
+        if (file.endsWith('.pug')) {
+          server.ws.send({ type: 'full-reload' })
+          return []
+        }
+      },
     },
   ],
   build: {
