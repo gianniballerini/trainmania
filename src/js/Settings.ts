@@ -43,16 +43,16 @@ class Settings {
             background: '#87ceeb', // sky blue
             fog: '#b8dff5',        // light sky blue fog
             ambient: {
-                color: '#ffffff', // pure white
-                intensity: 1.2,
+                color: '#997575',
+                intensity: 0.5,
             },
             sun: {
-                color: '#fff8e0', // bright warm white
-                intensity: 2.8,
+                color: '#fff19d',
+                intensity: 1.5,
             },
             fill: {
-                color: '#aad4ff', // light sky blue
-                intensity: 0.8,
+                color: '#a5cef8',
+                intensity: 1.4,
             },
             rectLight: {
                 color: '#ffeedd', // warm off-white
