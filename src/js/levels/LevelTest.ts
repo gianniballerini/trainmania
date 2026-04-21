@@ -1,6 +1,5 @@
 
-import type { Direction } from "../Constants"
-import { G, R } from "../GridCell"
+import { G, R, S, T } from "../GridCell"
 import type { Level } from "./Level"
 
 class LevelTest implements Level {
@@ -9,14 +8,11 @@ class LevelTest implements Level {
         [G(), G(), G(), G(),              G(), G(), G()],
         [G(), G(), G(), R('CURVE_SE'),    R('CURVE_SW'), G(), G()],
         [G(), G(), G(), R('STRAIGHT_NS'), R('STRAIGHT_NS'), G(), G()],
-        [G(), G(), G(), R('STRAIGHT_NS'), R('STRAIGHT_NS'), G(), G()],
+        [G(), G(), G(), S('S'),           R('STRAIGHT_NS'), G(), G()],
         [G(), G(), G(), R('STRAIGHT_NS'), R('STRAIGHT_NS'), G(), G()],
         [G(), G(), G(), R('CURVE_NE'),    R('CURVE_NW'), G(), G()],
-        [G(), G(), G(), G(),              G(), G(), G()],
+        [G(), G(), G(), T(),              G(), G(), G()],
     ]
-    trainStart: [number, number] = [3, 3]
-    trainDir: Direction = 'S'
-    stationPos: [number, number] = [3, 6]
     baseSpeed = 5000
 }
 

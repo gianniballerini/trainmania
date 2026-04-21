@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
 import { CELL, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
-import { cellToWorld, Grid } from './Grid.js'
+import { Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { LEVELS } from './levels/Level.js'
 import { createScene } from './scene.js'
@@ -38,10 +38,9 @@ export class Game {
   private readonly countdownValue: HTMLElement
 
   // ── Live game objects (replaced on each level load) ───────────────────────
-  grid:         Grid        | undefined
-  train:        Train       | undefined
-  smoke:        SmokeSystem | undefined
-  stationGroup: THREE.Group | undefined
+  grid:  Grid        | undefined
+  train: Train       | undefined
+  smoke: SmokeSystem | undefined
 
   // ── Speed ─────────────────────────────────────────────────────────────────
   lerpSpeed = 1
@@ -154,7 +153,6 @@ export class Game {
     this.grid?.dispose()
     this.train?.dispose()
     this.smoke?.dispose()
-    if (this.stationGroup) this.scene.remove(this.stationGroup)
 
     const levelDef     = LEVELS[idx]
     this.baseSpeed     = 1000 / levelDef.baseSpeed
@@ -168,11 +166,6 @@ export class Game {
     this.train        = new Train(this.scene, this.grid)
     this.train.lerpSpeed = this.lerpSpeed
     this.smoke        = Train.hasSmoke() ? new SmokeSystem(this.scene) : undefined
-
-    const [sc, sr]    = levelDef.stationPos
-    const stationPos  = cellToWorld(sc, sr, LEVELS[idx].grid[0].length, LEVELS[idx].grid.length)
-    this.stationGroup = tileRegistry.get('STATION').build(stationPos)
-    this.scene.add(this.stationGroup)
 
     this.cameraController.reset(this.camera)
     this.updateSelectedPiece()
@@ -377,7 +370,8 @@ export class Game {
     this.cameraController.tick(delta)
     this.cameraController.updateOrbit(this.camera)
 
-    const flag = this.stationGroup?.userData?.flag as THREE.Mesh | undefined
+    const [sc, sr] = this.grid?.stationPos ?? [0, 0]
+    const flag = this.grid?.getCell(sc, sr)?.tileGroup?.userData?.flag as THREE.Mesh | undefined
     if (flag) flag.rotation.y = Math.sin(now * 0.003) * 0.3
 
     this.renderer.render(this.scene, this.camera)

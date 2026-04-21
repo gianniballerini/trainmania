@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { CELL, CELL_H, CELL_SIZE, CellType, GAP, PieceId } from './Constants.js'
+import { CELL, CELL_H, CELL_SIZE, CellType, Direction, GAP, PieceId } from './Constants.js'
 import type { Level } from './levels/Level.js'
 import { Settings } from './Settings.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
@@ -58,6 +58,11 @@ export class Grid {
   hoverMesh: THREE.Mesh | null
   private readonly hoverMat: THREE.ShaderMaterial
 
+  // Derived from the grid scan — consumed by Train and Game
+  trainStart: [number, number] = [0, 0]
+  trainDir: Direction = 'S'
+  stationPos: [number, number] = [0, 0]
+
   constructor(scene: THREE.Scene, levelDef: Level) {
     this.scene     = scene
     this.level     = levelDef
@@ -87,21 +92,23 @@ export class Grid {
   }
 
   _buildTerrain(): void {
-    const { grid, stationPos, trainStart } = this.level
+    const { grid } = this.level
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         const gridCell       = grid[row][col]
         const isVoid         = gridCell.type === CELL.VOID
         const isPrebuiltRail = gridCell.type === CELL.RAIL
-        const isStation      = stationPos[0] === col && stationPos[1] === row
-        const isStart        = trainStart[0] === col && trainStart[1] === row
+        const type: CellType = gridCell.type
 
-        const type: CellType = isVoid        ? CELL.VOID
-                             : isStation     ? CELL.STATION
-                             : isStart       ? CELL.START
-                             : isPrebuiltRail ? CELL.RAIL
-                             : gridCell.type
+        // Extract derived metadata from special cell types
+        if (type === CELL.START && gridCell.dir) {
+          this.trainStart = [col, row]
+          this.trainDir   = gridCell.dir
+        }
+        if (type === CELL.STATION) {
+          this.stationPos = [col, row]
+        }
 
         const cell: CellData = {
           col, row, type,

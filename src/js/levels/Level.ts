@@ -1,4 +1,3 @@
-import type { Direction } from "../Constants"
 import type { GridCell } from "../GridCell"
 import { Level1 } from "./Level1"
 import { Level2 } from "./Level2"
@@ -9,9 +8,6 @@ import { LevelTest } from "./LevelTest"
 export interface Level {
   id: number
   grid: GridCell[][]
-  trainStart: [number, number]
-  trainDir: Direction
-  stationPos: [number, number]
   baseSpeed: number
 }
 

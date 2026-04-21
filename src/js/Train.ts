@@ -77,9 +77,9 @@ export class Train {
     this.lightsGroup = new Group()
     this.group.add(this.lightsGroup)
 
-    this.col     = grid.level.trainStart[0]
-    this.row     = grid.level.trainStart[1]
-    this.dir     = grid.level.trainDir
+    this.col     = grid.trainStart[0]
+    this.row     = grid.trainStart[1]
+    this.dir     = grid.trainDir
     this.moving    = false
     this.falling   = false
     this.fallVel   = 0
