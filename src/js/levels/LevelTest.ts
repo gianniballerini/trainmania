@@ -14,6 +14,7 @@ class LevelTest implements Level {
         [G(), G(), G(), T(),              G(), G(), G()],
     ]
     baseSpeed = 5000
+    countdown = 10
 }
 
 export { LevelTest }

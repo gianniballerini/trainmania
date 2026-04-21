@@ -14,6 +14,7 @@ class Level4 implements Level {
         [V(), V(), F(), T(), F(), V(), V()],
     ]
     baseSpeed = 5000
+    countdown = 10
 }
 
 export { Level4 }

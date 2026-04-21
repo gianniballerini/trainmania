@@ -5,12 +5,15 @@ import { cellToWorld } from '../Grid.js'
 import { BaseGameState } from './IGameState.js'
 
 export class PlayingState extends BaseGameState {
-  private countdown = 10;
+  private countdown = 0;
   private countdownActive = true;
 
   enter(game: Game): void {
-    game.updateCountdown(this.countdown);
-    game.setSpeedBtnEnabled(this.countdownActive);
+    const levelCountdown = game.grid?.level.countdown ?? 10
+    this.countdown = levelCountdown
+    this.countdownActive = levelCountdown > 0
+    game.updateCountdown(this.countdownActive ? this.countdown : null);
+    game.setSpeedBtnEnabled(!this.countdownActive);
   }
 
   update(game: Game, delta: number): void {

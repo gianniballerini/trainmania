@@ -13,7 +13,8 @@ class Level1 implements Level {
         [G(), G(), G(), G(),              G(), G(), G()],
         [G(), G(), G(), T(),              G(), G(), G()],
     ]
-    baseSpeed = 5000
+    baseSpeed = 3000
+    countdown = 5
 }
 
 export { Level1 }

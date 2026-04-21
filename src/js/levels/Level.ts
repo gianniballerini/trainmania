@@ -9,6 +9,7 @@ export interface Level {
   id: number
   grid: GridCell[][]
   baseSpeed: number
+  countdown?: number
 }
 
 export const LEVELS: Level[] = [
