@@ -8,6 +8,10 @@
         img(src='/images/icons/fastForward_dark.png', alt='Speed Up')
       span.hud__speed-label max speed
   .hud__right
+    button.hud__mute-btn(title='Mute All' data-sfx-click)
+      .hud__settings-icon.hud__icon
+        img(src='/images/icons/audioOn_dark.png', alt='Mute All')
+        img.hidden(src='/images/icons/audioOff_dark.png', alt='Unmute All')
     button.hud__settings-btn(title='Settings' data-sfx-click)
       .hud__settings-icon.hud__icon
         img(src='/images/icons/gear_dark.png', alt='Settings')

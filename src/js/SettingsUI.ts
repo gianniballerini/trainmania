@@ -9,6 +9,8 @@ export class SettingsUI {
   private readonly closeBtn:    HTMLElement
   private readonly tabs:        NodeListOf<HTMLButtonElement>
   private readonly panels:      NodeListOf<HTMLElement>
+
+  private readonly hudMutAll:  HTMLElement
   private readonly btnMuteAll:  HTMLElement
   private readonly btnMuteMusic: HTMLElement
   private readonly btnMuteSfx:  HTMLElement
@@ -23,9 +25,12 @@ export class SettingsUI {
     this.closeBtn     = document.querySelector('.settings__close')!
     this.tabs         = document.querySelectorAll('.settings__tab')
     this.panels       = document.querySelectorAll('.settings__panel')
+
+    this.hudMutAll   = document.querySelector('.hud__mute-btn')!
     this.btnMuteAll   = document.querySelector('.settings__mute-all')!
     this.btnMuteMusic = document.querySelector('.settings__mute-music')!
     this.btnMuteSfx   = document.querySelector('.settings__mute-sfx')!
+
     this.sliderMusic  = document.querySelector('.settings__music-slider')!
     this.sliderSfx    = document.querySelector('.settings__sfx-slider')!
 
@@ -67,6 +72,11 @@ export class SettingsUI {
       })
     })
 
+    this.hudMutAll.addEventListener('click', () => {
+      this.audio.muteAll(!this.audio.isAllMuted)
+      this.syncButtons()
+    })
+
     this.btnMuteAll.addEventListener('click', () => {
       this.audio.muteAll(!this.audio.isAllMuted)
       this.syncButtons()
@@ -100,8 +110,13 @@ export class SettingsUI {
     const { audio } = this
     const toggle = (btn: HTMLElement, muted: boolean) => {
       const [imgOn, imgOff] = btn.querySelectorAll<HTMLImageElement>('img')
+      const [hudImgOn, hudImgOff] = this.hudMutAll.querySelectorAll<HTMLImageElement>('img')
+
+      hudImgOn.classList.toggle('hidden', muted)
+      hudImgOff.classList.toggle('hidden', !muted)
       imgOn.classList.toggle('hidden', muted)
       imgOff.classList.toggle('hidden', !muted)
+
       btn.classList.toggle('muted', muted)
     }
     toggle(this.btnMuteAll,   audio.isAllMuted)

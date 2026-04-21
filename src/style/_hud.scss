@@ -23,6 +23,10 @@
   }
 
   &__right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 8 * $ptr;
   }
 
   &__level {
@@ -98,7 +102,7 @@
     font-family: 'Josefin Sans', sans-serif;
   }
 
-  &__settings-btn {
+  &__settings-btn, &__mute-btn {
     background: var(--hud-panel);
     border: 1 * $ptr solid var(--hud-border);
     border-radius: 8 * $ptr;

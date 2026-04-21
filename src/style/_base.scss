@@ -19,6 +19,11 @@ body {
   color: var(--cream);
   font-size: 16px;
 
+  div.hidden, img.hidden, canvas.hidden, iframe.hidden {
+    display: none;
+    pointer-events: none;
+  }
+
   @include respond-to($wide-1300-breakpoint) {
       font-size: 15px;
   }
@@ -74,9 +79,4 @@ body {
     width: 100%;
     height: 100%;
   }
-}
-
-div.hidden, img.hidden, canvas.hidden, iframe.hidden {
-    display: none;
-    pointer-events: none;
 }
