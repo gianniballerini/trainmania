@@ -1,5 +1,5 @@
-import type { IGameState } from './IGameState.js'
-import { BaseGameState } from './IGameState.js'
+import type { IGameState } from './IGameState.js';
+import { BaseGameState } from './IGameState.js';
 
 export class PausedState extends BaseGameState {
   /** The state that was active before pausing — restored on resume. */

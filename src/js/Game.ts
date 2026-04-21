@@ -36,7 +36,9 @@ export class Game {
   private readonly countdownBtn: HTMLElement
   private readonly countdownContainer: HTMLElement
   private readonly countdownValue: HTMLElement
-
+  private readonly coinsEl: HTMLElement
+  private readonly coinsCountEl: HTMLElement
+  private readonly timeValEl: HTMLElement
   // ── Live game objects (replaced on each level load) ───────────────────────
   grid:  Grid        | undefined
   train: Train       | undefined
@@ -54,7 +56,13 @@ export class Game {
 
   // ── Level ─────────────────────────────────────────────────────────────────
   levelIndex = 0
-
+  // ── Coins (per-level) ───────────────────────────────────────────────
+  coinCount  = 0
+  totalCoins = 0
+  // ── Play time (seconds elapsed while in PlayingState) ────────────
+  playTime = 0
+  playTimeAccumulated = 0
+  playTimeStamp = 0
   // ── Input ─────────────────────────────────────────────────────────────────
   isTouchMode = false
   followTrain = false
@@ -90,6 +98,9 @@ export class Game {
     this.countdownContainer = document.querySelector<HTMLElement>('.hud__countdown-container')!
     this.countdownValue = this.countdownContainer.querySelector<HTMLElement>('.hud__countdown-val')!
     this.countdownBtn = document.querySelector<HTMLElement>('.hud__countdown-button')!
+    this.coinsEl = document.querySelector<HTMLElement>('.hud__coins')!
+    this.coinsCountEl = document.querySelector<HTMLElement>('.hud__coins-count')!
+    this.timeValEl = document.querySelector<HTMLElement>('.hud__time-val')!
 
     this.countdownBtn.addEventListener('click', () => {
       if (this.currentState instanceof PlayingState) {
@@ -144,6 +155,7 @@ export class Game {
 
   resume(): void {
     if (this.currentState instanceof PausedState) {
+      this.lastTime = performance.now()
       this.changeState(this.currentState.previousState as BaseGameState)
     }
   }
@@ -167,6 +179,14 @@ export class Game {
     this.train.lerpSpeed = this.lerpSpeed
     this.smoke        = Train.hasSmoke() ? new SmokeSystem(this.scene) : undefined
 
+    await this.grid.buildCoins()
+    this.coinCount          = 0
+    this.totalCoins         = this.grid.totalCoins
+    this.playTimeAccumulated = 0
+    this.playTimeStamp      = 0
+    this.updateCoinDisplay()
+    this.updateTimeDisplay()
+
     this.cameraController.reset(this.camera)
     this.updateSelectedPiece()
     this.showDefaultGhost()
@@ -188,7 +208,11 @@ export class Game {
   // ── Tick (called by PlayingState.update when train lerp completes) ─────────
   doTick(): void {
     if (!this.train) return
-
+    // Collect coin on the current cell before stepping
+    if (this.grid?.collectCoin(this.train.col, this.train.row)) {
+      this.coinCount++
+      this.updateCoinDisplay()
+    }
     const result = this.train.step()
 
     this.lerpSpeed = Math.min(MAX_SPEED, this.lerpSpeed * SPEED_ACCEL)
@@ -317,7 +341,6 @@ export class Game {
   private _isPlaceable(cell: { type: string; trackPiece: unknown }): boolean {
     return cell.type !== CELL.VOID
         && cell.type !== CELL.STATION
-        && cell.type !== CELL.START
         && cell.trackPiece === null
   }
 
@@ -339,6 +362,22 @@ export class Game {
       : `hsl(${70 - (t - 0.5) * 100}, 80%, 50%)`
   }
 
+  updateTimeDisplay(): void {
+    const t = this.playTime
+    const m = Math.floor(t / 60)
+    const s = Math.floor(t % 60).toString().padStart(2, '0')
+    this.timeValEl.textContent = m > 0 ? `${m}:${s}` : `${Math.floor(t)}s`
+  }
+
+  updateCoinDisplay(): void {
+    if (this.totalCoins === 0) {
+      this.coinsEl.classList.add('hidden')
+      return
+    }
+    this.coinsEl.classList.remove('hidden')
+    this.coinsCountEl.textContent = `${this.coinCount} / ${this.totalCoins}`
+  }
+
   // ── Render loop ───────────────────────────────────────────────────────────
   private startRenderLoop(): void {
     this.animate()
@@ -352,9 +391,12 @@ export class Game {
 
     this.currentState.update(this, delta)
 
-    if (this.train) this.train.update(delta)
+    if (this.train && this.currentState instanceof PlayingState) this.train.update(delta)
     if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
     if (this.grid) this.grid.updateHover(now * 0.001)
+    if (this.grid) this.grid.updateCoins(delta)
+    this.playTime = this.playTimeAccumulated + (this.currentState instanceof PlayingState ? (performance.now() - this.playTimeStamp) / 1000 : 0)
+    this.updateTimeDisplay()
 
     // Lerp camera look target: train follow > ghost tile > grid center
     let goalX = 0

@@ -1,20 +1,21 @@
 
-import { G, R, S, T } from "../GridCell"
+import { coin, G, R, S, T } from "../GridCell"
 import type { Level } from "./Level"
 
 class Level1 implements Level {
     id = 1
     grid = [
-        [G(), G(), G(), S('S'),            G(), G(), G()],
-        [G(), G(), G(), R('STRAIGHT_NS'), G(), G(), G()],
-        [G(), G(), G(), R('STRAIGHT_NS'), G(), G(), G()],
-        [G(), G(), G(), G(),              G(), G(), G()],
-        [G(), G(), G(), G(),              G(), G(), G()],
-        [G(), G(), G(), G(),              G(), G(), G()],
-        [G(), G(), G(), T(),              G(), G(), G()],
+        [G(), G(), G(), S('S'),                      G(), G(), G()],
+        [G(), G(), G(), R('STRAIGHT_NS'),             G(), G(), G()],
+        [G(), G(), G(), coin(R('STRAIGHT_NS')),       G(), G(), G()],
+        [G(), G(), G(), G(),                          G(), G(), G()],
+        [G(), G(), G(), G(),                          G(), G(), G()],
+        [G(), G(), G(), G(),                          G(), G(), G()],
+        [G(), G(), G(), T(),                          G(), G(), G()],
     ]
     baseSpeed = 3000
     countdown = 5
+    coins = 1
 }
 
 export { Level1 }

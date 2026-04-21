@@ -5,6 +5,7 @@ export class GridCell {
     public readonly type: CellType,
     public readonly prebuiltPiece?: PieceId,
     public readonly dir?: Direction,
+    public readonly hasCoin?: boolean,
   ) {}
 }
 
@@ -28,3 +29,7 @@ export const S = (dir: Direction): GridCell => new GridCell('START', undefined, 
 
 /** Station (goal) cell */
 export const T = (): GridCell => new GridCell('STATION')
+
+/** Coin wrapper — marks any cell to have a floating collectible coin on top */
+export const coin = (cell: GridCell): GridCell =>
+  new GridCell(cell.type, cell.prebuiltPiece, cell.dir, true)

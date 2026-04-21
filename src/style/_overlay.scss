@@ -124,6 +124,42 @@
     text-transform: uppercase;
   }
 
+  &__score {
+    width: 100%;
+    max-width: 240 * $ptr;
+    display: flex;
+    flex-direction: column;
+    gap: 6 * $ptr;
+    padding: 10 * $ptr 16 * $ptr;
+    background: rgba(45, 53, 97, 0.06);
+    border-radius: 8 * $ptr;
+
+    &.hidden { display: none; }
+  }
+
+  &__score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16 * $ptr;
+    font-family: 'Josefin Sans', sans-serif;
+  }
+
+  &__score-label {
+    font-size: 9 * $ptr;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    opacity: 0.45;
+  }
+
+  &__score-time,
+  &__score-coins {
+    font-size: 20 * $ptr;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-color);
+  }
+
   &__btn {
     margin-top: 12 * $ptr;
     padding: 12 * $ptr 36 * $ptr;

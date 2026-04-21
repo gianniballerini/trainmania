@@ -5,7 +5,7 @@ import { TileBase } from './TileBase.js'
 export class StartTile extends TileBase {
   readonly id        = 'START'
   readonly label     = 'Start'
-  readonly isPlaceable = false
+  readonly isPlaceable = true
   readonly isRendered  = true
 
   private readonly mat = new THREE.MeshLambertMaterial({

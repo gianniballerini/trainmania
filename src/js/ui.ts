@@ -1,10 +1,13 @@
 import type { AudioManager } from './AudioManager.js'
 import type { TrainOption } from './Constants.js'
 
-const overlay = document.querySelector<HTMLElement>('.overlay')!
-const title   = document.querySelector<HTMLElement>('.overlay__title')!
-const sub     = document.querySelector<HTMLElement>('.overlay__sub')!
-let   btn     = document.querySelector<HTMLElement>('.overlay__btn')!
+const overlay     = document.querySelector<HTMLElement>('.overlay')!
+const title       = document.querySelector<HTMLElement>('.overlay__title')!
+const sub         = document.querySelector<HTMLElement>('.overlay__sub')!
+let   btn         = document.querySelector<HTMLElement>('.overlay__btn')!
+const scoreEl     = document.querySelector<HTMLElement>('.overlay__score')!
+const scoreTimeEl = document.querySelector<HTMLElement>('.overlay__score-time')!
+const scoreCoinsEl = document.querySelector<HTMLElement>('.overlay__score-coins')!
 
 const trainPicker = document.querySelector<HTMLElement>('.overlay__train-picker')!
 const trainStrip  = document.querySelector<HTMLElement>('.overlay__train-picker__strip')!
@@ -40,6 +43,12 @@ export function initUiSfx(audio: AudioManager): void {
     const target = (e.target as HTMLElement).closest<HTMLElement>('[data-sfx-click]')
     if (target) audio.playSfx('click')
   })
+
+  // Blur any button after a pointer click so keyboard events (Space, Enter)
+  // are never swallowed by a focused button.
+  document.addEventListener('pointerup', () => {
+    (document.activeElement as HTMLElement)?.blur()
+  }, { capture: true })
 }
 
 
@@ -67,6 +76,27 @@ export function showOverlay(
 
 export function hideOverlay(): void {
   overlay.classList.add('hidden')
+}
+
+export interface WinScore {
+  time: number
+  coins: number
+  totalCoins: number
+}
+
+export function showWinOverlay(
+  titleText: string,
+  subText: string,
+  score: WinScore,
+  btnText: string,
+  onBtn: () => void
+): void {
+  const m = Math.floor(score.time / 60)
+  const s = Math.floor(score.time % 60).toString().padStart(2, '0')
+  scoreTimeEl.textContent  = `${m}:${s}`
+  scoreCoinsEl.textContent = score.totalCoins > 0 ? `${score.coins} / ${score.totalCoins}` : ''
+  scoreEl.classList.toggle('hidden', score.totalCoins === 0)
+  showOverlay(titleText, subText, btnText, onBtn)
 }
 
 // ── Train picker (shared) ─────────────────────────────────────────────────────

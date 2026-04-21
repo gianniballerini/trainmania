@@ -7,11 +7,16 @@ import { BaseGameState } from './IGameState.js'
 export class PlayingState extends BaseGameState {
   private countdown = 0;
   private countdownActive = true;
+  private _initialised = false;
 
   enter(game: Game): void {
-    const levelCountdown = game.grid?.level.countdown ?? 10
-    this.countdown = levelCountdown
-    this.countdownActive = levelCountdown > 0
+    game.playTimeStamp = performance.now()
+    if (!this._initialised) {
+      const levelCountdown = game.grid?.level.countdown ?? 10
+      this.countdown = levelCountdown
+      this.countdownActive = levelCountdown > 0
+      this._initialised = true
+    }
     game.updateCountdown(this.countdownActive ? this.countdown : null);
     game.setSpeedBtnEnabled(!this.countdownActive);
   }
@@ -41,6 +46,7 @@ export class PlayingState extends BaseGameState {
   }
 
   exit(game: Game): void {
+    game.playTimeAccumulated += (performance.now() - game.playTimeStamp) / 1000
     game.updateCountdown(null);
     game.setSpeedBtnEnabled(true);
   }
@@ -61,7 +67,7 @@ export class PlayingState extends BaseGameState {
   }
 
   handleClick(game: Game, col: number, row: number, cell: CellData | null): void {
-    if (!game.selectedPiece || !game.grid || !cell || cell.type === CELL.VOID || cell.type === CELL.STATION || cell.type === CELL.START) return
+    if (!game.selectedPiece || !game.grid || !cell || cell.type === CELL.VOID || cell.type === CELL.STATION) return
     const placed = game.grid.placeTrack(col, row, game.selectedPiece)
     if (placed) {
       game.updateSelectedPiece()        // ← refresh ghost/selected piece

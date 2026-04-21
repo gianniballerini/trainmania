@@ -56,20 +56,26 @@
 
   &__speed-btn {
     background: var(--hud-panel);
+
     border: 1 * $ptr solid var(--hud-border);
     border-radius: 8 * $ptr;
+    padding: 6 * $ptr 9 * $ptr;
+
+    cursor: pointer;
+
     color: var(--text-color);
     font-size: 18 * $ptr;
     line-height: 1;
-    padding: 6 * $ptr 9 * $ptr;
-    cursor: pointer;
-    pointer-events: all;
     transition: background 0.15s;
     font-family: 'Josefin Sans', sans-serif;
+    pointer-events: all;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4 * $ptr;
+
+    width: 100 * $ptr;
 
     &:hover {
       background: rgba(245, 240, 232, 1);
@@ -114,6 +120,60 @@
     &:hover {
       background: rgba(245, 240, 232, 1);
     }
+  }
+
+  &__coins {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5 * $ptr;
+    background: var(--hud-panel);
+    border: 1 * $ptr solid var(--hud-border);
+    border-radius: 8 * $ptr;
+    padding: 4 * $ptr 10 * $ptr;
+    pointer-events: none;
+
+    width: 100 * $ptr;
+  }
+
+  &__coins-icon {
+    font-size: 14 * $ptr;
+    color: #f5c842;
+    line-height: 1;
+  }
+
+  &__coins-count {
+    font-size: 13 * $ptr;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
+    letter-spacing: 1 * $ptr;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__time {
+    display: flex;
+    flex-direction: row;;
+    align-items: center;
+    gap: 5 * $ptr;
+
+    background: var(--hud-panel);
+    padding: 4 * $ptr 10 * $ptr;
+    border: 1 * $ptr solid var(--hud-border);
+    border-radius: 8 * $ptr;
+    width: 100 * $ptr;
+
+    pointer-events: none;
+  }
+
+  &__time-val {
+    flex: 1;
+    text-align: center;
+    font-size: 14 * $ptr;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
   }
 }
 

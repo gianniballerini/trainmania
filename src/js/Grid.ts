@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { CoinSystem } from './collectibles/CoinSystem.js'
 import { CELL, CELL_H, CELL_SIZE, CellType, Direction, GAP, PieceId } from './Constants.js'
 import type { Level } from './levels/Level.js'
 import { Settings } from './Settings.js'
@@ -22,6 +23,8 @@ export interface CellData {
   tileGroup: THREE.Group | null
   trackMesh?: THREE.Group | null
   prebuilt?: boolean
+  hasCoin?: boolean
+  coinGroup?: THREE.Group | null
 }
 
 export function cellToWorld(col: number, row: number, cols: number, rows: number): THREE.Vector3 {
@@ -63,6 +66,9 @@ export class Grid {
   trainDir: Direction = 'S'
   stationPos: [number, number] = [0, 0]
 
+  // ── Coin system ──────────────────────────────────────────────────────────
+  readonly coins: CoinSystem
+
   constructor(scene: THREE.Scene, levelDef: Level) {
     this.scene     = scene
     this.level     = levelDef
@@ -84,6 +90,8 @@ export class Grid {
       vertexShader: hoverVert,
       fragmentShader: hoverFrag,
     })
+
+    this.coins = new CoinSystem(scene)
 
     scene.add(this.meshes)
     scene.add(this.railGroup)
@@ -115,6 +123,8 @@ export class Grid {
           trackPiece: isPrebuiltRail ? (gridCell.prebuiltPiece ?? null) : null,
           tileGroup: null,
           prebuilt: isPrebuiltRail,
+          hasCoin: gridCell.hasCoin ?? false,
+          coinGroup: null,
         }
         this.cells.push(cell)
 
@@ -152,6 +162,7 @@ export class Grid {
     if (!cell || !this._trackPlaceable(col, row)) return false
     if (cell.trackPiece) this._removeTrackVisual(cell)
     cell.trackPiece = pieceId
+    cell.prebuilt = false
     cell.type = CELL.RAIL
     this._buildTrackVisual(cell, pieceId)
     return true
@@ -159,11 +170,13 @@ export class Grid {
 
   removeTrack(col: number, row: number): boolean {
     const cell = this.getCell(col, row)
-    if (!cell || !cell.trackPiece || cell.prebuilt) return false
-    if (cell.type === CELL.STATION || cell.type === CELL.START) return false
+    if (!cell || !cell.trackPiece) return false
+    if (cell.type === CELL.STATION) return false
+    const restoreType = cell.type === CELL.START ? CELL.START : CELL.FLOOR
     this._removeTrackVisual(cell)
     cell.trackPiece = null
-    cell.type = CELL.FLOOR
+    cell.prebuilt = false
+    cell.type = restoreType
     return true
   }
 
@@ -287,7 +300,26 @@ export class Grid {
     tileRegistry.updateColors(Settings.colors)
   }
 
+  // ── Coin system (delegates to CoinSystem) ────────────────────────────────
+
+  get totalCoins(): number { return this.coins.totalCoins }
+
+  buildCoins(): Promise<void> {
+    return this.coins.build(this.cells, this.cols, this.rows)
+  }
+
+  updateCoins(delta: number): void {
+    this.coins.update(delta)
+  }
+
+  collectCoin(col: number, row: number): boolean {
+    const cell = this.getCell(col, row)
+    if (!cell) return false
+    return this.coins.collect(cell)
+  }
+
   dispose(): void {
+    this.coins.dispose()
     this.scene.remove(this.meshes)
     this.scene.remove(this.railGroup)
     this.hideGhost()
