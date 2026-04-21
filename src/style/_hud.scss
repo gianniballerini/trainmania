@@ -295,3 +295,53 @@
     object-fit: contain;
   }
 }
+
+// ── Ghost tile floating action buttons ────────────────────────────────────────
+.ghost-actions {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+
+  display: flex;
+  flex-direction: row;
+  gap: 8 * $ptr;
+
+  transform: translate(-50%, calc(-100% - 12 * $ptr));
+
+  opacity: 0;
+  transition: opacity 0.1s ease;
+
+  &.is-visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+.ghost-actions__btn {
+  width: 44 * $ptr;
+  height: 44 * $ptr;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--hud-panel);
+  border: 1 * $ptr solid rgba(45, 53, 97, 0.3);
+  border-radius: 10 * $ptr;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: background 0.12s, transform 0.08s, border-color 0.12s;
+
+  &:hover {
+    background: rgba(245, 240, 232, 1);
+    border-color: var(--accent-color);
+  }
+
+  &.is-active {
+    background: rgba(240, 192, 96, 0.45);
+    border-color: var(--stub-color);
+    transform: scale(0.93);
+  }
+}

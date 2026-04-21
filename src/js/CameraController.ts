@@ -64,6 +64,10 @@ export class CameraController {
     return this._dragging
   }
 
+  get isSettled(): boolean {
+    return !this._dragging && this._target.distanceTo(this._goalTarget) < 0.01
+  }
+
   isPastThreshold(clientX: number, clientY: number): boolean {
     return Math.hypot(clientX - this._startX, clientY - this._startY) > CameraController.DRAG_THRESHOLD
   }

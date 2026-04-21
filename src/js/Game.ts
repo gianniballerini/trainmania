@@ -65,7 +65,8 @@ export class Game {
   readonly cameraController!: CameraController
   readonly sceneController!:  SceneController
 
-  settingsUI: SettingsUI | undefined
+  inputManager: InputManager | undefined
+  settingsUI:   SettingsUI   | undefined
 
   // ── State machine ─────────────────────────────────────────────────────────
   currentState: BaseGameState = new BaseGameState()
@@ -120,7 +121,7 @@ export class Game {
     await this.loadLevel(0)
 
     // InputManager and SettingsUI created after level is ready (scene/objects in place)
-    new InputManager(this.canvas, this, this.cameraController)
+    this.inputManager = new InputManager(this.canvas, this, this.cameraController)
     this.settingsUI = new SettingsUI(this.audioManager, this)
     initUiSfx(this.audioManager)
 
@@ -369,6 +370,7 @@ export class Game {
     this.cameraController.setGoalTarget(new THREE.Vector3(goalX, 0, goalZ))
     this.cameraController.tick(delta)
     this.cameraController.updateOrbit(this.camera)
+    this.inputManager?.tick()
 
     const [sc, sr] = this.grid?.stationPos ?? [0, 0]
     const flag = this.grid?.getCell(sc, sr)?.tileGroup?.userData?.flag as THREE.Mesh | undefined

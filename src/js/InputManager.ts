@@ -1,12 +1,14 @@
 import * as THREE from 'three'
 import type { CameraController } from './CameraController.js'
 import type { Game } from './Game.js'
-import { CELL_SIZE_EXPORT as CELL_SIZE } from './Grid.js'
+import { CELL_SIZE_EXPORT as CELL_SIZE, cellToWorld } from './Grid.js'
 
 export class InputManager {
   private readonly raycaster = new THREE.Raycaster()
   private readonly pointer   = new THREE.Vector2()
   private readonly planeMesh: THREE.Mesh
+  private readonly ghostActionsEl: HTMLElement
+  private _ghostActionsPending = false
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -20,7 +22,42 @@ export class InputManager {
     this.planeMesh.rotation.x = -Math.PI / 2
     game.scene.add(this.planeMesh)
 
+    this.ghostActionsEl = document.querySelector<HTMLElement>('.ghost-actions')!
+
     this.bindEvents()
+  }
+
+  // ── Ghost action buttons (desktop only) ──────────────────────────────────
+
+  private showGhostActions(col: number, row: number): void {
+    if (this.game.isTouchMode) return
+    const { grid, camera } = this.game
+    if (!grid) return
+
+    const worldPos = cellToWorld(col, row, grid.cols, grid.rows)
+    worldPos.y = 0.8
+
+    const ndc = worldPos.clone().project(camera)
+    const x = (ndc.x + 1) / 2 * window.innerWidth
+    const y = (-ndc.y + 1) / 2 * window.innerHeight
+
+    this.ghostActionsEl.style.left = `${x}px`
+    this.ghostActionsEl.style.top  = `${y}px`
+    this.ghostActionsEl.classList.add('is-visible')
+  }
+
+  private hideGhostActions(): void {
+    this.ghostActionsEl.classList.remove('is-visible')
+  }
+
+  /** Called each frame by Game.animate — shows ghost action buttons once the camera has settled. */
+  tick(): void {
+    if (!this._ghostActionsPending || !this.cam.isSettled) return
+    const cell = this.game.lastHoveredCell
+    if (cell && !this.game.isTouchMode) {
+      this.showGhostActions(cell.col, cell.row)
+    }
+    this._ghostActionsPending = false
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -118,6 +155,8 @@ export class InputManager {
     })
     canvas.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return
+      this.hideGhostActions()
+      this._ghostActionsPending = game.lastHoveredCell !== null
       cam.startDrag(e.clientX, e.clientY)
       canvas.style.cursor = 'grabbing'
       e.preventDefault()
@@ -159,6 +198,8 @@ export class InputManager {
         if (game.followTrain) {
           game.lastHoveredCell = null
           game.grid?.hideGhost()
+          this.hideGhostActions()
+          this._ghostActionsPending = false
         }
         return
       }
@@ -166,15 +207,23 @@ export class InputManager {
       // Click on grid → cancel train follow
       game.followTrain = false
       const hit = this.hitTestGrid()
-      if (!hit) return
+      if (!hit) {
+        this.hideGhostActions()
+        this._ghostActionsPending = false
+        return
+      }
       const cell = game.grid?.getCell(hit.col, hit.row) ?? null
       const prev = game.lastHoveredCell
       if (prev && prev.col === hit.col && prev.row === hit.row) {
         // Second click on focused tile → place
         game.currentState.handleClick(game, hit.col, hit.row, cell)
+        this.hideGhostActions()
+        this._ghostActionsPending = false
       } else {
         // First click → focus the tile (show ghost)
         game.currentState.handlePointerMove(game, hit.col, hit.row, cell)
+        this.hideGhostActions()
+        this._ghostActionsPending = game.lastHoveredCell !== null
       }
     })
 
@@ -263,5 +312,11 @@ export class InputManager {
       swapBtn.addEventListener('mousedown', () => withActive(swapBtn, doSwap))
       swapBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(swapBtn, doSwap) }, { passive: false })
     }
+
+    // ── Ghost tile floating buttons ──────────────────────────────────────
+    const ghostRotateBtn = this.ghostActionsEl.querySelector<HTMLElement>('.ghost-actions__btn--rotate')!
+    const ghostSwapBtn   = this.ghostActionsEl.querySelector<HTMLElement>('.ghost-actions__btn--swap')!
+    ghostRotateBtn.addEventListener('click', () => withActive(ghostRotateBtn, doRotateL))
+    ghostSwapBtn.addEventListener('click',   () => withActive(ghostSwapBtn, doSwap))
   }
 }
