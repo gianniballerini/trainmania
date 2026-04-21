@@ -1,17 +1,17 @@
 
-import { F, R, S, T, V } from "../GridCell"
+import { G, R, S, T, V } from "../GridCell"
 import type { Level } from "./Level"
 
 class Level4 implements Level {
     id = 4
     grid = [
-        [V(), V(), F(), F(), F(), V(), V()],
-        [V(), V(), F(), F(), F(), V(), V()],
-        [F(), F(), F(), F(), F(), F(), F()],
-        [S('E'), R('STRAIGHT_EW'), F(), F(), F(), F(), F()],
-        [F(), F(), F(), F(), F(), F(), F()],
-        [V(), V(), F(), F(), F(), V(), V()],
-        [V(), V(), F(), T(), F(), V(), V()],
+        [V(), V(), G(), G(), G(), V(), V()],
+        [V(), V(), G(), G(), G(), V(), V()],
+        [G(), G(), G(), G(), G(), G(), G()],
+        [S('E'), R('STRAIGHT_EW'), G(), G(), G(), G(), G()],
+        [G(), G(), G(), G(), G(), G(), G()],
+        [V(), V(), G(), G(), G(), V(), V()],
+        [V(), V(), G(), T(), G(), V(), V()],
     ]
     baseSpeed = 5000
     countdown = 10
