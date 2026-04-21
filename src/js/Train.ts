@@ -21,7 +21,7 @@ function _trainAsset() {
   return {
     modelUrl: `/assets/models/${_selectedModelId}.glb`,
     colorMapUrl: '/assets/textures/colormap.png',
-    targetFootprint: 1.35,
+    targetFootprint: 1,
     yOffset: 0.02,
     rotationY: Math.PI, // Flip model 180° to face correct direction
   }

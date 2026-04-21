@@ -1,13 +1,15 @@
+export interface ColorsConfig {
+    floor: string
+    floor2: string
+    rail: string
+    station: string
+    start: string
+    rock: string
+    ghost: string
+}
+
 class Settings {
-    colors: {
-        floor: string,
-        floor2: string,
-        rail: string,
-        station: string,
-        start: string,
-        rock: string,
-        ghost: string
-    }
+    colors: ColorsConfig
     scene: {
         background: string,
         fog: string,

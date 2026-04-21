@@ -1,3 +1,8 @@
+// Grid layout constants — shared across Grid, TileBase and all tile classes
+export const CELL_SIZE = 2.0   // world units per cell
+export const CELL_H    = 0.5   // cube height
+export const GAP       = 0.06  // gap between cells
+
 // Directions as vectors [col, row]
 export type Direction = 'N' | 'S' | 'E' | 'W'
 
@@ -18,7 +23,25 @@ export type PieceId =
   | 'CURVE_SE'
   | 'CURVE_SW'
 
-export type CellType = 'VOID' | 'FLOOR' | 'RAIL' | 'STATION' | 'START' | 'ROCK'
+export type CellType =
+  | 'VOID'
+  | 'FLOOR'
+  | 'RAIL'
+  | 'STATION'
+  | 'START'
+  | 'ROCK'
+  | 'GRASS'
+
+export const CELL = {
+  VOID:    'VOID',
+  FLOOR:   'FLOOR',
+  RAIL:    'RAIL',
+  STATION: 'STATION',
+  START:   'START',
+  ROCK:   'ROCK',
+  GRASS:  'GRASS',
+} as const
+
 
 export const DIR: Record<Direction, [number, number]> = {
   N: [0, -1],
@@ -125,13 +148,3 @@ export const TRAIN_OPTIONS: TrainOption[] = [
 ]
 
 export const DEFAULT_TRAIN_ID = 'train-diesel-b'
-
-export const CELL = {
-  VOID:    'VOID',
-  FLOOR:   'FLOOR',
-  RAIL:    'RAIL',
-  STATION: 'STATION',
-  START:   'START',
-  ROCK:   'ROCK'
-} as const
-

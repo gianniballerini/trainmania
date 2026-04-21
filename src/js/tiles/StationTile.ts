@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { loadModelAsset, warnAssetLoadFailureOnce } from '../Assets.js'
+import { Settings, type ColorsConfig } from '../Settings.js'
 import { TileBase } from './TileBase.js'
 
 export interface StationTileOptions {
@@ -8,12 +9,17 @@ export interface StationTileOptions {
 }
 
 export class StationTile extends TileBase {
-  readonly id    = 'STATION'
-  readonly label = 'Station'
+  readonly id          = 'STATION'
+  readonly label       = 'Station'
+  readonly isPlaceable = false
+  readonly isRendered  = true
 
   private _model: THREE.Group | null = null
   private _loaded = false
   private readonly _modelUrl: string | null
+  private readonly _baseMat = new THREE.MeshLambertMaterial({
+    color: new THREE.Color(Settings.colors.station),
+  })
 
   constructor(options: StationTileOptions = {}) {
     super()
@@ -40,6 +46,7 @@ export class StationTile extends TileBase {
     const group = new THREE.Group()
     group.position.set(position.x, 0, position.z)
     group.rotation.y = rotationY
+    group.add(this.buildBaseBox(this._baseMat))
 
     if (this._model) {
       const clone = this._model.clone()
@@ -80,5 +87,9 @@ export class StationTile extends TileBase {
     group.userData.flag = flag
 
     return group
+  }
+
+  updateColors(colors: ColorsConfig): void {
+    this._baseMat.color.set(colors.station)
   }
 }

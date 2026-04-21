@@ -10,6 +10,9 @@ export class GridCell {
 /** Floor — buildable, no rail */
 export const F = (): GridCell => new GridCell('FLOOR')
 
+/** Grass — buildable, no rail */
+export const G = (): GridCell => new GridCell('GRASS')
+
 /** Void — unbuildable, not an obstacle */
 export const V = (): GridCell => new GridCell('VOID')
 

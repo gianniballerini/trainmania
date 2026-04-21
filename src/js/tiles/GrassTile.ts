@@ -1,25 +1,22 @@
 import * as THREE from 'three'
 import { loadModelAsset } from '../Assets.js'
-import { Settings, type ColorsConfig } from '../Settings.js'
+import { type ColorsConfig } from '../Settings.js'
 import { TileBase } from './TileBase.js'
 
-export class RockTile extends TileBase {
-  readonly id          = 'ROCK'
-  readonly label       = 'Rock'
-  readonly isPlaceable = false
+export class GrassTile extends TileBase {
+  readonly id          = 'GRASS'
+  readonly label       = 'Grass'
+  readonly isPlaceable = true
   readonly isRendered  = true
 
   private model: THREE.Group | null = null
-  private readonly mat = new THREE.MeshLambertMaterial({
-    color: new THREE.Color(Settings.colors.rock),
-  })
 
   async preload(): Promise<void> {
     if (!this.model) {
       this.model = await loadModelAsset({
-        modelUrl: '/assets/models/tile_rock.glb',
+        modelUrl: '/assets/models/block-grass-low-large.glb',
         targetFootprint: 2.0,
-        yOffset: 0,
+        yOffset: -0.5,
         castShadow: true,
         receiveShadow: true,
       })
@@ -28,12 +25,11 @@ export class RockTile extends TileBase {
 
   build(position: THREE.Vector3, rotationY = 0): THREE.Group {
     if (!this.model) {
-      throw new Error('RockTile: Model not preloaded!')
+      throw new Error('GrassTile: Model not preloaded!')
     }
 
     const group = new THREE.Group()
     group.position.set(position.x, 0, position.z)
-    group.add(this.buildBaseBox(this.mat))
 
     const instance = this.model.clone()
     instance.rotation.y = rotationY
@@ -43,6 +39,11 @@ export class RockTile extends TileBase {
   }
 
   updateColors(colors: ColorsConfig): void {
-    this.mat.color.set(colors.rock)
+    if (!this.model) return
+    this.model.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshLambertMaterial) {
+        child.material.color.set(colors.floor)
+      }
+    })
   }
 }

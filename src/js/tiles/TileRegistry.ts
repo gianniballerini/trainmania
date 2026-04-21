@@ -1,3 +1,4 @@
+import type { ColorsConfig } from '../Settings.js'
 import type { TileBase } from './TileBase.js'
 
 export type ProgressCallback = (loaded: number, total: number) => void
@@ -36,5 +37,12 @@ export class TileRegistry {
 
   get size(): number {
     return this.tiles.size
+  }
+
+  /** Propagate updated color settings to every registered tile. */
+  updateColors(colors: ColorsConfig): void {
+    for (const tile of this.tiles.values()) {
+      tile.updateColors(colors)
+    }
   }
 }

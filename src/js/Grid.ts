@@ -1,32 +1,25 @@
 import * as THREE from 'three'
-import { CELL, CellType, PieceId } from './Constants.js'
+import { CELL, CELL_H, CELL_SIZE, CellType, GAP, PieceId } from './Constants.js'
 import type { Level } from './levels/Level.js'
 import { Settings } from './Settings.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
 import hoverVert from './shaders/hover.vert.glsl?raw'
 import { tileRegistry } from './tiles/index.js'
 
-const CELL_SIZE  = 2.0   // world units per cell
-const CELL_H     = 0.5   // cube height
-const GAP        = 0.06  // gap between cells
-
-// Materials
-const MAT = {
-  floor:   new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.floor) }),   // moss green
-  floor2:  new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.floor2) }),   // alt moss
-  rail:    new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.rail) }),   // sandy track bed
-  station: new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.station) }),   // gold
-  start:   new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.start) }),   // slate blue
-  rock:    new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.rock) }),   // grey-brown rock base
-  ghost:   new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.ghost), transparent: true, opacity: 0.25, depthWrite: false }),
-}
+// Ghost material — a Grid-level concern, not delegated to tiles
+const MAT_GHOST = new THREE.MeshLambertMaterial({
+  color: new THREE.Color(Settings.colors.ghost),
+  transparent: true,
+  opacity: 0.25,
+  depthWrite: false,
+})
 
 export interface CellData {
   col: number
   row: number
   type: CellType
   trackPiece: PieceId | null
-  mesh: THREE.Mesh | null
+  tileGroup: THREE.Group | null
   trackMesh?: THREE.Group | null
   prebuilt?: boolean
 }
@@ -95,62 +88,43 @@ export class Grid {
 
   _buildTerrain(): void {
     const { grid, stationPos, trainStart } = this.level
-    const geo = new THREE.BoxGeometry(
-      CELL_SIZE - GAP,
-      CELL_H,
-      CELL_SIZE - GAP
-    )
 
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        const gridCell     = grid[row][col]
-        const isVoid        = gridCell.type === CELL.VOID
+        const gridCell       = grid[row][col]
+        const isVoid         = gridCell.type === CELL.VOID
         const isPrebuiltRail = gridCell.type === CELL.RAIL
-        const isRock        = gridCell.type === CELL.ROCK
-        const isStation     = stationPos[0] === col && stationPos[1] === row
-        const isStart       = trainStart[0] === col && trainStart[1] === row
+        const isStation      = stationPos[0] === col && stationPos[1] === row
+        const isStart        = trainStart[0] === col && trainStart[1] === row
 
-        const type: CellType = isVoid ? CELL.VOID
-                             : isStation ? CELL.STATION
-                             : isStart   ? CELL.START
+        const type: CellType = isVoid        ? CELL.VOID
+                             : isStation     ? CELL.STATION
+                             : isStart       ? CELL.START
                              : isPrebuiltRail ? CELL.RAIL
-                             : isRock    ? CELL.ROCK
-                             : CELL.FLOOR
+                             : gridCell.type
 
         const cell: CellData = {
           col, row, type,
           trackPiece: isPrebuiltRail ? (gridCell.prebuiltPiece ?? null) : null,
-          mesh: null,
+          tileGroup: null,
           prebuilt: isPrebuiltRail,
         }
         this.cells.push(cell)
 
         if (isVoid) continue
 
-        const mat = isStation ? MAT.station
-                  : isStart   ? MAT.start
-                  : isPrebuiltRail ? MAT.rail
-                  : isRock    ? MAT.rock
-                  : (col + row) % 2 === 0 ? MAT.floor : MAT.floor2
+        // For RAIL cells the terrain base is a floor tile; track sits on top
+        const terrainType = type === CELL.RAIL ? CELL.FLOOR : type
 
-        const mesh = new THREE.Mesh(geo, mat)
-        mesh.castShadow    = true
-        mesh.receiveShadow = true
+        if (!tileRegistry.has(terrainType)) continue
 
-        const pos = cellToWorld(col, row, this.cols, this.rows)
-        mesh.position.set(pos.x, -CELL_H / 2, pos.z)
-        mesh.userData = { col, row }
-
-        this.meshes.add(mesh)
-        cell.mesh = mesh
+        const pos   = cellToWorld(col, row, this.cols, this.rows)
+        const group = tileRegistry.get(terrainType).build(pos)
+        this.meshes.add(group)
+        cell.tileGroup = group
 
         if (isPrebuiltRail && cell.trackPiece) {
           this._buildTrackVisual(cell, cell.trackPiece)
-        }
-
-        if (isRock && tileRegistry.has('ROCK')) {
-          const rockGroup = tileRegistry.get('ROCK').build(pos)
-          this.meshes.add(rockGroup)
         }
       }
     }
@@ -168,7 +142,7 @@ export class Grid {
 
   placeTrack(col: number, row: number, pieceId: PieceId): boolean {
     const cell = this.getCell(col, row)
-    if (!this._trackPlaceable(col, row)) return false
+    if (!cell || !this._trackPlaceable(col, row)) return false
     if (cell.trackPiece) this._removeTrackVisual(cell)
     cell.trackPiece = pieceId
     cell.type = CELL.RAIL
@@ -189,15 +163,7 @@ export class Grid {
   _trackPlaceable(col: number, row: number): boolean {
     const cell = this.getCell(col, row)
     if (!cell) return false
-    switch (cell.type) {
-      case CELL.VOID:
-      case CELL.STATION:
-      case CELL.START:
-      case CELL.ROCK:
-        return false
-      default:
-        return true
-    }
+    return tileRegistry.has(cell.type) && tileRegistry.get(cell.type).isPlaceable
   }
 
   _removeTrackVisual(cell: CellData): void {
@@ -237,7 +203,7 @@ export class Grid {
 
     // Base highlight box (translucent)
     const geo = new THREE.BoxGeometry(CELL_SIZE - GAP + 0.05, CELL_H + 0.05, CELL_SIZE - GAP + 0.05)
-    this.ghostMesh = new THREE.Mesh(geo, MAT.ghost)
+    this.ghostMesh = new THREE.Mesh(geo, MAT_GHOST)
     this.ghostMesh.position.set(pos.x, -CELL_H / 2, pos.z)
     this.scene.add(this.ghostMesh)
 
@@ -251,7 +217,7 @@ export class Grid {
       })
 
       // Build track visual into a temporary cell, then clone with ghost material
-      const tmpCell: CellData = { col, row, type: CELL.RAIL, trackPiece: pieceId, mesh: null }
+      const tmpCell: CellData = { col, row, type: CELL.RAIL, trackPiece: pieceId, tileGroup: null }
       this._buildTrackVisual(tmpCell, pieceId)
       const trackGroup = tmpCell.trackMesh!
       // Remove from railGroup (was added by _buildTrackVisual)
@@ -310,13 +276,8 @@ export class Grid {
   }
 
   updateColors(): void {
-    MAT.floor.color.set(Settings.colors.floor)
-    MAT.floor2.color.set(Settings.colors.floor2)
-    MAT.rail.color.set(Settings.colors.rail)
-    MAT.station.color.set(Settings.colors.station)
-    MAT.start.color.set(Settings.colors.start)
-    MAT.rock.color.set(Settings.colors.rock)
-    MAT.ghost.color.set(Settings.colors.ghost)
+    MAT_GHOST.color.set(Settings.colors.ghost)
+    tileRegistry.updateColors(Settings.colors)
   }
 
   dispose(): void {

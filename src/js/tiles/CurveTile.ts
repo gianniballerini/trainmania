@@ -1,16 +1,7 @@
 import * as THREE from 'three'
 import { loadModelAsset, warnAssetLoadFailureOnce } from '../Assets.js'
+import type { ColorsConfig } from '../Settings.js'
 import { TileBase } from './TileBase.js'
-
-const CELL_SIZE = 2.0
-const RAIL_W    = 0.08
-const RAIL_H    = 0.06
-const TIE_W     = 0.12
-const TIE_H     = 0.04
-const TIE_L     = CELL_SIZE * 0.36
-
-const STEEL_MAT = new THREE.MeshLambertMaterial({ color: 0xaaaaaa })
-const TIE_MAT   = new THREE.MeshLambertMaterial({ color: 0x8b6040 })
 
 const MODEL_OPTIONS = {
   modelUrl: '/assets/models/track_curve_03.glb',
@@ -34,8 +25,10 @@ export const CURVE_ROTATION: Record<string, number> = {
 }
 
 export class CurveTile extends TileBase {
-  readonly id    = 'CURVE'
-  readonly label = 'Curve'
+  readonly id          = 'CURVE'
+  readonly label       = 'Curve'
+  readonly isPlaceable = true
+  readonly isRendered  = false  // track-overlay only; no terrain base box
 
   private _model: THREE.Group | null = null
   private _loaded = false
@@ -62,44 +55,11 @@ export class CurveTile extends TileBase {
       const clone = this._model.clone()
       clone.rotation.y = rotationY
       group.add(clone)
-      return group
     }
 
-    // Procedural fallback — NE base orientation wrapped in a rotated sub-group.
-    // fromDir=N [0,-1], toDir=E [1,0]
-    const sub = new THREE.Group()
-    sub.rotation.y = rotationY
-
-    const s = CELL_SIZE / 2
-    const OFFSETS = [-0.13, 0.13]
-
-    OFFSETS.forEach(off => {
-      const perpEntry: [number, number] = [-off, 0]   // perp to N: [ez*off, ex*off] = [-1*off, 0]
-      const perpExit:  [number, number] = [0, off]    // perp to E: [ez2*off, ex2*off] = [0*off, 1*off]
-
-      const pts = [
-        new THREE.Vector3(perpEntry[0] * CELL_SIZE,        RAIL_H, -s + perpEntry[1] * CELL_SIZE),
-        new THREE.Vector3(perpEntry[0] * CELL_SIZE * 0.5,  RAIL_H,      perpEntry[1] * CELL_SIZE * 0.5),
-        new THREE.Vector3(perpExit[0]  * CELL_SIZE * 0.5,  RAIL_H,      perpExit[1]  * CELL_SIZE * 0.5),
-        new THREE.Vector3(s + perpExit[0] * CELL_SIZE,     RAIL_H,      perpExit[1]  * CELL_SIZE),
-      ]
-
-      const curve  = new THREE.CatmullRomCurve3(pts)
-      const tubeGeo = new THREE.TubeGeometry(curve, 8, RAIL_W / 2, 4, false)
-      sub.add(new THREE.Mesh(tubeGeo, STEEL_MAT))
-    })
-
-    for (let i = 0; i <= 3; i++) {
-      const t  = i / 3
-      const cx = s * t          // ex*s*(1-t) + ex2*s*t = 0 + s*t
-      const cz = -s * (1 - t)   // ez*s*(1-t) + ez2*s*t = -s*(1-t) + 0
-      const tieGeo = new THREE.BoxGeometry(TIE_L * 0.8, TIE_H, TIE_W * 0.5)
-      const tie = new THREE.Mesh(tieGeo, TIE_MAT)
-      tie.position.set(cx * 0.5, TIE_H / 2, cz * 0.5)
-      sub.add(tie)
-    }
-
-    group.add(sub)
     return group
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateColors(_colors: ColorsConfig): void { /* track materials are not theme-aware */ }
 }
