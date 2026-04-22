@@ -42,6 +42,7 @@ export class Game {
   private readonly coinsCountEl: HTMLElement
   private readonly timeValEl: HTMLElement
   private readonly railsCountEl: HTMLElement
+  private readonly placeBtnSpan: HTMLElement
   private tweakpane: Tweakpane | undefined
   // ── Live game objects (replaced on each level load) ───────────────────────
   grid:  Grid        | undefined
@@ -109,6 +110,7 @@ export class Game {
     this.coinsCountEl = document.querySelector<HTMLElement>('.hud__coins-count')!
     this.timeValEl = document.querySelector<HTMLElement>('.hud__time-val')!
     this.railsCountEl = document.querySelector<HTMLElement>('.hud__rails-count')!
+    this.placeBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--place .span')!
 
     this.countdownBtn.addEventListener('click', () => {
       if (this.currentState instanceof PlayingState) {
@@ -251,6 +253,8 @@ export class Game {
     this.selectedPiece = tileToPieceId(this.currentTileType, this.currentRotation)
     if (this.grid && this.selectedPiece && this.lastHoveredCell) {
       this.grid.showGhost(this.lastHoveredCell.col, this.lastHoveredCell.row, this.selectedPiece)
+      const hoveredCell = this.grid.getCell(this.lastHoveredCell.col, this.lastHoveredCell.row)
+      this.updatePlaceBtn(hoveredCell?.trackPiece != null)
     }
   }
 
@@ -279,6 +283,7 @@ export class Game {
     if (!cell) return
     this.lastHoveredCell = { col: cell.col, row: cell.row }
     this.grid.showGhost(cell.col, cell.row, this.selectedPiece)
+    this.updatePlaceBtn(false)
   }
 
   /**
@@ -394,6 +399,10 @@ export class Game {
     this.railsCountEl.textContent = String(this.railsPlaced)
   }
 
+  updatePlaceBtn(isReplace: boolean): void {
+    this.placeBtnSpan.textContent = isReplace ? 'Replace' : 'Place'
+  }
+
   // ── Render loop ───────────────────────────────────────────────────────────
   private startRenderLoop(): void {
     this.animate()
@@ -407,7 +416,7 @@ export class Game {
 
     this.currentState.update(this, delta)
 
-    if (this.train && this.currentState instanceof PlayingState) this.train.update(delta)
+    if (this.train && (this.currentState instanceof PlayingState || this.currentState instanceof DeadState || this.currentState instanceof WinState)) this.train.update(delta)
     if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
     if (this.grid) this.grid.updateHover(now * 0.001)
     if (this.grid) this.grid.updateCoins(delta)

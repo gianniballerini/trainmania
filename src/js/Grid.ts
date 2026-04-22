@@ -225,7 +225,7 @@ export class Grid {
     // Base highlight box (translucent)
     const geo = new THREE.BoxGeometry(CELL_SIZE - GAP + 0.05, CELL_H + 0.05, CELL_SIZE - GAP + 0.05)
     this.ghostMesh = new THREE.Mesh(geo, MAT_GHOST)
-    this.ghostMesh.position.set(pos.x, -CELL_H / 2, pos.z)
+    this.ghostMesh.position.set(pos.x, -CELL_H / 2 + 0.05, pos.z)
     this.scene.add(this.ghostMesh)
 
     // Track preview if a piece is specified
@@ -233,7 +233,7 @@ export class Grid {
       const ghostMat = new THREE.MeshLambertMaterial({
         color: 0xd4a843,
         transparent: true,
-        opacity: 0.45,
+        opacity: 0.6,
         depthWrite: false,
       })
 
@@ -252,6 +252,7 @@ export class Grid {
       })
 
       this.ghostTrackGroup = trackGroup
+      this.ghostTrackGroup.position.y += 0.05
       this.scene.add(this.ghostTrackGroup)
     }
   }

@@ -59,10 +59,12 @@ export class PlayingState extends BaseGameState {
     if (cell && cell.type !== CELL.VOID) {
       game.lastHoveredCell = { col, row }
       game.grid.showGhost(col, row, game.selectedPiece)
+      game.updatePlaceBtn(cell.trackPiece !== null)
       this._playGhostSfx(game)
     } else {
       game.lastHoveredCell = null
       game.grid.hideGhost()
+      game.updatePlaceBtn(false)
     }
   }
 
@@ -142,6 +144,7 @@ export class PlayingState extends BaseGameState {
     game.lastHoveredCell = { col, row }
     this._playGhostSfx(game)
     game.grid.showGhost(col, row, game.selectedPiece)
+    game.updatePlaceBtn(cell.trackPiece !== null)
   }
 
   private _playGhostSfx(game: Game): void {
