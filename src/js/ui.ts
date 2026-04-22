@@ -22,6 +22,10 @@ const loadingScreen  = document.querySelector<HTMLElement>('.loading-screen')!
 const loadingBarFill = document.querySelector<HTMLElement>('.loading-screen__bar-fill')!
 const loadingLabel   = document.querySelector<HTMLElement>('.loading-screen__label')!
 
+const overlayLoadBar      = document.querySelector<HTMLElement>('.overlay__load-bar')!
+const overlayLoadBarFill  = document.querySelector<HTMLElement>('.overlay__load-bar__fill')!
+const overlayLoadBarLabel = document.querySelector<HTMLElement>('.overlay__load-bar__label')!
+
 // ── Loading screen ────────────────────────────────────────────────────────────
 
 export function showLoadingScreen(): void {
@@ -38,6 +42,27 @@ export function updateLoadingProgress(loaded: number, total: number): void {
 
 export function hideLoadingScreen(): void {
   loadingScreen.classList.add('hidden')
+}
+
+// ── Overlay load bar (bottom-left, shown while background assets load) ──────────
+
+export function showOverlayLoadBar(): void {
+  overlayLoadBarFill.style.width = '0%'
+  overlayLoadBarLabel.textContent = 'Loading…'
+  overlayLoadBar.classList.remove('hidden')
+}
+
+export function updateOverlayLoadProgress(loaded: number, total: number): void {
+  const pct = total > 0 ? Math.round((loaded / total) * 100) : 0
+  overlayLoadBarFill.style.width = `${pct}%`
+}
+
+export function hideOverlayLoadBar(): void {
+  overlayLoadBar.classList.add('hidden')
+}
+
+export function setOverlayBtnDisabled(disabled: boolean): void {
+  btn.classList.toggle('is-disabled', disabled)
 }
 
 export function initUiSfx(audio: AudioManager): void {

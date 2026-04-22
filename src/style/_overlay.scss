@@ -227,11 +227,17 @@
     letter-spacing: 3 * $ptr;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
+    transition: background 0.15s, transform 0.1s, opacity 0.2s;
 
     &:hover {
       background: #1e2447;
       transform: scale(1.03);
+    }
+
+    &.is-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      cursor: default;
     }
   }
 
@@ -262,6 +268,43 @@
       display: flex;
       gap: 8 * $ptr;
       padding: 4 * $ptr 2 * $ptr;
+    }
+  }
+
+  // ── Overlay load bar (bottom-left, shown during background asset load) ───────
+  &__load-bar {
+    position: absolute;
+    bottom: 24 * $ptr;
+    left: 24 * $ptr;
+    width: 180 * $ptr;
+    display: flex;
+    flex-direction: column;
+    gap: 6 * $ptr;
+
+    &.hidden { display: none; }
+
+    &__track {
+      width: 100%;
+      height: 4 * $ptr;
+      background: rgba(45, 53, 97, 0.12);
+      border-radius: 99 * $ptr;
+      overflow: hidden;
+    }
+
+    &__fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-color);
+      border-radius: 99 * $ptr;
+      transition: width 0.3s ease;
+    }
+
+    &__label {
+      font-size: 10 * $ptr;
+      letter-spacing: 2 * $ptr;
+      text-transform: uppercase;
+      color: var(--label-color);
+      opacity: 0.75;
     }
   }
 }

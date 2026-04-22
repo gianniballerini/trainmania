@@ -1,4 +1,4 @@
-.loading-screen
+.loading-screen.hidden
   .loading-screen__box
     .loading-screen__title TrainMania
     .loading-screen__bar-track
@@ -25,6 +25,10 @@
     .button.overlay__btn(data-sfx-click)
       span
     button.overlay__leaderboard-btn(data-sfx-click) Leaderboard
+  .overlay__load-bar.hidden
+    .overlay__load-bar__track
+      .overlay__load-bar__fill
+    .overlay__load-bar__label Loading…
 
 .train-picker-modal.hidden
   .train-picker-modal__box

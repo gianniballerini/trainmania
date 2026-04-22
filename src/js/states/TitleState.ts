@@ -2,7 +2,7 @@ import soundDefs from '../../data/sounds.json'
 import { BACKGROUND_TRACKS, DEFAULT_TRAIN_ID, TRAIN_OPTIONS } from '../Constants.js'
 import type { Game } from '../Game.js'
 import { Train } from '../Train.js'
-import { hideTrainPicker, showOverlay, showTrainPicker } from '../ui.js'
+import { hideOverlayLoadBar, hideTrainPicker, setOverlayBtnDisabled, showOverlay, showOverlayLoadBar, showTrainPicker } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
 import { PlayingState } from './PlayingState.js'
 
@@ -29,5 +29,12 @@ export class TitleState extends BaseGameState {
         game.changeState(new PlayingState())
       },
     )
+
+    showOverlayLoadBar()
+    setOverlayBtnDisabled(true)
+    game.assetsReady.then(() => {
+      hideOverlayLoadBar()
+      setOverlayBtnDisabled(false)
+    }).catch(console.error)
   }
 }

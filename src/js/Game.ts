@@ -19,7 +19,7 @@ import { WinState } from './states/WinState.js'
 import { tileRegistry } from './tiles/index.js'
 import { Train } from './Train.js'
 import { Tweakpane } from './Tweakpane.js'
-import { hideLoadingScreen, initUiSfx, showLoadingScreen, updateLoadingProgress } from './ui.js'
+import { initUiSfx, updateOverlayLoadProgress } from './ui.js'
 
 // ── Speed constants ───────────────────────────────────────────────────────────
 const SPEED_ACCEL = 1.05
@@ -82,6 +82,7 @@ export class Game {
 
   settingsUI:     SettingsUI     | undefined
   leaderboardUI:  LeaderboardUI  | undefined
+  assetsReady!:   Promise<void>
 
   // ── State machine ─────────────────────────────────────────────────────────
   currentState: BaseGameState = new BaseGameState()
@@ -132,26 +133,25 @@ export class Game {
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   async boot(): Promise<void> {
-    // Loading screen — shown immediately while assets load.
-    showLoadingScreen()
-    const totalAssets = tileRegistry.size
-    let loadedAssets  = 0
-
-    await tileRegistry.preloadAll(() => {
-      loadedAssets++
-      updateLoadingProgress(loadedAssets, totalAssets)
-    })
-
-    this.levelIndex = 0
-    await this.loadLevel(0)
-
-    // InputManager and SettingsUI created after level is ready (scene/objects in place)
-    new InputManager(this.canvas, this, this.cameraController)
-    this.settingsUI    = new SettingsUI(this.audioManager, this)
-    this.leaderboardUI = new LeaderboardUI(this)
     initUiSfx(this.audioManager)
 
-    hideLoadingScreen()
+    // Start background loading immediately — tiles + first level load while
+    // the user browses the train picker. assetsReady must be set before
+    // changeState so TitleState.enter can attach a .then() to it.
+    const totalAssets = tileRegistry.size
+    let loadedAssets  = 0
+    this.assetsReady = tileRegistry.preloadAll(() => {
+      loadedAssets++
+      updateOverlayLoadProgress(loadedAssets, totalAssets)
+    }).then(async () => {
+      this.levelIndex = 0
+      await this.loadLevel(0)
+      // InputManager and UI panels require the level/scene to be ready.
+      new InputManager(this.canvas, this, this.cameraController)
+      this.settingsUI    = new SettingsUI(this.audioManager, this)
+      this.leaderboardUI = new LeaderboardUI(this)
+    })
+
     this.changeState(new TitleState())
     this.startRenderLoop()
   }
