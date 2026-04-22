@@ -5,7 +5,7 @@ import { Game } from '../Game.js'
 import { cellToWorld, type CellData } from '../Grid.js'
 
 const COIN_MODEL_URL = '/assets/models/coin-gold.glb'
-const COIN_HEIGHT    = CELL_H + 0.55
+const COIN_HEIGHT    = CELL_H + 0.2
 const COIN_BOB_FREQ  = 2.5
 const COIN_BOB_AMP   = 0.12
 const COIN_SPIN_SPD  = 2.0

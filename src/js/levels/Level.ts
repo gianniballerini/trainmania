@@ -18,5 +18,5 @@ export const LEVELS: Level[] = [
   new Level2(),
   new Level3(),
   new Level4(),
-  new LevelTest(),
+  ...(import.meta.env.DEV ? [new LevelTest()] : []),
 ]
