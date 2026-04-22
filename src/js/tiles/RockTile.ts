@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { loadModelAsset } from '../Assets.js'
-import { Settings, type ColorsConfig } from '../Settings.js'
+import { type ColorsConfig } from '../Settings.js'
 import { TileBase } from './TileBase.js'
 
 export class RockTile extends TileBase {
@@ -10,16 +10,13 @@ export class RockTile extends TileBase {
   readonly isRendered  = true
 
   private model: THREE.Group | null = null
-  private readonly mat = new THREE.MeshLambertMaterial({
-    color: new THREE.Color(Settings.colors.rock),
-  })
 
   async preload(): Promise<void> {
     if (!this.model) {
       this.model = await loadModelAsset({
         modelUrl: '/assets/models/tile_rock.glb',
         targetFootprint: 2.0,
-        yOffset: 0,
+        yOffset: -0.4,
         castShadow: true,
         receiveShadow: true,
       })
@@ -33,7 +30,6 @@ export class RockTile extends TileBase {
 
     const group = new THREE.Group()
     group.position.set(position.x, 0, position.z)
-    group.add(this.buildBaseBox(this.mat))
 
     const instance = this.model.clone()
     instance.rotation.y = rotationY
@@ -43,6 +39,12 @@ export class RockTile extends TileBase {
   }
 
   updateColors(colors: ColorsConfig): void {
-    this.mat.color.set(colors.rock)
+    if (!this.model) return
+
+    this.model.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshLambertMaterial) {
+        child.material.color.set(colors.rock)
+      }
+    })
   }
 }
