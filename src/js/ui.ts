@@ -9,6 +9,7 @@ const scoreEl     = document.querySelector<HTMLElement>('.overlay__score')!
 const scoreTimeEl = document.querySelector<HTMLElement>('.overlay__score-time')!
 const scoreCoinsEl  = document.querySelector<HTMLElement>('.overlay__score-coins')!
 const scoreRailsEl  = document.querySelector<HTMLElement>('.overlay__score-rails')!
+const highScoreStampEl = document.querySelector<HTMLElement>('.overlay__high-score-stamp')!
 
 const trainPicker = document.querySelector<HTMLElement>('.overlay__train-picker')!
 const trainStrip  = document.querySelector<HTMLElement>('.overlay__train-picker__strip')!
@@ -78,6 +79,9 @@ export function showOverlay(
 export function hideOverlay(): void {
   overlay.classList.add('hidden')
   scoreEl.classList.add('hidden')
+  highScoreStampEl.classList.add('hidden')
+  highScoreStampEl.classList.remove('is-slamming')
+  overlay.querySelector<HTMLElement>('.overlay__box')?.classList.remove('is-shaking')
 }
 
 export interface WinScore {
@@ -92,7 +96,8 @@ export function showWinOverlay(
   subText: string,
   score: WinScore,
   btnText: string,
-  onBtn: () => void
+  onBtn: () => void,
+  isNewBest = false,
 ): void {
   const m = Math.floor(score.time / 60)
   const s = Math.floor(score.time % 60).toString().padStart(2, '0')
@@ -100,6 +105,27 @@ export function showWinOverlay(
   scoreCoinsEl.textContent = `${score.coins} / ${score.totalCoins}`
   scoreRailsEl.textContent = String(score.railsPlaced)
   scoreEl.classList.remove('hidden')
+
+  if (isNewBest) {
+    highScoreStampEl.classList.remove('hidden')
+    // Remove then re-add the animation class so it re-fires even on repeat wins
+    highScoreStampEl.classList.remove('is-slamming')
+    requestAnimationFrame(() => {
+      highScoreStampEl.classList.add('is-slamming')
+    })
+    // Shake the box timed to the stamp's impact (delay 300ms + ~55% of 550ms ≈ 600ms)
+    const box = overlay.querySelector<HTMLElement>('.overlay__box')
+    if (box) {
+      setTimeout(() => {
+        box.classList.add('is-shaking')
+        box.addEventListener('animationend', () => box.classList.remove('is-shaking'), { once: true })
+      }, 600)
+    }
+  } else {
+    highScoreStampEl.classList.add('hidden')
+    highScoreStampEl.classList.remove('is-slamming')
+  }
+
   showOverlay(titleText, subText, btnText, onBtn)
 }
 

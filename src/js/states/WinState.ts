@@ -9,7 +9,7 @@ import { TitleState } from './TitleState.js'
 export class WinState extends BaseGameState {
   enter(game: Game): void {
     // Persist personal best before showing win overlay
-    tryUpdateBestScore(LEVELS[game.levelIndex].id, {
+    const isNewBest = tryUpdateBestScore(LEVELS[game.levelIndex].id, {
       coins:      game.coinCount,
       totalCoins: game.totalCoins,
       tiles:      game.railsPlaced,
@@ -36,6 +36,7 @@ export class WinState extends BaseGameState {
             game.changeState(new TitleState())
           }
         },
+        isNewBest,
       )
     }, 600)
   }

@@ -59,6 +59,25 @@
   }
 }
 
+// ── Stamp & shake keyframes ─────────────────────────────────────────────────
+
+@keyframes stamp-slam {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) rotate(-10deg) scale(2.2); }
+  55%  { opacity: 0.3; transform: translate(-50%, -50%) rotate(-10deg) scale(0.88); }
+  75%  { transform: translate(-50%, -50%) rotate(-10deg) scale(1.06); }
+  100% { opacity: 0.3; transform: translate(-50%, -50%) rotate(-10deg) scale(1); }
+}
+
+@keyframes overlay-shake {
+  0%   { translate: 0; }
+  18%  { translate: -7px 0; }
+  36%  { translate:  6px 0; }
+  54%  { translate: -4px 0; }
+  72%  { translate:  3px 0; }
+  86%  { translate: -1px 0; }
+  100% { translate:  0; }
+}
+
 // ── Game overlay (pause / title / win / dead) ───────────────────────────────
 .overlay {
   position: absolute;
@@ -113,6 +132,34 @@
 
     &::after {
 
+    }
+  }
+
+  &__high-score-stamp {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-10deg);
+    width: 120 * $ptr;
+    height: 120 * $ptr;
+    object-fit: contain;
+    opacity: 0.3;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+
+    &.hidden {
+      display: none;
+    }
+
+    &.is-slamming {
+      animation: stamp-slam 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) 0.3s both;
+    }
+  }
+
+  &__box {
+    &.is-shaking {
+      animation: overlay-shake 0.38s ease-out;
     }
   }
 

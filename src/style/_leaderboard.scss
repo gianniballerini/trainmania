@@ -162,14 +162,18 @@
 .overlay__leaderboard-btn {
   background: none;
   border: none;
+
   color: var(--label-color);
-  font-family: 'Josefin Sans', sans-serif;
+
   font-size: 10 * $ptr;
   font-weight: 700;
   letter-spacing: 2 * $ptr;
   text-transform: uppercase;
   cursor: pointer;
-  padding: 4 * $ptr 8 * $ptr;
+
+  padding: 10 * $ptr 36 * $ptr;
+  border-top: 1px solid var(--hud-border);
+  border-bottom: 1px solid var(--hud-border);
   border-radius: 6 * $ptr;
   transition: color 0.15s, background 0.15s;
   pointer-events: all;
