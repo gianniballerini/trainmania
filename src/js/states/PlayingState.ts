@@ -70,6 +70,8 @@ export class PlayingState extends BaseGameState {
     if (!game.selectedPiece || !game.grid || !cell || cell.type === CELL.VOID || cell.type === CELL.STATION) return
     const placed = game.grid.placeTrack(col, row, game.selectedPiece)
     if (placed) {
+      game.railsPlaced++
+      game.updateRailsDisplay()
       game.updateSelectedPiece()        // ← refresh ghost/selected piece
       game.grid.hideGhost()
       game.showDefaultGhost()

@@ -7,7 +7,8 @@ const sub         = document.querySelector<HTMLElement>('.overlay__sub')!
 let   btn         = document.querySelector<HTMLElement>('.overlay__btn')!
 const scoreEl     = document.querySelector<HTMLElement>('.overlay__score')!
 const scoreTimeEl = document.querySelector<HTMLElement>('.overlay__score-time')!
-const scoreCoinsEl = document.querySelector<HTMLElement>('.overlay__score-coins')!
+const scoreCoinsEl  = document.querySelector<HTMLElement>('.overlay__score-coins')!
+const scoreRailsEl  = document.querySelector<HTMLElement>('.overlay__score-rails')!
 
 const trainPicker = document.querySelector<HTMLElement>('.overlay__train-picker')!
 const trainStrip  = document.querySelector<HTMLElement>('.overlay__train-picker__strip')!
@@ -76,12 +77,14 @@ export function showOverlay(
 
 export function hideOverlay(): void {
   overlay.classList.add('hidden')
+  scoreEl.classList.add('hidden')
 }
 
 export interface WinScore {
   time: number
   coins: number
   totalCoins: number
+  railsPlaced: number
 }
 
 export function showWinOverlay(
@@ -94,8 +97,9 @@ export function showWinOverlay(
   const m = Math.floor(score.time / 60)
   const s = Math.floor(score.time % 60).toString().padStart(2, '0')
   scoreTimeEl.textContent  = `${m}:${s}`
-  scoreCoinsEl.textContent = score.totalCoins > 0 ? `${score.coins} / ${score.totalCoins}` : ''
-  scoreEl.classList.toggle('hidden', score.totalCoins === 0)
+  scoreCoinsEl.textContent = `${score.coins} / ${score.totalCoins}`
+  scoreRailsEl.textContent = String(score.railsPlaced)
+  scoreEl.classList.remove('hidden')
   showOverlay(titleText, subText, btnText, onBtn)
 }
 

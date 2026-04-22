@@ -40,6 +40,7 @@ export class Game {
   private readonly coinsEl: HTMLElement
   private readonly coinsCountEl: HTMLElement
   private readonly timeValEl: HTMLElement
+  private readonly railsCountEl: HTMLElement
   private tweakpane: Tweakpane | undefined
   // ── Live game objects (replaced on each level load) ───────────────────────
   grid:  Grid        | undefined
@@ -61,6 +62,8 @@ export class Game {
   // ── Coins (per-level) ───────────────────────────────────────────────
   coinCount  = 0
   totalCoins = 0
+  // ── Rails placed (cumulative per-level) ────────────────────────────
+  railsPlaced = 0
   // ── Play time (seconds elapsed while in PlayingState) ────────────
   playTime = 0
   playTimeAccumulated = 0
@@ -103,6 +106,7 @@ export class Game {
     this.coinsEl = document.querySelector<HTMLElement>('.hud__coins')!
     this.coinsCountEl = document.querySelector<HTMLElement>('.hud__coins-count')!
     this.timeValEl = document.querySelector<HTMLElement>('.hud__time-val')!
+    this.railsCountEl = document.querySelector<HTMLElement>('.hud__rails-count')!
 
     this.countdownBtn.addEventListener('click', () => {
       if (this.currentState instanceof PlayingState) {
@@ -189,10 +193,12 @@ export class Game {
     await this.grid.buildCoins()
     this.coinCount          = 0
     this.totalCoins         = this.grid.totalCoins
+    this.railsPlaced        = 0
     this.playTimeAccumulated = 0
     this.playTimeStamp      = 0
     this.updateCoinDisplay()
     this.updateTimeDisplay()
+    this.updateRailsDisplay()
 
     this.cameraController.reset(this.camera)
     this.updateSelectedPiece()
@@ -377,12 +383,12 @@ export class Game {
   }
 
   updateCoinDisplay(): void {
-    if (this.totalCoins === 0) {
-      this.coinsEl.classList.add('hidden')
-      return
-    }
     this.coinsEl.classList.remove('hidden')
     this.coinsCountEl.textContent = `${this.coinCount} / ${this.totalCoins}`
+  }
+
+  updateRailsDisplay(): void {
+    this.railsCountEl.textContent = String(this.railsPlaced)
   }
 
   // ── Render loop ───────────────────────────────────────────────────────────

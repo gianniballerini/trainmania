@@ -153,7 +153,8 @@
   }
 
   &__score-time,
-  &__score-coins {
+  &__score-coins,
+  &__score-rails {
     font-size: 20 * $ptr;
     font-weight: 700;
     font-variant-numeric: tabular-nums;

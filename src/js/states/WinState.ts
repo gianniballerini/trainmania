@@ -13,7 +13,7 @@ export class WinState extends BaseGameState {
       showWinOverlay(
         '🚉 ARRIVED',
         hasNext ? `level ${game.levelIndex + 1} cleared` : 'all levels complete!',
-        { time: game.playTime, coins: game.coinCount, totalCoins: game.totalCoins },
+        { time: game.playTime, coins: game.coinCount, totalCoins: game.totalCoins, railsPlaced: game.railsPlaced },
         hasNext ? 'Next Level' : 'Play Again',
         async () => {
           if (hasNext) {
