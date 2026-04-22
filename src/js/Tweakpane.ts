@@ -75,6 +75,10 @@ class Tweakpane {
         // sceneFolder.addBinding(Settings.scene.rectLight, 'intensity', { min: 0, max: 20, label: 'Rect Light Int' }).on('change', this.updateSceneLights.bind(this));
     }
 
+    hide(): void {
+        this.pane.element.style.display = 'none'
+    }
+
     loadLevel(level: number) {
         window.game?.loadLevel(level)
     }
@@ -89,5 +93,4 @@ class Tweakpane {
 
 }
 
-const tweakpane = new Tweakpane()
-export { tweakpane as Tweakpane };
+export { Tweakpane };

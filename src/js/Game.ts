@@ -17,6 +17,7 @@ import { TitleState } from './states/TitleState.js'
 import { WinState } from './states/WinState.js'
 import { tileRegistry } from './tiles/index.js'
 import { Train } from './Train.js'
+import { Tweakpane } from './Tweakpane.js'
 import { hideLoadingScreen, initUiSfx, showLoadingScreen, updateLoadingProgress } from './ui.js'
 
 // ── Speed constants ───────────────────────────────────────────────────────────
@@ -39,6 +40,7 @@ export class Game {
   private readonly coinsEl: HTMLElement
   private readonly coinsCountEl: HTMLElement
   private readonly timeValEl: HTMLElement
+  private tweakpane: Tweakpane | undefined
   // ── Live game objects (replaced on each level load) ───────────────────────
   grid:  Grid        | undefined
   train: Train       | undefined
@@ -113,6 +115,11 @@ export class Game {
         this.boostSpeed()
       }
     })
+  }
+
+  // ── Dev tools ─────────────────────────────────────────────────────────────
+  enableDevTools(): void {
+    this.tweakpane = new Tweakpane()
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────
