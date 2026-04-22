@@ -57,6 +57,16 @@ export function getAllBestScores(): ScoreMap {
 }
 
 /**
+ * Returns true if the given level is unlocked.
+ * Level 1 is always unlocked. Every other level requires a saved best score
+ * for the immediately preceding level.
+ */
+export function isLevelUnlocked(levelId: number): boolean {
+  if (levelId <= 1) return true
+  return getBestScore(levelId - 1) !== undefined
+}
+
+/**
  * Saves run as best score for levelId only if it strictly beats the current
  * stored best (exact tie keeps the existing score).
  * Returns true when the stored score was updated.

@@ -22,5 +22,5 @@
   { "name": "drop_00",            "path": "/assets/sound/drop_002.webm",            "volume": 1.0 },
   { "name": "drop_01",            "path": "/assets/sound/drop_003.webm",            "volume": 1.0 },
   { "name": "click",            "path": "/assets/sound/bong_001.webm",            "volume": 1.0 },
-  { "name": "coin",            "path": "/assets/sound/coin.webm",            "volume": 1.0 }
+  { "name": "coin",            "path": "/assets/sound/coin.webm",            "volume": 0.5 }
 ]

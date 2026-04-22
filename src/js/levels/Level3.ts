@@ -4,6 +4,7 @@ import type { Level } from "./Level"
 
 class Level3 implements Level {
     id = 3
+    label = 'Level 3'
     grid = [
         [G(), S('S'),           G(), coin(G()), V(), V(), V()],
         [G(), R('STRAIGHT_NS'), G(),      G(), V(), V(), V()],

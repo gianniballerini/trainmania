@@ -1,5 +1,7 @@
 import type { AudioManager } from './AudioManager.js'
 import type { TrainOption } from './Constants.js'
+import { isLevelUnlocked } from './LeaderboardStore.js'
+import type { Level } from './levels/Level.js'
 
 const overlay     = document.querySelector<HTMLElement>('.overlay')!
 const title       = document.querySelector<HTMLElement>('.overlay__title')!
@@ -13,6 +15,9 @@ const highScoreStampEl = document.querySelector<HTMLElement>('.overlay__high-sco
 
 const trainPicker = document.querySelector<HTMLElement>('.overlay__train-picker')!
 const trainStrip  = document.querySelector<HTMLElement>('.overlay__train-picker__strip')!
+
+const levelPicker = document.querySelector<HTMLElement>('.overlay__level-picker')!
+const levelStrip  = document.querySelector<HTMLElement>('.overlay__level-picker__strip')!
 
 const trainPickerModal      = document.querySelector<HTMLElement>('.train-picker-modal')!
 const trainPickerModalStrip = document.querySelector<HTMLElement>('.train-picker-modal__strip')!
@@ -205,6 +210,61 @@ export function showTrainPicker(
 
 export function hideTrainPicker(): void {
   trainPicker.classList.add('hidden')
+}
+
+// ── Title-screen level picker ─────────────────────────────────────────────────
+
+function renderLevelStrip(
+  strip: HTMLElement,
+  levels: Level[],
+  defaultId: number,
+  onSelect: (id: number) => void,
+): void {
+  strip.innerHTML = ''
+  levels.forEach((l) => {
+    const unlocked = isLevelUnlocked(l.id)
+
+    const card = document.createElement('div')
+    card.className = 'level-card'
+    if (l.id === defaultId) card.classList.add('is-selected')
+    if (!unlocked) card.classList.add('is-locked')
+    card.dataset.levelId = String(l.id)
+
+    const img = document.createElement('img')
+    img.src = `/images/thumbnails/lvl${l.id}.jpg`
+    img.alt = l.label
+    card.appendChild(img)
+
+    const label = document.createElement('span')
+    label.textContent = l.label
+    card.appendChild(label)
+
+    if (unlocked) {
+      card.addEventListener('click', () => {
+        strip.querySelectorAll('.is-selected').forEach((el) => el.classList.remove('is-selected'))
+        card.classList.add('is-selected')
+        onSelect(l.id)
+      })
+    }
+
+    strip.appendChild(card)
+  })
+
+  const selected = strip.querySelector<HTMLElement>('.is-selected')
+  if (selected) selected.scrollIntoView({ block: 'nearest', inline: 'center' })
+}
+
+export function showLevelPicker(
+  levels: Level[],
+  defaultId: number,
+  onSelect: (id: number) => void,
+): void {
+  renderLevelStrip(levelStrip, levels, defaultId, onSelect)
+  levelPicker.classList.remove('hidden')
+}
+
+export function hideLevelPicker(): void {
+  levelPicker.classList.add('hidden')
 }
 
 // ── Standalone "Choose Train" modal ───────────────────────────────────────────

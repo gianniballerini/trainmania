@@ -271,6 +271,52 @@
     }
   }
 
+  // ── Level picker ──────────────────────────────────────────────────────────
+  &__level-picker {
+    width: 100%;
+    max-width: 520 * $ptr;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6 * $ptr;
+
+    &.hidden { display: none; }
+
+    &__label {
+      font-size: 9 * $ptr;
+      font-weight: 600;
+      letter-spacing: 2 * $ptr;
+      text-transform: uppercase;
+      opacity: 0.45;
+      padding-left: 2 * $ptr;
+    }
+
+    &__strip {
+      display: flex;
+      gap: 8 * $ptr;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(45, 53, 97, 0.2) transparent;
+      padding: 4 * $ptr 2 * $ptr;
+
+      &::-webkit-scrollbar {
+        height: 4 * $ptr;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(45, 53, 97, 0.2);
+        border-radius: 99 * $ptr;
+      }
+    }
+  }
+
   // ── Overlay load bar (bottom-left, shown during background asset load) ───────
   &__load-bar {
     position: absolute;
@@ -337,6 +383,61 @@
   img {
     width: 164 * $ptr;
     height: 164 * $ptr;
+    object-fit: contain;
+    border-radius: 4 * $ptr;
+    pointer-events: none;
+  }
+
+  span {
+    font-size: 9 * $ptr;
+    font-weight: 600;
+    letter-spacing: 1 * $ptr;
+    text-transform: uppercase;
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+}
+
+// ── Level card (used in title-screen level picker) ─────────────────────────
+.level-card {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4 * $ptr;
+  cursor: pointer;
+  border: 2 * $ptr solid transparent;
+  border-radius: 8 * $ptr;
+  padding: 4 * $ptr;
+  margin-bottom: 3 * $ptr;
+  transition: border-color 0.15s, transform 0.1s;
+  background: rgba(45, 53, 97, 0.05);
+
+  &:hover {
+    transform: scale(1.05);
+    border-color: rgba(45, 53, 97, 0.3);
+  }
+
+  &.is-selected {
+    border-color: var(--accent-color);
+    background: rgba(45, 53, 97, 0.1);
+  }
+
+  &.is-locked {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+    filter: grayscale(100%);
+
+    &:hover {
+      transform: none;
+      border-color: transparent;
+    }
+  }
+
+  img {
+    width: 96 * $ptr;
+    height: 96 * $ptr;
     object-fit: contain;
     border-radius: 4 * $ptr;
     pointer-events: none;

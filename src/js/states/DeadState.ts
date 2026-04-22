@@ -1,9 +1,9 @@
-import { BACKGROUND_TRACKS, GAME_OVER_TRACKS } from '../Constants.js'
+import { GAME_OVER_TRACKS } from '../Constants.js'
 import type { Game } from '../Game.js'
 import { LEVELS } from '../levels/Level.js'
 import { showOverlay } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
-import { PlayingState } from './PlayingState.js'
+import { TitleState } from './TitleState.js'
 
 export class DeadState extends BaseGameState {
   constructor(private readonly derailed: boolean) {
@@ -23,12 +23,9 @@ export class DeadState extends BaseGameState {
       showOverlay(
         this.derailed ? 'DERAILED' : 'FELL OFF',
         `level ${LEVELS[game.levelIndex].id} — starting over`,
-        'Restart',
-        async () => {
-          game.levelIndex = 0
-          await game.loadLevel(0)
-          game.audioManager.switchMusic(BACKGROUND_TRACKS)
-          game.changeState(new PlayingState())
+        'Main Menu',
+        () => {
+          game.changeState(new TitleState())
         },
       )
     }, 1200)

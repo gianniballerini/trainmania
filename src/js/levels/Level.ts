@@ -7,6 +7,7 @@ import { LevelTest } from "./LevelTest"
 
 export interface Level {
   id: number
+  label: string
   grid: GridCell[][]
   baseSpeed: number
   countdown?: number

@@ -3,7 +3,8 @@ import { G, R, S, T } from "../GridCell"
 import type { Level } from "./Level"
 
 class LevelTest implements Level {
-    id = 1
+    id = 1000
+    label = 'Test'
     grid = [
         [G(), G(), G(), G(),              G(), G(), G()],
         [G(), G(), G(), R('CURVE_SE'),    R('CURVE_SW'), G(), G()],
