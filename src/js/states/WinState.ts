@@ -1,4 +1,5 @@
 import type { Game } from '../Game.js'
+import { tryUpdateBestScore } from '../LeaderboardStore.js'
 import { LEVELS } from '../levels/Level.js'
 import { showWinOverlay } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
@@ -7,6 +8,15 @@ import { TitleState } from './TitleState.js'
 
 export class WinState extends BaseGameState {
   enter(game: Game): void {
+    // Persist personal best before showing win overlay
+    tryUpdateBestScore(LEVELS[game.levelIndex].id, {
+      coins:      game.coinCount,
+      totalCoins: game.totalCoins,
+      tiles:      game.railsPlaced,
+      time:       game.playTime,
+      version:    1,
+    })
+
     setTimeout(() => {
       game.audioManager.playSfx('whistle')
       const hasNext = game.levelIndex + 1 < LEVELS.length

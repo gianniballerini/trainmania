@@ -1,0 +1,22 @@
+.leaderboard.hidden
+  .leaderboard__box
+    button.leaderboard__close(data-sfx-click) ✕
+    .leaderboard__header
+      .leaderboard__title Leaderboard
+    .leaderboard__body
+
+      //- Left tab rail
+      .leaderboard__tabs
+        button.leaderboard__tab.active(data-tab='personal' data-sfx-click) My Scores
+        button.leaderboard__tab(data-tab='level-1' data-sfx-click) Level 1
+        button.leaderboard__tab(data-tab='level-2' data-sfx-click) Level 2
+        button.leaderboard__tab(data-tab='level-3' data-sfx-click) Level 3
+        button.leaderboard__tab(data-tab='level-4' data-sfx-click) Level 4
+
+      //- Tab content panels (populated at runtime by LeaderboardUI)
+      .leaderboard__content
+        .leaderboard__panel.leaderboard__panel--personal.active
+        .leaderboard__panel.leaderboard__panel--level-1
+        .leaderboard__panel.leaderboard__panel--level-2
+        .leaderboard__panel.leaderboard__panel--level-3
+        .leaderboard__panel.leaderboard__panel--level-4

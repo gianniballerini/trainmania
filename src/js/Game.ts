@@ -4,6 +4,7 @@ import { CameraController } from './CameraController.js'
 import { CELL, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
 import { Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
+import { LeaderboardUI } from './LeaderboardUI.js'
 import { LEVELS } from './levels/Level.js'
 import { createScene } from './scene.js'
 import { SceneController } from './SceneController.js'
@@ -78,7 +79,8 @@ export class Game {
   readonly cameraController!: CameraController
   readonly sceneController!:  SceneController
 
-  settingsUI: SettingsUI | undefined
+  settingsUI:     SettingsUI     | undefined
+  leaderboardUI:  LeaderboardUI  | undefined
 
   // ── State machine ─────────────────────────────────────────────────────────
   currentState: BaseGameState = new BaseGameState()
@@ -143,7 +145,8 @@ export class Game {
 
     // InputManager and SettingsUI created after level is ready (scene/objects in place)
     new InputManager(this.canvas, this, this.cameraController)
-    this.settingsUI = new SettingsUI(this.audioManager, this)
+    this.settingsUI    = new SettingsUI(this.audioManager, this)
+    this.leaderboardUI = new LeaderboardUI(this)
     initUiSfx(this.audioManager)
 
     hideLoadingScreen()

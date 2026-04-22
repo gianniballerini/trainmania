@@ -1,0 +1,274 @@
+@use 'variables' as *;
+@use 'breakpoints' as *;
+@use 'mixins' as *;
+
+// ── Leaderboard modal backdrop ────────────────────────────────────────────────
+
+.leaderboard {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 240, 232, 0.6);
+  backdrop-filter: blur(4 * $ptr);
+  z-index: 55; // above overlay (no z-index) and settings (50)
+
+  &.hidden {
+    display: none;
+  }
+
+  // ── Modal box ──────────────────────────────────────────────────────────────
+
+  &__box {
+    position: relative;
+    background: var(--background-color);
+    border: 1 * $ptr solid rgba(45, 53, 97, 0.15);
+    border-radius: 16 * $ptr;
+    width: 540 * $ptr;
+    max-width: calc(100vw - 40 * $ptr);
+    max-height: calc(100vh - 80 * $ptr);
+    min-height: 50vh;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24 * $ptr 80 * $ptr rgba(45, 53, 97, 0.18);
+  }
+
+  // ── Header ─────────────────────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.12);
+    min-height: 50 * $ptr;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    color: var(--accent-color);
+    font-weight: 700;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    font-size: 13 * $ptr;
+  }
+
+  // ── Close button ───────────────────────────────────────────────────────────
+
+  &__close {
+    position: absolute;
+    top: 12 * $ptr;
+    right: 14 * $ptr;
+    background: none;
+    border: none;
+    color: rgba(45, 53, 97, 0.4);
+    font-size: 16 * $ptr;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+    z-index: 1;
+
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
+
+  // ── Body (tabs + content) ──────────────────────────────────────────────────
+
+  &__body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  // ── Tab rail (left column) ─────────────────────────────────────────────────
+
+  &__tabs {
+    display: flex;
+    flex-direction: column;
+    padding: 20 * $ptr 0;
+    border-right: 1 * $ptr solid rgba(45, 53, 97, 0.1);
+    min-width: 100 * $ptr;
+    flex-shrink: 0;
+    gap: 4 * $ptr;
+    overflow-y: auto;
+  }
+
+  &__tab {
+    background: none;
+    border: none;
+    color: var(--label-color);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10 * $ptr;
+    font-weight: 700;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10 * $ptr 16 * $ptr;
+    cursor: pointer;
+    border-left: 3 * $ptr solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+    &:hover {
+      color: var(--text-color);
+      background: rgba(45, 53, 97, 0.06);
+    }
+
+    &.active {
+      color: var(--accent-color);
+      border-left-color: var(--accent-color);
+      background: rgba(45, 53, 97, 0.08);
+    }
+  }
+
+  // ── Content area (right) ───────────────────────────────────────────────────
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20 * $ptr 24 * $ptr;
+  }
+
+  &__panel {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+}
+
+// ── HUD leaderboard button ────────────────────────────────────────────────────
+// Extends the existing mute/settings button appearance.
+
+.hud__leaderboard-btn {
+  background: var(--hud-panel);
+  border: 1 * $ptr solid var(--hud-border);
+  border-radius: 8 * $ptr;
+  padding: 5 * $ptr;
+  cursor: pointer;
+  pointer-events: all;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(245, 240, 232, 1);
+  }
+}
+
+// ── Overlay secondary leaderboard trigger ─────────────────────────────────────
+
+.overlay__leaderboard-btn {
+  background: none;
+  border: none;
+  color: var(--label-color);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 10 * $ptr;
+  font-weight: 700;
+  letter-spacing: 2 * $ptr;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4 * $ptr 8 * $ptr;
+  border-radius: 6 * $ptr;
+  transition: color 0.15s, background 0.15s;
+  pointer-events: all;
+  opacity: 0.6;
+
+  &:hover {
+    color: var(--accent-color);
+    background: rgba(45, 53, 97, 0.06);
+    opacity: 1;
+  }
+}
+
+// ── Score table ───────────────────────────────────────────────────────────────
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Josefin Sans', sans-serif;
+
+  &--single {
+    margin-top: 8 * $ptr;
+  }
+
+  thead tr {
+    border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.12);
+  }
+
+  tbody tr {
+    border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.07);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  th {
+    padding: 6 * $ptr 8 * $ptr;
+    font-size: 9 * $ptr;
+    font-weight: 700;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    color: var(--label-color);
+    opacity: 0.6;
+  }
+
+  &__head-label {
+    text-align: left;
+  }
+
+  &__head-stat {
+    text-align: right;
+  }
+
+  &__label {
+    padding: 10 * $ptr 8 * $ptr;
+    font-size: 10 * $ptr;
+    font-weight: 700;
+    letter-spacing: 1.5 * $ptr;
+    text-transform: uppercase;
+    color: var(--text-color);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  &__stat {
+    padding: 10 * $ptr 8 * $ptr;
+    font-size: 16 * $ptr;
+    font-weight: 700;
+    color: var(--accent-color);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__total {
+    font-size: 10 * $ptr;
+    opacity: 0.5;
+  }
+
+  &__empty {
+    padding: 10 * $ptr 8 * $ptr;
+    font-size: 10 * $ptr;
+    font-weight: 700;
+    letter-spacing: 1.5 * $ptr;
+    text-transform: uppercase;
+    color: var(--label-color);
+    text-align: right;
+    opacity: 0.5;
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.lb-empty {
+  margin-top: 24 * $ptr;
+  text-align: center;
+  font-size: 10 * $ptr;
+  font-weight: 700;
+  letter-spacing: 2 * $ptr;
+  text-transform: uppercase;
+  color: var(--label-color);
+  opacity: 0.5;
+}
