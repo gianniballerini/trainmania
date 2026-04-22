@@ -4,227 +4,239 @@
 
 .hud {
   position: absolute;
-  top: 18 * $ptr;
-  left: 18 * $ptr;
-  right: 18 * $ptr;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: 100dvw;
+  padding: 10 * $ptr;
+
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 12 * $ptr;
+
   pointer-events: none;
-  width: calc(100% - 36 * $ptr);
 
-  &__left {
+
+  &__top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+    &__left {
+      display: flex;
+      flex-direction: column;
+
+      align-items: center;
+
+      row-gap: 8 * $ptr;
+    }
+
+      &__level {
+        font-size: 11 * $ptr;
+        font-weight: 700;
+        letter-spacing: 3 * $ptr;
+        color: var(--accent-color);
+        text-transform: uppercase;
+        text-shadow: none;
+      }
+
+      &__speed-wrap {
+        width: 90 * $ptr;
+        height: 4 * $ptr;
+        background: rgba(45, 53, 97, 0.15);
+        border-radius: 2 * $ptr;
+        overflow: hidden;
+      }
+
+      &__speed-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--accent-color);
+        border-radius: 2 * $ptr;
+        transition: width 0.3s ease, background 0.3s ease;
+      }
+
+      &__speed-btn {
+        background: var(--hud-panel);
+
+        border: 1 * $ptr solid var(--accent-color);
+        border-radius: 8 * $ptr;
+        padding: 4 * $ptr 4 * $ptr;
+
+        cursor: pointer;
+
+        color: var(--text-color);
+        font-size: 13 * $ptr;
+        transition: background 0.15s;
+        pointer-events: all;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 2 * $ptr;
+        align-self: flex-start;
+
+        width: 80 * $ptr;
+
+        &:hover {
+          background: rgba(245, 240, 232, 1);
+        }
+
+        &.is-active {
+          background: rgba(240, 192, 96, 0.5);
+          border-color: var(--stub-color);
+        }
+
+        &--disabled {
+          opacity: 0.4;
+          pointer-events: none;
+          cursor: not-allowed;
+        }
+
+        @include respond-to($medium-breakpoint) {
+          font-size: 18 * $ptr;
+          padding: 6 * $ptr 9 * $ptr;
+          width: 100 * $ptr;
+        }
+      }
+
+      &__speed-label {
+        font-size: 11 * $ptr;
+        font-weight: 700;
+        letter-spacing: 1.2 * $ptr;
+        text-transform: uppercase;
+        // color: var(--label-color);
+        font-family: 'Josefin Sans', sans-serif;
+      }
+
+      &__settings-btn, &__mute-btn {
+        background: var(--hud-panel);
+        border: 1 * $ptr solid var(--hud-border);
+        border-radius: 8 * $ptr;
+        padding: 5 * $ptr;
+        cursor: pointer;
+        pointer-events: all;
+        transition: background 0.15s;
+
+        &:hover {
+          background: rgba(245, 240, 232, 1);
+        }
+      }
+
+      &__coins, &__rails, &__time {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 5 * $ptr;
+        align-self: flex-start;
+
+        background: var(--hud-panel);
+        border: 1 * $ptr solid var(--hud-border);
+        border-radius: 8 * $ptr;
+        padding: 4 * $ptr 8 * $ptr;
+        width: 80 * $ptr;
+
+        font-size: 12 * $ptr;
+
+        pointer-events: none;
+
+        @include respond-to($medium-breakpoint) {
+          font-size: 14 * $ptr;
+          padding: 4 * $ptr 10 * $ptr;
+          width: 100 * $ptr;
+        }
+      }
+
+      &__counter-icon {
+        width: 16 * $ptr;
+        height: 16 * $ptr;
+        overflow: hidden;
+
+        img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        @include respond-to($medium-breakpoint) {
+          width: 24 * $ptr;
+          height: 24 * $ptr;
+        }
+      }
+
+      &__coins-count {
+        flex: 1;
+        text-align: center;
+
+        font-weight: 700;
+        font-family: 'Josefin Sans', sans-serif;
+        letter-spacing: 1 * $ptr;
+        color: var(--text-color);
+        font-variant-numeric: tabular-nums;
+      }
+
+      &__rails-count {
+        flex: 1;
+        text-align: center;
+
+        font-weight: 700;
+        font-family: 'Josefin Sans', sans-serif;
+        letter-spacing: 1 * $ptr;
+        color: var(--text-color);
+        font-variant-numeric: tabular-nums;
+      }
+
+      &__time-val {
+        flex: 1;
+        text-align: center;
+        font-weight: 700;
+        font-family: 'Josefin Sans', sans-serif;
+        color: var(--text-color);
+        font-variant-numeric: tabular-nums;
+      }
+
+    &__right {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      column-gap: 8 * $ptr;
+    }
+
+  &__bottom {
     display: flex;
     flex-direction: column;
-
+    width: 100%;
     align-items: center;
-
-    row-gap: 8 * $ptr;
-  }
-
-  &__right {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    column-gap: 8 * $ptr;
-  }
-
-  &__level {
-    font-size: 11 * $ptr;
-    font-weight: 700;
-    letter-spacing: 3 * $ptr;
-    color: var(--accent-color);
-    text-transform: uppercase;
-    text-shadow: none;
-  }
-
-  &__speed-wrap {
-    width: 90 * $ptr;
-    height: 4 * $ptr;
-    background: rgba(45, 53, 97, 0.15);
-    border-radius: 2 * $ptr;
-    overflow: hidden;
-  }
-
-  &__speed-bar {
-    height: 100%;
-    width: 0%;
-    background: var(--accent-color);
-    border-radius: 2 * $ptr;
-    transition: width 0.3s ease, background 0.3s ease;
-  }
-
-  &__speed-btn {
-    background: var(--hud-panel);
-
-    border: 1 * $ptr solid var(--hud-border);
-    border-radius: 8 * $ptr;
-    padding: 6 * $ptr 9 * $ptr;
-
-    cursor: pointer;
-
-    color: var(--text-color);
-    font-size: 18 * $ptr;
-    line-height: 1;
-    transition: background 0.15s;
-    font-family: 'Josefin Sans', sans-serif;
-    pointer-events: all;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4 * $ptr;
-
-    width: 100 * $ptr;
-
-    &:hover {
-      background: rgba(245, 240, 232, 1);
-    }
-
-    &.is-active {
-      background: rgba(240, 192, 96, 0.5);
-      border-color: var(--stub-color);
-    }
-
-    &--disabled {
-      opacity: 0.4;
-      pointer-events: none;
-      cursor: not-allowed;
-    }
-  }
-
-  &__speed-icon {
-    width: 20 * $ptr;
-    height: 20 * $ptr;
-    overflow: hidden;
-  }
-
-  &__speed-label {
-    font-size: 9 * $ptr;
-    font-weight: 700;
-    letter-spacing: 1.5 * $ptr;
-    text-transform: uppercase;
-    color: var(--label-color);
-    font-family: 'Josefin Sans', sans-serif;
-  }
-
-  &__settings-btn, &__mute-btn {
-    background: var(--hud-panel);
-    border: 1 * $ptr solid var(--hud-border);
-    border-radius: 8 * $ptr;
-    padding: 5 * $ptr;
-    cursor: pointer;
-    pointer-events: all;
-    transition: background 0.15s;
-
-    &:hover {
-      background: rgba(245, 240, 232, 1);
-    }
-  }
-
-  &__coins {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5 * $ptr;
-    background: var(--hud-panel);
-    border: 1 * $ptr solid var(--hud-border);
-    border-radius: 8 * $ptr;
-    padding: 4 * $ptr 10 * $ptr;
-    pointer-events: none;
-
-    width: 100 * $ptr;
-  }
-
-  &__coins-icon {
-    font-size: 14 * $ptr;
-    color: #f5c842;
-    line-height: 1;
-  }
-
-  &__coins-count {
-    flex: 1;
-    text-align: center;
-
-    font-size: 13 * $ptr;
-    font-weight: 700;
-    font-family: 'Josefin Sans', sans-serif;
-    letter-spacing: 1 * $ptr;
-    color: var(--text-color);
-    font-variant-numeric: tabular-nums;
-  }
-
-  &__rails {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5 * $ptr;
-    background: var(--hud-panel);
-    border: 1 * $ptr solid var(--hud-border);
-    border-radius: 8 * $ptr;
-    padding: 4 * $ptr 10 * $ptr;
-    pointer-events: none;
-
-    width: 100 * $ptr;
-  }
-
-  &__rails-count {
-    flex: 1;
-    text-align: center;
-
-    font-size: 13 * $ptr;
-    font-weight: 700;
-    font-family: 'Josefin Sans', sans-serif;
-    letter-spacing: 1 * $ptr;
-    color: var(--text-color);
-    font-variant-numeric: tabular-nums;
-  }
-
-  &__time {
-    display: flex;
-    flex-direction: row;;
-    align-items: center;
-    gap: 5 * $ptr;
-
-    background: var(--hud-panel);
-    padding: 4 * $ptr 10 * $ptr;
-    border: 1 * $ptr solid var(--hud-border);
-    border-radius: 8 * $ptr;
-    width: 100 * $ptr;
-
-    pointer-events: none;
-  }
-
-  &__time-val {
-    flex: 1;
-    text-align: center;
-    font-size: 14 * $ptr;
-    font-weight: 700;
-    font-family: 'Josefin Sans', sans-serif;
-    color: var(--text-color);
-    font-variant-numeric: tabular-nums;
+    justify-content: baseline;
   }
 }
 
 .hud__countdown-container {
-  position: absolute;
-  top: 120 * $ptr;
-  left: 50%;
-  transform: translateX(-50%);
-
+  position: relative;
   width: fit-content;
 
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: row;
-  column-gap: 5 * $ptr;
+
+  margin-right: -12 * $ptr;
+
+  @include respond-to($medium-breakpoint) {
+    position: absolute;
+    bottom: 20 * $ptr;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 .hud__countdown {
   background-color: var(--hud-panel);
   border: 1 * $ptr solid var(--hud-border);
-  border-radius: 8 * $ptr 0 0 8 * $ptr;
+  border-right: 2 * $ptr dashed var(--perforation-color);
+  border-left: 2 * $ptr dashed var(--perforation-color);
   padding: 4 * $ptr 10 * $ptr;
   width: 300 * $ptr;
   height: 40 * $ptr;
@@ -239,6 +251,19 @@
   font-weight: 600;
   text-align: center;
   color: var(--accent-color);
+
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -17 * $ptr;
+    width: 15 * $ptr;
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 8 * $ptr 0 0 8 * $ptr;
+  }
 
 }
   .hud__countdown-text {
@@ -266,35 +291,27 @@
 
   width: 40 * $ptr;
   height: 40 * $ptr;
+
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0 * $ptr;
+    width: 5 * $ptr;
+    height: 100%;
+    background: var(--accent-color);
+    // border-radius: 16 * $ptr 0 0 16 * $ptr;
+  }
 }
 
-// .hud__settings-icon {
-//   width: 32 * $ptr;
-//   height: 32 * $ptr;
-//   overflow: hidden;
-
-//   img {
-//     display: block;
-//     width: 100%;
-//     height: 100%;
-//     object-fit: contain;
-
-//     filter: invert(70%) sepia(100%) hue-rotate(180deg) brightness(90%);
-//   }
-// }
-
 .hud__actions {
-  position: absolute;
-  bottom: 0;
-  // left: 50%;
-  // transform: translateX(-50%);
-
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 12 * $ptr;
 
-  padding: 20 * $ptr;
+  gap: 12 * $ptr;
 
   width: 100%;
 
@@ -305,13 +322,13 @@
 .hud__actions-left {
   display: flex;
   flex-direction: column;
-  row-gap: 12 * $ptr;
+  row-gap: 8 * $ptr;
 }
 
 .hud__actions-right {
   display: flex;
   flex-direction: column;
-  row-gap: 12 * $ptr;
+  row-gap: 8 * $ptr;
 }
 
 .hud__action-btn {
@@ -327,7 +344,7 @@
   justify-content: center;
 
   background: var(--hud-panel);
-  border: 1 * $ptr solid rgba(45, 53, 97, 0.3);
+  border: 1 * $ptr solid var(--hud-border);
   border-radius: 10 * $ptr;
 
   color: var(--text-color);
@@ -357,20 +374,6 @@
     min-width: 96 * $ptr;
   }
 }
-
-
-// .hud__action-btn-icon {
-//   width: 24 * $ptr;
-//   height: 24 * $ptr;
-//   overflow: hidden;
-
-//   img {
-//     display: block;
-//     width: 100%;
-//     height: 100%;
-//     object-fit: contain;
-//   }
-// }
 
 .hud__icon {
   width: 24 * $ptr;

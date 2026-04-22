@@ -1,55 +1,56 @@
 .hud
-  .hud__left
-    .hud__level LEVEL #[span.hud__level-num 1]
-    .hud__speed-wrap
-      .hud__speed-bar
-    button.button.hud__speed-btn(title='Speed Up' tabindex='-1')
-      .hud__speed-icon.hud__icon
-        img(src='/images/icons/fastForward_dark.png', alt='Speed Up')
-      span.hud__speed-label max speed
-    .hud__coins.hidden
-      .hud__icon
-        img(src='/images/thumbnails/coin.png', alt='Coins')
-      span.hud__coins-count 0
-    .hud__rails
-      .hud__icon
-        img(src='/images/icons/card_outline_place_dark.png', alt='Rails placed')
-      span.hud__rails-count 0
-    .hud__time
-      .hud__icon
-        img(src='/images/icons/hourglass_dark.png', alt='Time')
-      span.hud__time-val 0s
-  .hud__right
-    button.hud__mute-btn(title='Mute All' data-sfx-click tabindex='-1')
-      .hud__settings-icon.hud__icon
-        img(src='/images/icons/audioOn_dark.png', alt='Mute All')
-        img.hidden(src='/images/icons/audioOff_dark.png', alt='Unmute All')
-    button.hud__settings-btn(title='Settings' data-sfx-click tabindex='-1')
-      .hud__settings-icon.hud__icon
-        img(src='/images/icons/gear_dark.png', alt='Settings')
+  .hud__top
+    .hud__left
+      .hud__level LEVEL #[span.hud__level-num 1]
+      .hud__speed-wrap
+        .hud__speed-bar
+      .hud__coins.hidden
+        .hud__counter-icon
+          img(src='/images/thumbnails/coin.png', alt='Coins')
+        span.hud__coins-count 0
+      .hud__rails
+        .hud__counter-icon
+          img(src='/images/icons/card_outline_place_dark.png', alt='Rails placed')
+        span.hud__rails-count 0
+      .hud__time
+        .hud__counter-icon
+          img(src='/images/icons/hourglass_dark.png', alt='Time')
+        span.hud__time-val 0s
+      button.button.hud__speed-btn(title='Speed Up' tabindex='-1')
+        span.hud__speed-label max speed
+        .hud__speed-icon.hud__counter-icon
+          img(src='/images/icons/fastForward_dark.png', alt='Speed Up')
+    .hud__right
+      button.hud__mute-btn(title='Mute All' data-sfx-click tabindex='-1')
+        .hud__settings-icon.hud__icon
+          img(src='/images/icons/audioOn_dark.png', alt='Mute All')
+          img.hidden(src='/images/icons/audioOff_dark.png', alt='Unmute All')
+      button.hud__settings-btn(title='Settings' data-sfx-click tabindex='-1')
+        .hud__settings-icon.hud__icon
+          img(src='/images/icons/gear_dark.png', alt='Settings')
+  .hud__bottom
+    .hud__actions
+      .hud__actions-left
+        button.hud__action-btn.hud__action-btn--swap.hud__action-btn--left-up(title='Swap Track' tabindex='-1')
+          .hud__action-btn-icon.hud__icon
+            img(src='/images/icons/cards_flip_dark.png', alt='Swap Track')
+          .span Swap
+        button.hud__action-btn.hud__action-btn--rotate.hud__action-btn--left-down(title='Rotate Track (S)' tabindex='-1')
+          .hud__action-btn-icon.hud__icon
+            img(src='/images/icons/card_flipdouble_dark.png', alt='Rotate Track')
+          .span Rotate
+      .hud__actions-right
+        button.hud__action-btn.hud__action-btn--place.hud__action-btn--right(title='Place Track' tabindex='-1')
+          .hud__action-btn-icon.hud__icon
+            img(src='/images/icons/card_outline_place_dark.png', alt='Place Track')
+          .span Place
 
-.hud__countdown-container.hidden
-  .hud__countdown
-    .hud__countdown-text
-      | Train will depart in:
-      span.hud__countdown-val
-      | s
-  .button.hud__countdown-button(tabindex='-1')
-    .hud__icon
-      img(src='/images/icons/fastForward_dark.png', alt='Skip Countdown')
-
-.hud__actions
-  .hud__actions-left
-    button.hud__action-btn.hud__action-btn--swap.hud__action-btn--left-up(title='Swap Track' tabindex='-1')
-      .hud__action-btn-icon.hud__icon
-        img(src='/images/icons/cards_flip_dark.png', alt='Swap Track')
-      .span Swap
-    button.hud__action-btn.hud__action-btn--rotate.hud__action-btn--left-down(title='Rotate Track (S)' tabindex='-1')
-      .hud__action-btn-icon.hud__icon
-        img(src='/images/icons/card_flipdouble_dark.png', alt='Rotate Track')
-      .span Rotate
-  .hud__actions-right
-    button.hud__action-btn.hud__action-btn--place.hud__action-btn--right(title='Place Track' tabindex='-1')
-      .hud__action-btn-icon.hud__icon
-        img(src='/images/icons/card_outline_place_dark.png', alt='Place Track')
-      .span Place
+    .hud__countdown-container.hidden
+      .hud__countdown
+        .hud__countdown-text
+          | Train will depart in:
+          span.hud__countdown-val
+          | s
+      .button.hud__countdown-button(tabindex='-1')
+        .hud__icon
+          img(src='/images/icons/fastForward_dark.png', alt='Skip Countdown')

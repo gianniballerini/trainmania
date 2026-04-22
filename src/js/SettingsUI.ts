@@ -6,6 +6,7 @@ import { showTrainPickerModal } from './ui.js'
 
 export class SettingsUI {
   private readonly modal:       HTMLElement
+  private readonly modalBox:    HTMLElement
   private readonly closeBtn:    HTMLElement
   private readonly tabs:        NodeListOf<HTMLButtonElement>
   private readonly panels:      NodeListOf<HTMLElement>
@@ -22,6 +23,7 @@ export class SettingsUI {
     private readonly game: Game,
   ) {
     this.modal        = document.querySelector('.settings')!
+    this.modalBox     = document.querySelector('.settings__box')!
     this.closeBtn     = document.querySelector('.settings__close')!
     this.tabs         = document.querySelectorAll('.settings__tab')
     this.panels       = document.querySelectorAll('.settings__panel')
@@ -52,13 +54,19 @@ export class SettingsUI {
   // ── Internal ──────────────────────────────────────────────────────────────
 
   private bindEvents(): void {
-    const { modal, closeBtn, tabs, panels } = this
+    const { modal, modalBox, closeBtn, tabs, panels } = this
 
     document.querySelector<HTMLElement>('.hud__settings-btn')!
       .addEventListener('click', () => this.open())
 
     closeBtn.addEventListener('click', () => this.close())
     modal.addEventListener('click', (e) => { if (e.target === modal) this.close() })
+    document.addEventListener('pointerdown', (e) => {
+      if (modal.classList.contains('hidden')) return
+      const target = e.target as Node | null
+      if (!target || modalBox.contains(target)) return
+      this.close()
+    })
 
     document.querySelector<HTMLElement>('.settings__change-train')!
       .addEventListener('click', () => this.changeTrain())
