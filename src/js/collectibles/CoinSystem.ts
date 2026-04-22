@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { loadModelAsset, warnAssetLoadFailureOnce } from '../Assets.js'
 import { CELL_H } from '../Constants.js'
+import { Game } from '../Game.js'
 import { cellToWorld, type CellData } from '../Grid.js'
 
 const COIN_MODEL_URL = '/assets/models/coin-gold.glb'
@@ -62,12 +63,13 @@ export class CoinSystem {
    * Collect the coin on the given cell.
    * Returns true if a coin was collected, false if there was none.
    */
-  collect(cell: CellData): boolean {
+  collect(cell: CellData, game: Game): boolean {
     if (!cell.hasCoin || !cell.coinGroup) return false
     this.scene.remove(cell.coinGroup)
     this._entries = this._entries.filter(e => e.group !== cell.coinGroup)
     cell.coinGroup = null
     cell.hasCoin = false
+    game.audioManager.playSfx(`coin`)
     return true
   }
 

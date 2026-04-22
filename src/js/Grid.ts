@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { CoinSystem } from './collectibles/CoinSystem.js'
 import { CELL, CELL_H, CELL_SIZE, CellType, Direction, GAP, PieceId } from './Constants.js'
+import { Game } from './Game.js'
 import type { Level } from './levels/Level.js'
 import { Settings } from './Settings.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
@@ -312,10 +313,10 @@ export class Grid {
     this.coins.update(delta)
   }
 
-  collectCoin(col: number, row: number): boolean {
+  collectCoin(col: number, row: number, game: Game): boolean {
     const cell = this.getCell(col, row)
     if (!cell) return false
-    return this.coins.collect(cell)
+    return this.coins.collect(cell, game)
   }
 
   dispose(): void {

@@ -222,7 +222,7 @@ export class Game {
   doTick(): void {
     if (!this.train) return
     // Collect coin on the current cell before stepping
-    if (this.grid?.collectCoin(this.train.col, this.train.row)) {
+    if (this.grid?.collectCoin(this.train.col, this.train.row, this)) {
       this.coinCount++
       this.updateCoinDisplay()
     }
