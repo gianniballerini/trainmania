@@ -42,6 +42,7 @@ export class Game {
   private readonly coinsCountEl: HTMLElement
   private readonly timeValEl: HTMLElement
   private readonly railsCountEl: HTMLElement
+  private readonly actionButtonsEl: HTMLElement
   private readonly straightBtnSpan: HTMLElement
   private readonly straight_btn_annotation: HTMLElement
   private readonly curvedBtnSpan: HTMLElement
@@ -120,6 +121,7 @@ export class Game {
     this.coinsCountEl = document.querySelector<HTMLElement>('.hud__coins-count')!
     this.timeValEl = document.querySelector<HTMLElement>('.hud__time-val')!
     this.railsCountEl = document.querySelector<HTMLElement>('.hud__rails-count')!
+    this.actionButtonsEl = document.querySelector<HTMLElement>('.hud__actions')!
 
     this.straightBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--straight span')!
     this.straight_btn_annotation = document.querySelector<HTMLElement>('.hud__annotation--straight')!
@@ -439,6 +441,10 @@ export class Game {
     this.placeBtnSpan.textContent = isReplace ? 'Replace' : 'Place'
   }
 
+  updateActionButtonsEnabled(): void {
+    this.actionButtonsEl.classList.toggle('is-disabled', this.lastHoveredCell === null)
+  }
+
   // ── Render loop ───────────────────────────────────────────────────────────
   private startRenderLoop(): void {
     this.animate()
@@ -458,6 +464,7 @@ export class Game {
     if (this.grid) this.grid.updateCoins(delta)
     this.playTime = this.playTimeAccumulated + (this.currentState instanceof PlayingState ? (performance.now() - this.playTimeStamp) / 1000 : 0)
     this.updateTimeDisplay()
+    this.updateActionButtonsEnabled()
 
     // Lerp camera look target: train follow > ghost tile > grid center
     let goalX = 0

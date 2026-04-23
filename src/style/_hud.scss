@@ -318,6 +318,22 @@
 
   pointer-events: none;
 
+  &.is-disabled {
+    .hud__action-btn {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hud__action-btn--left-up,
+    .hud__action-btn--left-down {
+      transform: translateX(-140%);
+    }
+
+    .hud__action-btn--right {
+      transform: translateX(140%);
+    }
+  }
+
 }
 
 .hud__actions-left {
@@ -360,7 +376,7 @@
   cursor: pointer;
   user-select: none;
 
-  transition: background 0.12s, transform 0.08s, border-color 0.12s;
+  transition: background 0.12s, transform 0.24s ease, border-color 0.12s, opacity 0.24s ease;
 
   &:hover {
     background: rgba(245, 240, 232, 1);
