@@ -192,7 +192,7 @@ export class Game {
     this.updateSpeedBar(0)
 
     this.grid         = new Grid(this.scene, levelDef)
-    this.cameraController.setPanBounds(Math.max(this.grid.cols, this.grid.rows) * CELL_SIZE / 2)
+    this.cameraController.setPanBounds(this.grid.cols * CELL_SIZE / 2, this.grid.rows * CELL_SIZE / 2)
     this.train        = new Train(this.scene, this.grid)
     this.train.lerpSpeed = this.lerpSpeed
     this.smoke        = Train.hasSmoke() ? new SmokeSystem(this.scene) : undefined
