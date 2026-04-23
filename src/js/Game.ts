@@ -42,6 +42,10 @@ export class Game {
   private readonly coinsCountEl: HTMLElement
   private readonly timeValEl: HTMLElement
   private readonly railsCountEl: HTMLElement
+  private readonly straightBtnSpan: HTMLElement
+  private readonly straight_btn_annotation: HTMLElement
+  private readonly curvedBtnSpan: HTMLElement
+  private readonly curved_btn_annotation: HTMLElement
   private readonly placeBtnSpan: HTMLElement
   private tweakpane: Tweakpane | undefined
   // ── Live game objects (replaced on each level load) ───────────────────────
@@ -57,6 +61,10 @@ export class Game {
   selectedPiece:   PieceId | null = null
   currentTileType: TileType       = 'STRAIGHT'
   currentRotation                 = 0
+  private readonly rotationByTileType: Record<TileType, number> = {
+    STRAIGHT: 0,
+    CURVE: 0,
+  }
   lastHoveredCell: { col: number; row: number } | null = null
 
   // ── Level ─────────────────────────────────────────────────────────────────
@@ -112,7 +120,14 @@ export class Game {
     this.coinsCountEl = document.querySelector<HTMLElement>('.hud__coins-count')!
     this.timeValEl = document.querySelector<HTMLElement>('.hud__time-val')!
     this.railsCountEl = document.querySelector<HTMLElement>('.hud__rails-count')!
-    this.placeBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--place .span')!
+
+    this.straightBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--straight span')!
+    this.straight_btn_annotation = document.querySelector<HTMLElement>('.hud__annotation--straight')!
+
+    this.curvedBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--curved span')!
+    this.curved_btn_annotation = document.querySelector<HTMLElement>('.hud__annotation--curved')!
+
+    this.placeBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--place span')!
 
     this.countdownBtn.addEventListener('click', () => {
       if (this.currentState instanceof PlayingState) {
@@ -253,11 +268,30 @@ export class Game {
   // ── HUD helpers ───────────────────────────────────────────────────────────
   updateSelectedPiece(): void {
     this.selectedPiece = tileToPieceId(this.currentTileType, this.currentRotation)
+    if (this.currentTileType === 'STRAIGHT') {
+      this.straight_btn_annotation.classList.remove('hidden')
+      this.curved_btn_annotation.classList.add('hidden')
+    } else if (this.currentTileType === 'CURVE') {
+      this.straight_btn_annotation.classList.add('hidden')
+      this.curved_btn_annotation.classList.remove('hidden')
+    }
     if (this.grid && this.selectedPiece && this.lastHoveredCell) {
       this.grid.showGhost(this.lastHoveredCell.col, this.lastHoveredCell.row, this.selectedPiece)
       const hoveredCell = this.grid.getCell(this.lastHoveredCell.col, this.lastHoveredCell.row)
       this.updatePlaceBtn(hoveredCell?.trackPiece != null)
     }
+  }
+
+  selectTileType(type: TileType): void {
+    this.currentTileType = type
+    this.currentRotation = this.rotationByTileType[type]
+    this.updateSelectedPiece()
+  }
+
+  rotateCurrentTile(step = 1): void {
+    this.currentRotation = (this.currentRotation + step + 4) % 4
+    this.rotationByTileType[this.currentTileType] = this.currentRotation
+    this.updateSelectedPiece()
   }
 
   // -- Start of the Game --

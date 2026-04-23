@@ -19,7 +19,7 @@ body {
   color: var(--cream);
   font-size: 16px;
 
-  div.hidden, img.hidden, canvas.hidden, iframe.hidden {
+  div.hidden, img.hidden, canvas.hidden, iframe.hidden, span.hidden {
     display: none;
     pointer-events: none;
   }

@@ -98,17 +98,26 @@ export class PlayingState extends BaseGameState {
     let idx: number
     switch (key) {
       case 'A':
-        game.currentTileType = game.currentTileType === 'STRAIGHT' ? 'CURVE' : 'STRAIGHT'
-        game.currentRotation = 0
+        if (game.currentTileType === 'STRAIGHT') {
+          game.rotateCurrentTile(1)
+          idx = Math.floor(Math.random() * 3) + 1
+          game.audioManager.playSfx(`rotate_0${idx}`)
+          break
+        }
+        game.selectTileType('STRAIGHT')
         idx = Math.floor(Math.random() * 5) + 1
         game.audioManager.playSfx(`toggle_0${idx}`)
-        game.updateSelectedPiece()
         break
       case 'S':
-        game.currentRotation = (game.currentRotation + 1) % 4
-        game.updateSelectedPiece()
-        idx = Math.floor(Math.random() * 3) + 1
-        game.audioManager.playSfx(`rotate_0${idx}`)
+        if (game.currentTileType === 'CURVE') {
+          game.rotateCurrentTile(1)
+          idx = Math.floor(Math.random() * 3) + 1
+          game.audioManager.playSfx(`rotate_0${idx}`)
+          break
+        }
+        game.selectTileType('CURVE')
+        idx = Math.floor(Math.random() * 5) + 1
+        game.audioManager.playSfx(`toggle_0${idx}`)
         break
       case " ":
       case 'ENTER': {

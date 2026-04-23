@@ -68,9 +68,9 @@ export class InputManager {
     const { canvas, game, cam } = this
 
     // ── Action helpers (shared by keyboard, mouse, touch, HUD buttons) ────
-    const rotateBtn = document.querySelector<HTMLElement>('.hud__action-btn--rotate')
+    const straightBtn = document.querySelector<HTMLElement>('.hud__action-btn--straight')
+    const curvedBtn = document.querySelector<HTMLElement>('.hud__action-btn--curved')
     const placeBtn = document.querySelector<HTMLElement>('.hud__action-btn--place')
-    const swapBtn = document.querySelector<HTMLElement>('.hud__action-btn--swap')
 
     const withActive = (el: HTMLElement, fn: () => void) => {
       el.classList.add('is-active')
@@ -82,8 +82,7 @@ export class InputManager {
     }
 
     const doRotateL = () => {
-      game.currentRotation = (game.currentRotation + 3) % 4
-      game.updateSelectedPiece()
+      game.rotateCurrentTile(-1)
       const idx = Math.floor(Math.random() * 3) + 1
       game.audioManager.playSfx(`rotate_0${idx}`)
     }
@@ -92,10 +91,13 @@ export class InputManager {
       if (!cell) return
       game.currentState.handleClick(game, cell.col, cell.row, game.grid?.getCell(cell.col, cell.row) ?? null)
     }
-    const doSwap = () => {
-      game.currentTileType = game.currentTileType === 'STRAIGHT' ? 'CURVE' : 'STRAIGHT'
-      game.currentRotation = 0
-      game.updateSelectedPiece()
+    const doSelectOrRotate = (type: 'STRAIGHT' | 'CURVE') => {
+      if (game.currentTileType === type) {
+        doRotateL()
+        return
+      }
+
+      game.selectTileType(type)
       const idx = Math.floor(Math.random() * 5) + 1
       game.audioManager.playSfx(`toggle_0${idx}`)
     }
@@ -116,8 +118,8 @@ export class InputManager {
       }
       game.currentState.handleKeyDown(game, key)
 
-      if (key === 'A') flashBtn(swapBtn)
-      else if (key === 'S') flashBtn(rotateBtn)
+      if (key === 'A') flashBtn(straightBtn)
+      else if (key === 'S') flashBtn(curvedBtn)
       else if (key === 'ENTER' || key === ' ') flashBtn(placeBtn)
     })
     canvas.addEventListener('mousedown', (e) => {
@@ -189,14 +191,14 @@ export class InputManager {
       if (e.button !== 1) return
       e.preventDefault()
       doRotateL()
-      flashBtn(rotateBtn)
+      flashBtn(game.currentTileType === 'STRAIGHT' ? straightBtn : curvedBtn)
     })
 
     // ── Right click → swap ────────────────────────────────────────────────
     canvas.addEventListener('contextmenu', (e) => {
       e.preventDefault()
-      doSwap()
-      flashBtn(swapBtn)
+      doSelectOrRotate(game.currentTileType === 'STRAIGHT' ? 'CURVE' : 'STRAIGHT')
+      flashBtn(game.currentTileType === 'STRAIGHT' ? straightBtn : curvedBtn)
     })
 
     // ── Touch ─────────────────────────────────────────────────────────────
@@ -259,17 +261,17 @@ export class InputManager {
     }, { passive: false })
 
     // ── HTML action buttons ───────────────────────────────────────────────
-    if (rotateBtn) {
-      rotateBtn.addEventListener('mousedown', () => withActive(rotateBtn, doRotateL))
-      rotateBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(rotateBtn, doRotateL) }, { passive: false })
+    if (straightBtn) {
+      straightBtn.addEventListener('mousedown', () => withActive(straightBtn, () => doSelectOrRotate('STRAIGHT')))
+      straightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(straightBtn, () => doSelectOrRotate('STRAIGHT')) }, { passive: false })
+    }
+    if (curvedBtn) {
+      curvedBtn.addEventListener('mousedown', () => withActive(curvedBtn, () => doSelectOrRotate('CURVE')))
+      curvedBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(curvedBtn, () => doSelectOrRotate('CURVE')) }, { passive: false })
     }
     if (placeBtn) {
       placeBtn.addEventListener('mousedown', () => withActive(placeBtn, doPlace))
       placeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(placeBtn, doPlace) }, { passive: false })
-    }
-    if (swapBtn) {
-      swapBtn.addEventListener('mousedown', () => withActive(swapBtn, doSwap))
-      swapBtn.addEventListener('touchstart', (e) => { e.preventDefault(); withActive(swapBtn, doSwap) }, { passive: false })
     }
   }
 }

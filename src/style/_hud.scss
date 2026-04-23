@@ -333,6 +333,8 @@
 }
 
 .hud__action-btn {
+  position: relative;
+
   flex: 1;
   height: 100 * $ptr;
   padding: 12 * $ptr 18 * $ptr;
@@ -374,6 +376,19 @@
   @include respond-to($medium-breakpoint) {
     min-width: 96 * $ptr;
   }
+}
+
+.hud__annotation {
+  position: absolute;
+  top: 50%;
+  right: -20  * $ptr;
+  transform: translate3d(0, -50%, 0);
+
+  padding: 6 * $ptr;
+  border-radius: 50%;
+
+  background-color: var(--hud-panel);
+  box-shadow: 0 0 2 * $ptr 2 * $ptr var(--hud-shadow);
 }
 
 .hud__icon {
