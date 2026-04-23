@@ -17,6 +17,7 @@ export class SettingsUI {
   private readonly btnMuteSfx:  HTMLElement
   private readonly sliderMusic: HTMLInputElement
   private readonly sliderSfx:   HTMLInputElement
+  private readonly btnInvertY:  HTMLButtonElement
 
   constructor(
     private readonly audio: AudioManager,
@@ -35,7 +36,9 @@ export class SettingsUI {
 
     this.sliderMusic  = document.querySelector('.settings__music-slider')!
     this.sliderSfx    = document.querySelector('.settings__sfx-slider')!
+    this.btnInvertY   = document.querySelector('.settings__invert-y-btn')!
 
+    this.syncInvertY()
     this.bindEvents()
   }
 
@@ -70,6 +73,11 @@ export class SettingsUI {
 
     document.querySelector<HTMLElement>('.settings__change-train')!
       .addEventListener('click', () => this.changeTrain())
+
+    this.btnInvertY.addEventListener('click', () => {
+      this.game.cameraController.invertY = !this.game.cameraController.invertY
+      this.syncInvertY()
+    })
 
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -130,5 +138,11 @@ export class SettingsUI {
     toggle(this.btnMuteAll,   audio.isAllMuted)
     toggle(this.btnMuteMusic, audio.isMusicMuted)
     toggle(this.btnMuteSfx,   audio.isSfxMuted)
+  }
+
+  private syncInvertY(): void {
+    const on = this.game.cameraController.invertY
+    this.btnInvertY.textContent = on ? 'On' : 'Off'
+    this.btnInvertY.classList.toggle('on', on)
   }
 }

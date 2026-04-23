@@ -37,7 +37,7 @@ export class TitleState extends BaseGameState {
         hideLevelPicker()
         game.audioManager.init()
         game.audioManager.preloadSfx(soundDefs)
-        game.audioManager.playMusic(BACKGROUND_TRACKS)
+        game.audioManager.switchMusic(BACKGROUND_TRACKS)
         game.changeState(new PlayingState())
       },
     )

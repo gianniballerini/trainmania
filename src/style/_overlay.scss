@@ -381,11 +381,16 @@
   }
 
   img {
-    width: 164 * $ptr;
-    height: 164 * $ptr;
+    width: 100 * $ptr;
+    height: 100 * $ptr;
     object-fit: contain;
     border-radius: 4 * $ptr;
     pointer-events: none;
+
+    @include respond-to($medium-breakpoint) {
+      width: 164 * $ptr;
+      height: 164 * $ptr;
+    }
   }
 
   span {
@@ -436,11 +441,16 @@
   }
 
   img {
-    width: 96 * $ptr;
+    width: 80 * $ptr;
     height: 96 * $ptr;
     object-fit: contain;
     border-radius: 4 * $ptr;
     pointer-events: none;
+
+    @include respond-to($medium-breakpoint) {
+      width: 96 * $ptr;
+      height: 96 * $ptr;
+    }
   }
 
   span {

@@ -164,6 +164,7 @@ export class InputManager {
           game.lastHoveredCell = null
           game.grid?.hideGhost()
         }
+        cam.resetPan()
         return
       }
 
@@ -178,6 +179,7 @@ export class InputManager {
         game.currentState.handleClick(game, hit.col, hit.row, cell)
       } else {
         // First click → focus the tile (show ghost)
+        cam.resetPan()
         game.currentState.handlePointerMove(game, hit.col, hit.row, cell)
       }
     })
@@ -234,6 +236,7 @@ export class InputManager {
           game.lastHoveredCell = null
           game.grid?.hideGhost()
         }
+        cam.resetPan()
         return
       }
 
@@ -250,6 +253,7 @@ export class InputManager {
         game.showDefaultGhost()
       } else {
         // First tap → focus the tile (shows ghost)
+        cam.resetPan()
         game.currentState.handlePointerMove(game, hit.col, hit.row, cell)
       }
     }, { passive: false })

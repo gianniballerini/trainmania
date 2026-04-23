@@ -180,6 +180,12 @@
       border-color: rgba(192, 82, 42, 0.4);
       color: var(--rust);
     }
+
+    &.on {
+      background: rgba(45, 53, 97, 0.15);
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
   }
 
   &__vol-label {

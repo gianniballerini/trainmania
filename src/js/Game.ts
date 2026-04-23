@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
-import { CELL, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
+import { CELL, CELL_SIZE, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
 import { Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { LeaderboardUI } from './LeaderboardUI.js'
@@ -93,6 +93,7 @@ export class Game {
   constructor(readonly canvas: HTMLCanvasElement) {
     this.audioManager     = new AudioManager();
     this.cameraController = new CameraController();
+    this.cameraController.loadPreferences()
 
     const { renderer, scene, camera } = createScene(canvas)
     this.renderer = renderer
@@ -191,6 +192,7 @@ export class Game {
     this.updateSpeedBar(0)
 
     this.grid         = new Grid(this.scene, levelDef)
+    this.cameraController.setPanBounds(Math.max(this.grid.cols, this.grid.rows) * CELL_SIZE / 2)
     this.train        = new Train(this.scene, this.grid)
     this.train.lerpSpeed = this.lerpSpeed
     this.smoke        = Train.hasSmoke() ? new SmokeSystem(this.scene) : undefined
