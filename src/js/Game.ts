@@ -184,6 +184,7 @@ export class Game {
   pause(): void {
     if (this.currentState instanceof PlayingState) {
       this.changeState(new PausedState(this.currentState))
+      this.audioManager.setPaused(true)
     }
   }
 
@@ -191,6 +192,7 @@ export class Game {
     if (this.currentState instanceof PausedState) {
       this.lastTime = performance.now()
       this.changeState(this.currentState.previousState as BaseGameState)
+      this.audioManager.setPaused(false)
     }
   }
 

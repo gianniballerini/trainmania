@@ -35,13 +35,47 @@ export class AudioManager {
   private _sfxGain: GainNode | null = null
   private _sfxCache = new Map<string, { buffer: AudioBuffer; volume: number }>()
 
+  // ── Web Audio (Music graph) ───────────────────────────────────────────────
+  private _musicSource:      MediaElementAudioSourceNode | null = null
+  private _lowpassFilter:    BiquadFilterNode | null           = null
+  private _pauseGain:        GainNode | null                   = null
+  private _musicGain:        GainNode | null                   = null
+
+  // ── Web Audio (SFX graph) ─────────────────────────────────────────────────
+  private _sfxLowpassFilter: BiquadFilterNode | null           = null
+  private _sfxPauseGain:     GainNode | null                   = null
+
   // ── Init (call once from first user gesture) ───────────────────────────────
   init(): void {
     if (this._ctx) return
     this._ctx     = new AudioContext()
     this._sfxGain = this._ctx.createGain()
     this._sfxGain.gain.value = this._mutedAll || this._mutedSfx ? 0 : this._sfxVolume
-    this._sfxGain.connect(this._ctx.destination)
+
+    // SFX graph: _sfxGain → sfxLowpassFilter → sfxPauseGain → destination
+    this._sfxLowpassFilter                    = this._ctx.createBiquadFilter()
+    this._sfxLowpassFilter.type               = 'lowpass'
+    this._sfxLowpassFilter.frequency.value    = 20000
+    this._sfxPauseGain                        = this._ctx.createGain()
+    this._sfxPauseGain.gain.value             = 1.0
+    this._sfxGain.connect(this._sfxLowpassFilter)
+    this._sfxLowpassFilter.connect(this._sfxPauseGain)
+    this._sfxPauseGain.connect(this._ctx.destination)
+
+    // Music graph: _audioEl → lowpassFilter → pauseGain → musicGain → destination
+    this._musicSource            = this._ctx.createMediaElementSource(this._audioEl)
+    this._lowpassFilter          = this._ctx.createBiquadFilter()
+    this._lowpassFilter.type     = 'lowpass'
+    this._lowpassFilter.frequency.value = 20000
+    this._pauseGain              = this._ctx.createGain()
+    this._pauseGain.gain.value   = 1.0
+    this._musicGain              = this._ctx.createGain()
+    this._musicGain.gain.value   = this._effectiveMusicVolume()
+    this._musicSource.connect(this._lowpassFilter)
+    this._lowpassFilter.connect(this._pauseGain)
+    this._pauseGain.connect(this._musicGain)
+    this._musicGain.connect(this._ctx.destination)
+
     // Resume context if it was suspended (mobile browsers)
     if (this._ctx.state === 'suspended') {
       this._ctx.resume()
@@ -82,13 +116,13 @@ export class AudioManager {
   }
 
   setMusicVolume(value: number): void {
-    this._musicVolume        = clamp01(value)
-    this._audioEl.volume     = this._effectiveMusicVolume()
+    this._musicVolume = clamp01(value)
+    if (this._musicGain) this._musicGain.gain.value = this._effectiveMusicVolume()
   }
 
   muteMusic(muted: boolean): void {
-    this._mutedMusic         = muted
-    this._audioEl.volume     = this._effectiveMusicVolume()
+    this._mutedMusic = muted
+    if (this._musicGain) this._musicGain.gain.value = this._effectiveMusicVolume()
   }
 
   get isMusicMuted(): boolean { return this._mutedMusic || this._mutedAll }
@@ -156,14 +190,41 @@ export class AudioManager {
   // ── Master mute ────────────────────────────────────────────────────────────
 
   muteAll(muted: boolean): void {
-    this._mutedAll           = muted
-    this._audioEl.volume     = this._effectiveMusicVolume()
+    this._mutedAll = muted
+    if (this._musicGain) this._musicGain.gain.value = this._effectiveMusicVolume()
     if (this._sfxGain) {
       this._sfxGain.gain.value = this._effectiveSfxVolume()
     }
   }
 
   get isAllMuted(): boolean { return this._mutedAll }
+
+  // ── Pause effect ──────────────────────────────────────────────────────────
+
+  /**
+   * Apply or remove the classic "paused" muffling effect on both music and SFX.
+   * Use `setMusicPaused` / `setSfxPaused` to control each channel independently.
+   */
+  setPaused(paused: boolean, rampDuration = 0.3): void {
+    this.setMusicPaused(paused, rampDuration)
+    // this.setSfxPaused(paused, rampDuration)
+  }
+
+  /** Muffling effect for music only — lowpass (300 Hz ↔ 20 kHz) + gain dip. */
+  setMusicPaused(paused: boolean, rampDuration = 0.3): void {
+    if (!this._ctx || !this._lowpassFilter || !this._pauseGain) return
+    const t = this._ctx.currentTime + rampDuration
+    this._lowpassFilter.frequency.linearRampToValueAtTime(paused ? 300 : 20000, t)
+    this._pauseGain.gain.linearRampToValueAtTime(paused ? 0.6 : 1.0, t)
+  }
+
+  /** Muffling effect for SFX only — lowpass (300 Hz ↔ 20 kHz) + gain dip. */
+  setSfxPaused(paused: boolean, rampDuration = 0.3): void {
+    if (!this._ctx || !this._sfxLowpassFilter || !this._sfxPauseGain) return
+    const t = this._ctx.currentTime + rampDuration
+    this._sfxLowpassFilter.frequency.linearRampToValueAtTime(paused ? 300 : 20000, t)
+    this._sfxPauseGain.gain.linearRampToValueAtTime(paused ? 0.6 : 1.0, t)
+  }
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
@@ -172,7 +233,6 @@ export class AudioManager {
 
     const url             = this._tracks[this._trackIndex]
     this._audioEl.src     = url
-    this._audioEl.volume  = this._effectiveMusicVolume()
     this._audioEl.onended = () => {
       this._trackIndex = (this._trackIndex + 1) % this._tracks.length
       this._loadAndPlayTrack()
