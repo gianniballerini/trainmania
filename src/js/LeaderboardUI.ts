@@ -42,6 +42,10 @@ export class LeaderboardUI {
     this.modal.classList.remove('hidden')
   }
 
+  get isOpen(): boolean {
+    return !this.modal.classList.contains('hidden')
+  }
+
   close(): void {
     this.modal.classList.add('hidden')
     if (this.wasPlaying) this.game.resume()
