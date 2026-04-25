@@ -1,0 +1,17 @@
+.global-score-modal.hidden
+  .global-score-modal__box
+    .global-score-modal__icon
+      img(src='/images/icons/award_dark.png' alt='Global Score Icon')
+    .global-score-modal__title You made it to the Global Leaderboard!
+    .global-score-modal__sub Enter your name to claim your spot
+    input.global-score-modal__input(
+      type='text'
+      maxlength='32'
+      placeholder='Your name…'
+      autocomplete='off'
+    )
+    .global-score-modal__error.hidden
+    .button.global-score-modal__submit(data-sfx-click)
+      span Submit
+    button.global-score-modal__skip(data-sfx-click) Skip
+    .global-score-modal__result.hidden

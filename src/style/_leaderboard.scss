@@ -223,8 +223,25 @@
     text-align: left;
   }
 
+  &__head-rank {
+    text-align: right;
+    width: 24 * $ptr;
+  }
+
   &__head-stat {
     text-align: right;
+  }
+
+  &__rank {
+    padding: 10 * $ptr 8 * $ptr;
+    font-size: 10 * $ptr;
+    font-weight: 700;
+    letter-spacing: 1 * $ptr;
+    color: var(--label-color);
+    text-align: right;
+    opacity: 0.5;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   &__label {
@@ -264,7 +281,43 @@
   }
 }
 
-// ── Empty state ───────────────────────────────────────────────────────────────
+// ── Empty / loading / section states ─────────────────────────────────────────
+
+.lb-section-heading {
+  margin: 16 * $ptr 0 4 * $ptr;
+  font-size: 9 * $ptr;
+  font-weight: 700;
+  letter-spacing: 2 * $ptr;
+  text-transform: uppercase;
+  color: var(--label-color);
+  opacity: 0.5;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.lb-loading {
+  margin-top: 16 * $ptr;
+  text-align: center;
+  font-size: 10 * $ptr;
+  font-weight: 700;
+  letter-spacing: 2 * $ptr;
+  text-transform: uppercase;
+  color: var(--label-color);
+  opacity: 0.4;
+}
+
+.lb-error {
+  margin-top: 16 * $ptr;
+  text-align: center;
+  font-size: 10 * $ptr;
+  font-weight: 700;
+  letter-spacing: 2 * $ptr;
+  text-transform: uppercase;
+  color: var(--rust);
+  opacity: 0.8;
+}
 
 .lb-empty {
   margin-top: 24 * $ptr;

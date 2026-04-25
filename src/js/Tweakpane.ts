@@ -10,7 +10,7 @@ class Tweakpane {
             expanded: false
         });
 
-        const levelsFolder = this.pane.addFolder({
+        const levelsFolder = (this.pane as any).addFolder({
             title: 'Levels',
             expanded: false
         });
@@ -45,7 +45,7 @@ class Tweakpane {
         });
         lvl4_btn.on('click', () => this.loadLevel(4));
 
-        const colorsFolder = this.pane.addFolder({
+        const colorsFolder = (this.pane as any).addFolder({
             title: 'Colors',
             expanded: false
         });
@@ -58,7 +58,7 @@ class Tweakpane {
         colorsFolder.addBinding(Settings.colors, 'rock').on('change', this.updateColors.bind(this));
         colorsFolder.addBinding(Settings.colors, 'ghost').on('change', this.updateColors.bind(this));
 
-        const sceneFolder = this.pane.addFolder({
+        const sceneFolder = (this.pane as any).addFolder({
             title: 'Scene',
             expanded: false
         });
@@ -84,7 +84,7 @@ class Tweakpane {
     }
 
     updateColors(): void {
-        window.game?.grid.updateColors()
+        window.game?.grid?.updateColors()
     }
 
     updateSceneLights(): void {

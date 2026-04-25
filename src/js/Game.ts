@@ -1,7 +1,9 @@
 import * as THREE from 'three'
+import { ApiClient } from './ApiClient.js'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
 import { CELL, CELL_SIZE, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
+import { GlobalHighScoreModal } from './GlobalHighScoreModal.js'
 import { Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
 import { LeaderboardUI } from './LeaderboardUI.js'
@@ -89,9 +91,11 @@ export class Game {
   readonly cameraController!: CameraController
   readonly sceneController!:  SceneController
 
-  settingsUI:     SettingsUI     | undefined
-  leaderboardUI:  LeaderboardUI  | undefined
-  assetsReady!:   Promise<void>
+  settingsUI:          SettingsUI          | undefined
+  leaderboardUI:       LeaderboardUI       | undefined
+  apiClient:           ApiClient           | undefined
+  globalHighScoreModal: GlobalHighScoreModal | undefined
+  assetsReady!:        Promise<void>
 
   // ── State machine ─────────────────────────────────────────────────────────
   currentState: BaseGameState = new BaseGameState()
@@ -166,8 +170,10 @@ export class Game {
       await this.loadLevel(0)
       // InputManager and UI panels require the level/scene to be ready.
       new InputManager(this.canvas, this, this.cameraController)
-      this.settingsUI    = new SettingsUI(this.audioManager, this)
-      this.leaderboardUI = new LeaderboardUI(this)
+      this.settingsUI          = new SettingsUI(this.audioManager, this)
+      this.leaderboardUI       = new LeaderboardUI(this)
+      this.apiClient           = new ApiClient()
+      this.globalHighScoreModal = new GlobalHighScoreModal(this.apiClient)
     })
 
     this.changeState(new TitleState())

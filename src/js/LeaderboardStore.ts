@@ -1,6 +1,7 @@
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface LevelScore {
+  name?:     string   // player name
   coins:      number
   totalCoins: number
   tiles:      number   // railsPlaced

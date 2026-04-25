@@ -79,7 +79,13 @@ export function initUiSfx(audio: AudioManager): void {
   // Blur any button after a pointer click so keyboard events (Space, Enter)
   // are never swallowed by a focused button.
   document.addEventListener('pointerup', () => {
-    (document.activeElement as HTMLElement)?.blur()
+    const active = document.activeElement as HTMLElement | null
+    if (!active) return
+
+    // Keep focus on text-entry controls (e.g. global score name input).
+    if (active.matches('input, textarea, select, [contenteditable], [contenteditable="true"]')) return
+
+    active.blur()
   }, { capture: true })
 }
 

@@ -1,0 +1,174 @@
+@use 'variables' as *;
+@use 'breakpoints' as *;
+
+// ── Global high-score modal backdrop ─────────────────────────────────────────
+
+.global-score-modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 240, 232, 0.6);
+  backdrop-filter: blur(4 * $ptr);
+  z-index: 60; // above leaderboard (55) and settings (50)
+
+  &.hidden {
+    display: none;
+  }
+
+  // ── Modal box ──────────────────────────────────────────────────────────────
+
+  &__box {
+    position: relative;
+    background: var(--background-color);
+    border: 1 * $ptr solid rgba(45, 53, 97, 0.15);
+    border-radius: 16 * $ptr;
+    width: 400 * $ptr;
+    max-width: calc(100vw - 40 * $ptr);
+    padding: 40 * $ptr 36 * $ptr 32 * $ptr;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16 * $ptr;
+
+    box-shadow: 0 24 * $ptr 80 * $ptr rgba(45, 53, 97, 0.18);
+  }
+
+  // ── Title & subtitle ───────────────────────────────────────────────────────
+
+  &__icon {
+    width: 48 * $ptr;
+    height: 48 * $ptr;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__title {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 20 * $ptr;
+    letter-spacing: 1 * $ptr;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__sub {
+    color: var(--label-color);
+    font-size: 11 * $ptr;
+    letter-spacing: 1.5 * $ptr;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  // ── Name input ────────────────────────────────────────────────────────────
+
+  &__input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10 * $ptr 14 * $ptr;
+    border: 1.5 * $ptr solid rgba(45, 53, 97, 0.2);
+    border-radius: 8 * $ptr;
+    background: #fff;
+    color: var(--text-color);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 14 * $ptr;
+    letter-spacing: 1 * $ptr;
+    outline: none;
+    transition: border-color 0.15s;
+
+    pointer-events: all;
+    user-select: text;
+
+    &:focus, &:active  {
+      border-color: var(--accent-color);
+    }
+  }
+
+  // ── Inline error ──────────────────────────────────────────────────────────
+
+  &__error {
+    color: var(--rust);
+    font-size: 10 * $ptr;
+    letter-spacing: 1 * $ptr;
+    text-transform: uppercase;
+    align-self: flex-start;
+    margin-top: -8 * $ptr;
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  // ── Submit button (reuses .button) ────────────────────────────────────────
+
+  &__submit {
+    width: 100%;
+    text-align: center;
+    margin-top: 4 * $ptr;
+
+    border: none;
+    padding: 12 * $ptr 36 * $ptr;
+    background: var(--accent-color);
+    border-radius: 8 * $ptr;
+
+    color: var(--background-color);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10 * $ptr;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.15s;
+
+    &:hover {
+      background: #1e2447;
+      transform: scale(0.99);
+    }
+
+    &.is-loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  // ── Skip link ─────────────────────────────────────────────────────────────
+
+  &__skip {
+    background: none;
+    border: none;
+    color: var(--label-color);
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 10 * $ptr;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.15s;
+
+    &:hover {
+      color: var(--text-color);
+    }
+  }
+
+  // ── Result message ────────────────────────────────────────────────────────
+
+  &__result {
+    color: var(--moss);
+    font-size: 12 * $ptr;
+    letter-spacing: 1 * $ptr;
+    text-transform: uppercase;
+    text-align: center;
+
+    &.is-error {
+      color: var(--rust);
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+}
