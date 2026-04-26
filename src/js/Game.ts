@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { ApiClient } from './ApiClient.js'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
+import { CloudLayer } from './CloudLayer.js'
 import { CELL, CELL_SIZE, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
 import { GlobalHighScoreModal } from './GlobalHighScoreModal.js'
 import { Grid } from './Grid.js'
@@ -51,6 +52,9 @@ export class Game {
   private readonly curved_btn_annotation: HTMLElement
   private readonly placeBtnSpan: HTMLElement
   private tweakpane: Tweakpane | undefined
+  // ── Scene-level decorations (persist across levels) ────────────────────────
+  private readonly cloudLayer: CloudLayer
+
   // ── Live game objects (replaced on each level load) ───────────────────────
   grid:  Grid        | undefined
   train: Train       | undefined
@@ -114,6 +118,7 @@ export class Game {
     this.camera   = camera
 
     this.sceneController = new SceneController(scene)
+    this.cloudLayer       = new CloudLayer(scene, this.camera)
 
     this.speedBar = document.querySelector<HTMLElement>('.hud__speed-bar')!
     this.levelNum = document.querySelector<HTMLElement>('.hud__level-num')!
@@ -468,6 +473,7 @@ export class Game {
 
     if (this.train && (this.currentState instanceof PlayingState || this.currentState instanceof DeadState || this.currentState instanceof WinState)) this.train.update(delta)
     if (this.smoke) this.smoke.update(delta, this.train?.group, this.currentState instanceof PlayingState)
+    this.cloudLayer.update(delta, now * 0.001)
     if (this.grid) this.grid.updateHover(now * 0.001)
     if (this.grid) this.grid.updateCoins(delta)
     this.playTime = this.playTimeAccumulated + (this.currentState instanceof PlayingState ? (performance.now() - this.playTimeStamp) / 1000 : 0)

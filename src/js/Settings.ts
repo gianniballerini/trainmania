@@ -1,3 +1,19 @@
+export interface CloudsConfig {
+    count:         number
+    scaleMin:      number
+    scaleMax:      number
+    driftSpeedMin: number
+    driftSpeedMax: number
+    depth:         number
+    coverX:        number
+    coverY:        number
+    verticalBias:  number
+    verticalDrift: number
+    noiseScale:    number
+    dispStrength:  number
+    dispSpeed:     number
+}
+
 export interface ColorsConfig {
     floor: string
     floor2: string
@@ -29,6 +45,7 @@ class Settings {
             color: string,
             intensity: number,
         }
+        clouds: CloudsConfig
     }
     constructor() {
         this.colors = {
@@ -59,7 +76,22 @@ class Settings {
             rectLight: {
                 color: '#ffeedd', // warm off-white
                 intensity: 7,
-            }
+            },
+            clouds: {
+                count:         10,
+                scaleMin:      8,
+                scaleMax:      12,
+                driftSpeedMin: 0.25,
+                driftSpeedMax: 2.0,
+                depth:         40,
+                coverX:        1.0,
+                coverY:        1.2,
+                verticalBias:  0,
+                verticalDrift: 0.08,
+                noiseScale:    0.2,
+                dispStrength:  0.024,
+                dispSpeed:     0.072,
+            },
         }
     }
 }

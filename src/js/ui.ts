@@ -233,7 +233,7 @@ function renderLevelStrip(
     const card = document.createElement('div')
     card.className = 'level-card'
     if (l.id === defaultId) card.classList.add('is-selected')
-    if (!unlocked) card.classList.add('is-locked')
+    if (!unlocked && !import.meta.env.DEV) card.classList.add('is-locked')
     card.dataset.levelId = String(l.id)
 
     const img = document.createElement('img')
@@ -245,7 +245,7 @@ function renderLevelStrip(
     label.textContent = l.label
     card.appendChild(label)
 
-    if (unlocked) {
+    if (unlocked || import.meta.env.DEV) {
       card.addEventListener('click', () => {
         strip.querySelectorAll('.is-selected').forEach((el) => el.classList.remove('is-selected'))
         card.classList.add('is-selected')

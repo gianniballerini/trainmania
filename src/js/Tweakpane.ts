@@ -73,6 +73,24 @@ class Tweakpane {
         sceneFolder.addBinding(Settings.scene.fill, 'intensity', { min: 0, max: 3, label: 'Fill Int' }).on('change', this.updateSceneLights.bind(this));
         // sceneFolder.addBinding(Settings.scene.rectLight, 'color', {label: 'Rect Light Color'}).on('change', this.updateSceneLights.bind(this));
         // sceneFolder.addBinding(Settings.scene.rectLight, 'intensity', { min: 0, max: 20, label: 'Rect Light Int' }).on('change', this.updateSceneLights.bind(this));
+
+        const cloudFolder = (this.pane as any).addFolder({
+            title: 'Clouds',
+            expanded: false,
+        });
+
+        cloudFolder.addBinding(Settings.scene.clouds, 'scaleMin', { min: 1, max: 20, step: 0.1, label: 'Scale Min' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'scaleMax', { min: 1, max: 24, step: 0.1, label: 'Scale Max' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'driftSpeedMin', { min: 0, max: 2.5, step: 0.01, label: 'Drift Min' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'driftSpeedMax', { min: 0, max: 3, step: 0.01, label: 'Drift Max' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'depth', { min: 20, max: 120, step: 0.5, label: 'Depth' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'coverX', { min: 0.8, max: 2.5, step: 0.01, label: 'Cover X' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'coverY', { min: 0.8, max: 2.5, step: 0.01, label: 'Cover Y' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'verticalBias', { min: -0.8, max: 0.8, step: 0.01, label: 'Y Bias' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'verticalDrift', { min: 0, max: 0.5, step: 0.005, label: 'Y Drift' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'noiseScale', { min: 0.2, max: 5, step: 0.01, label: 'Noise Scale' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'dispStrength', { min: 0, max: 0.1, step: 0.001, label: 'Disp Strength' });
+        cloudFolder.addBinding(Settings.scene.clouds, 'dispSpeed', { min: 0, max: 0.15, step: 0.001, label: 'Disp Speed' });
     }
 
     hide(): void {
