@@ -84,9 +84,13 @@ interface CloudInstance {
 // ─── Noise generation ─────────────────────────────────────────────────────────
 
 /**
- * Generates a 256×256 canvas-based value-noise texture.
- * Uses a coarse 16×16 grid of random values with smoothstep interpolation so
- * the result looks organic rather than like pure white noise.
+ * Generates a 256×256 canvas-based Worley (cellular) noise texture.
+ * Divides the space into a GRID×GRID lattice, places one random feature
+ * point per cell, then colours each pixel by its distance to the nearest
+ * feature point across the 3×3 neighbourhood (so cells tile seamlessly).
+ *
+ * The raw F1 distance is inverted (1 - d) so that cell centres are bright
+ * and edges are dark — a look that maps well onto cloud / foam shapes.
  */
 function generateNoiseTexture(size = 256): THREE.Texture {
   const canvas = document.createElement('canvas')
@@ -94,31 +98,60 @@ function generateNoiseTexture(size = 256): THREE.Texture {
   canvas.height = size
   const ctx = canvas.getContext('2d')!
 
-  const GRID   = 16
-  const stride = GRID + 1
-  const grid: number[] = Array.from({ length: stride * stride }, () => Math.random())
+  // ── Feature points ──────────────────────────────────────────────────────────
+  const GRID = 8                    // number of cells per axis (tweak for larger/smaller cells)
+  const cellSize = size / GRID
 
-  const smooth = (t: number): number => t * t * (3 - 2 * t) // smoothstep
-  const lerp   = (a: number, b: number, t: number): number => a + (b - a) * smooth(t)
+  // One random feature point per cell, stored as pixel coordinates
+  const pts: { x: number; y: number }[] = []
+  for (let cy = 0; cy < GRID; cy++) {
+    for (let cx = 0; cx < GRID; cx++) {
+      pts.push({
+        x: (cx + Math.random()) * cellSize,
+        y: (cy + Math.random()) * cellSize,
+      })
+    }
+  }
 
+  // ── Rasterise ───────────────────────────────────────────────────────────────
   const imageData = ctx.createImageData(size, size)
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const fx = (x / size) * GRID
-      const fy = (y / size) * GRID
-      const ix = Math.floor(fx)
-      const iy = Math.floor(fy)
-      const tx = fx - ix
-      const ty = fy - iy
 
-      const v = lerp(
-        lerp(grid[iy * stride + ix],       grid[iy * stride + ix + 1],       tx),
-        lerp(grid[(iy + 1) * stride + ix], grid[(iy + 1) * stride + ix + 1], tx),
-        ty,
-      )
+  for (let py = 0; py < size; py++) {
+    for (let px = 0; px < size; px++) {
+
+      // Which cell does this pixel fall in?
+      const cx = Math.floor(px / cellSize)
+      const cy = Math.floor(py / cellSize)
+
+      let minDist2 = Infinity
+
+      // Check only the 3×3 neighbourhood — sufficient because a nearer point
+      // in a non-adjacent cell would violate the one-point-per-cell contract.
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          // Wrap neighbour indices so the texture tiles seamlessly
+          const nx = ((cx + dx) + GRID) % GRID
+          const ny = ((cy + dy) + GRID) % GRID
+          const pt = pts[ny * GRID + nx]
+
+          // Reconstruct the wrapped pixel position of the neighbour's point
+          const wrappedX = pt.x + (cx + dx - nx) * cellSize
+          const wrappedY = pt.y + (cy + dy - ny) * cellSize
+
+          const ddx = px - wrappedX
+          const ddy = py - wrappedY
+          const d2  = ddx * ddx + ddy * ddy
+          if (d2 < minDist2) minDist2 = d2
+        }
+      }
+
+      // Normalise: max possible distance is half the diagonal of a cell
+      const maxDist = Math.SQRT2 * cellSize * 0.5
+      const d       = Math.sqrt(minDist2) / maxDist   // 0..~1
+      const v       = 1 - Math.min(d, 1)              // invert so centres are bright
 
       const byte = Math.round(v * 255)
-      const i    = (y * size + x) * 4
+      const i    = (py * size + px) * 4
       imageData.data[i]     = byte
       imageData.data[i + 1] = byte
       imageData.data[i + 2] = byte
@@ -128,9 +161,9 @@ function generateNoiseTexture(size = 256): THREE.Texture {
 
   ctx.putImageData(imageData, 0, 0)
 
-  const tex    = new THREE.CanvasTexture(canvas)
-  tex.wrapS    = THREE.RepeatWrapping
-  tex.wrapT    = THREE.RepeatWrapping
+  const tex  = new THREE.CanvasTexture(canvas)
+  tex.wrapS  = THREE.RepeatWrapping
+  tex.wrapT  = THREE.RepeatWrapping
   return tex
 }
 
