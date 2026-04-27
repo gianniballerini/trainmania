@@ -215,29 +215,84 @@
   }
 
   &__btn {
-    margin-top: 12 * $ptr;
     padding: 12 * $ptr 36 * $ptr;
+    width: 90%;
+
     background: var(--accent-color);
     color: var(--background-color);
+
     border: none;
     border-radius: 8 * $ptr;
+
     font-family: 'Josefin Sans', sans-serif;
     font-size: 12 * $ptr;
     font-weight: 700;
     letter-spacing: 3 * $ptr;
     text-transform: uppercase;
-    cursor: pointer;
+
     transition: background 0.15s, transform 0.1s, opacity 0.2s;
 
     &:hover {
       background: #1e2447;
-      transform: scale(1.03);
+      transform: scale(0.98);
     }
 
     &.is-disabled {
       opacity: 0.4;
       pointer-events: none;
       cursor: default;
+    }
+  }
+
+  .overlay__leaderboard-btn {
+    background: none;
+    border: none;
+    width: 90%;
+
+    color: var(--label-color);
+
+    font-size: 10 * $ptr;
+    font-weight: 700;
+    letter-spacing: 2 * $ptr;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    padding: 10 * $ptr 36 * $ptr;
+    border-top: 1px solid var(--hud-border);
+    border-bottom: 1px solid var(--hud-border);
+    border-radius: 6 * $ptr;
+    transition: color 0.15s, background 0.15s;
+    pointer-events: all;
+    opacity: 0.6;
+
+    &:hover {
+      color: var(--accent-color);
+      background: rgba(45, 53, 97, 0.06);
+      opacity: 1;
+    }
+  }
+
+  &__retry-btn {
+    padding: 10 * $ptr 36 * $ptr;
+    width: 90%;
+
+    background: transparent;
+    color: var(--accent-color);
+    border: 2 * $ptr solid var(--accent-color);
+    border-radius: 8 * $ptr;
+
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 12 * $ptr;
+    font-weight: 700;
+    letter-spacing: 3 * $ptr;
+    text-transform: uppercase;
+
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+
+    &:hover {
+      background: var(--accent-color);
+      color: var(--background-color);
+      transform: scale(0.98);
     }
   }
 

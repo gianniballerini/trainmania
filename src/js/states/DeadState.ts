@@ -3,6 +3,7 @@ import type { Game } from '../Game.js'
 import { LEVELS } from '../levels/Level.js'
 import { showOverlay } from '../ui.js'
 import { BaseGameState } from './IGameState.js'
+import { PlayingState } from './PlayingState.js'
 import { TitleState } from './TitleState.js'
 
 export class DeadState extends BaseGameState {
@@ -26,6 +27,10 @@ export class DeadState extends BaseGameState {
         'Main Menu',
         () => {
           game.changeState(new TitleState())
+        },
+        async () => {
+          await game.loadLevel(game.levelIndex)
+          game.changeState(new PlayingState())
         },
       )
     }, 1200)

@@ -7,6 +7,7 @@ const overlay     = document.querySelector<HTMLElement>('.overlay')!
 const title       = document.querySelector<HTMLElement>('.overlay__title')!
 const sub         = document.querySelector<HTMLElement>('.overlay__sub')!
 let   btn         = document.querySelector<HTMLElement>('.overlay__btn')!
+let   retryBtn    = document.querySelector<HTMLElement>('.overlay__retry-btn')!
 const scoreEl     = document.querySelector<HTMLElement>('.overlay__score')!
 const scoreTimeEl = document.querySelector<HTMLElement>('.overlay__score-time')!
 const scoreCoinsEl  = document.querySelector<HTMLElement>('.overlay__score-coins')!
@@ -94,7 +95,8 @@ export function showOverlay(
   titleText: string,
   subText: string,
   btnText: string,
-  onBtn: () => void
+  onBtn: () => void,
+  onRetry?: () => void,
 ): void {
   title.textContent = titleText
   sub.textContent   = subText
@@ -110,6 +112,20 @@ export function showOverlay(
     hideOverlay()
     onBtn()
   }, { once: true })
+
+  // Retry button
+  const newRetryBtn = retryBtn.cloneNode(true) as HTMLElement
+  retryBtn.replaceWith(newRetryBtn)
+  retryBtn = newRetryBtn
+  if (onRetry) {
+    retryBtn.classList.remove('hidden')
+    retryBtn.addEventListener('click', () => {
+      hideOverlay()
+      onRetry()
+    }, { once: true })
+  } else {
+    retryBtn.classList.add('hidden')
+  }
 }
 
 export function hideOverlay(): void {
