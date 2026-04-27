@@ -33,6 +33,7 @@ export type CellType =
   | 'GRASS'
   | 'SNOW'
   | 'SNOW_ROCK'
+  | 'PLATFORM'
 
 export const CELL = {
   VOID:    'VOID',
@@ -44,6 +45,7 @@ export const CELL = {
   GRASS:  'GRASS',
   SNOW:   'SNOW',
   SNOW_ROCK: 'SNOW_ROCK',
+  PLATFORM: 'PLATFORM'
 } as const
 
 

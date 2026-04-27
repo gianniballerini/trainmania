@@ -33,17 +33,41 @@ class Tweakpane {
         });
         lvl2_btn.on('click', () => this.loadLevel(2));
 
-        const lvl3_btn = levelsFolder.addButton({
+        const lvl4_btn = levelsFolder.addButton({
             title: 'Level4',
             label: 'Level4',   // optional
         });
-        lvl3_btn.on('click', () => this.loadLevel(3));
+        lvl4_btn.on('click', () => this.loadLevel(3));
 
-        const lvl4_btn = levelsFolder.addButton({
+        const lvl5_btn = levelsFolder.addButton({
+            title: 'Level5',
+            label: 'Level5',   // optional
+        });
+        lvl5_btn.on('click', () => this.loadLevel(4));
+
+        const lvl6_btn = levelsFolder.addButton({
+            title: 'Level6',
+            label: 'Level6',   // optional
+        });
+        lvl6_btn.on('click', () => this.loadLevel(5));
+
+        const lvl7_btn = levelsFolder.addButton({
+            title: 'Level7',
+            label: 'Level7',   // optional
+        });
+        lvl7_btn.on('click', () => this.loadLevel(6));
+
+        const lvl8_btn = levelsFolder.addButton({
+            title: 'Level8',
+            label: 'Level8',   // optional
+        });
+        lvl8_btn.on('click', () => this.loadLevel(7));
+
+        const lvlTest_btn = levelsFolder.addButton({
             title: 'LevelTest',
             label: 'Testing Level',   // optional
         });
-        lvl4_btn.on('click', () => this.loadLevel(4));
+        lvlTest_btn.on('click', () => this.loadLevel(8));
 
         const colorsFolder = (this.pane as any).addFolder({
             title: 'Colors',

@@ -3,21 +3,14 @@ import { loadModelAsset, warnAssetLoadFailureOnce } from '../Assets.js'
 import { CELL_H } from '../Constants.js'
 import { Game } from '../Game.js'
 import { cellToWorld, type CellData } from '../Grid.js'
+import { Coin } from './Coin.js'
 
 const COIN_MODEL_URL = '/assets/models/coin-gold.glb'
 const COIN_HEIGHT    = CELL_H + 0.2
-const COIN_BOB_FREQ  = 2.5
-const COIN_BOB_AMP   = 0.12
-const COIN_SPIN_SPD  = 2.0
-
-interface CoinEntry {
-  group: THREE.Group
-  baseY: number
-}
 
 export class CoinSystem {
   private readonly scene: THREE.Scene
-  private _entries: CoinEntry[] = []
+  private _coins: Coin[] = []
   private _time = 0
 
   totalCoins = 0
@@ -42,7 +35,7 @@ export class CoinSystem {
         group.position.set(pos.x, COIN_HEIGHT, pos.z)
         this.scene.add(group)
         cell.coinGroup = group
-        this._entries.push({ group, baseY: COIN_HEIGHT })
+        this._coins.push(new Coin(group, COIN_HEIGHT))
         this.totalCoins++
       } catch (err) {
         warnAssetLoadFailureOnce('coin-gold', COIN_MODEL_URL, err)
@@ -53,10 +46,17 @@ export class CoinSystem {
   /** Animate all active coins. Call every frame with delta seconds. */
   update(delta: number): void {
     this._time += delta
-    for (const entry of this._entries) {
-      entry.group.position.y = entry.baseY + Math.sin(this._time * COIN_BOB_FREQ) * COIN_BOB_AMP
-      entry.group.rotation.y += delta * COIN_SPIN_SPD
+    for (const coin of this._coins) {
+      coin.update(this._time, delta)
     }
+    // Clean up coins whose collect animation has finished
+    this._coins = this._coins.filter(coin => {
+      if (coin.isDone) {
+        coin.removeFromScene(this.scene)
+        return false
+      }
+      return true
+    })
   }
 
   /**
@@ -65,8 +65,9 @@ export class CoinSystem {
    */
   collect(cell: CellData, game: Game): boolean {
     if (!cell.hasCoin || !cell.coinGroup) return false
-    this.scene.remove(cell.coinGroup)
-    this._entries = this._entries.filter(e => e.group !== cell.coinGroup)
+    const coin = this._coins.find(c => c.group === cell.coinGroup)
+    coin?.collect()
+    // Clear cell references immediately so the coin can't be double-collected
     cell.coinGroup = null
     cell.hasCoin = false
     game.audioManager.playSfx(`coin`)
@@ -74,10 +75,10 @@ export class CoinSystem {
   }
 
   dispose(): void {
-    for (const entry of this._entries) {
-      this.scene.remove(entry.group)
+    for (const coin of this._coins) {
+      coin.removeFromScene(this.scene)
     }
-    this._entries = []
+    this._coins = []
     this.totalCoins = 0
   }
 }

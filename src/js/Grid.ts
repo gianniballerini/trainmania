@@ -7,6 +7,7 @@ import { Settings } from './Settings.js'
 import hoverFrag from './shaders/hover.frag.glsl?raw'
 import hoverVert from './shaders/hover.vert.glsl?raw'
 import { tileRegistry } from './tiles/index.js'
+import { PlatformTile } from './tiles/PlatformTile.js'
 
 // Ghost material — a Grid-level concern, not delegated to tiles
 const MAT_GHOST = new THREE.MeshLambertMaterial({
@@ -26,6 +27,7 @@ export interface CellData {
   prebuilt?: boolean
   hasCoin?: boolean
   coinGroup?: THREE.Group | null
+  fallen?: boolean
 }
 
 export function cellToWorld(col: number, row: number, cols: number, rows: number): THREE.Vector3 {
@@ -155,7 +157,7 @@ export class Grid {
 
   isWalkable(col: number, row: number): boolean {
     const c = this.getCell(col, row)
-    return c !== null && c.type !== CELL.VOID
+    return c !== null && c.type !== CELL.VOID && !c.fallen
   }
 
   placeTrack(col: number, row: number, pieceId: PieceId): boolean {
@@ -164,7 +166,7 @@ export class Grid {
     if (cell.trackPiece) this._removeTrackVisual(cell)
     cell.trackPiece = pieceId
     cell.prebuilt = false
-    cell.type = CELL.RAIL
+    if (cell.type !== CELL.PLATFORM && cell.type !== CELL.START) cell.type = CELL.RAIL
     this._buildTrackVisual(cell, pieceId)
     return true
   }
@@ -173,7 +175,7 @@ export class Grid {
     const cell = this.getCell(col, row)
     if (!cell || !cell.trackPiece) return false
     if (cell.type === CELL.STATION) return false
-    const restoreType = cell.type === CELL.START ? CELL.START : CELL.FLOOR
+    const restoreType = cell.type === CELL.START ? CELL.START : cell.type === CELL.PLATFORM ? CELL.PLATFORM : CELL.FLOOR
     this._removeTrackVisual(cell)
     cell.trackPiece = null
     cell.prebuilt = false
@@ -184,6 +186,7 @@ export class Grid {
   _trackPlaceable(col: number, row: number): boolean {
     const cell = this.getCell(col, row)
     if (!cell) return false
+    if (cell.fallen) return false
     return tileRegistry.has(cell.type) && tileRegistry.get(cell.type).isPlaceable
   }
 
@@ -300,6 +303,22 @@ export class Grid {
   updateColors(): void {
     MAT_GHOST.color.set(Settings.colors.ghost)
     tileRegistry.updateColors(Settings.colors)
+  }
+
+  // ── Platform system ──────────────────────────────────────────────────────
+
+  triggerPlatformFall(cell: CellData): void {
+    if (cell.fallen) return
+    cell.fallen = true
+    const trackMesh = cell.trackMesh ?? null
+    cell.trackMesh = null
+    if (cell.tileGroup) {
+      ;(tileRegistry.get(CELL.PLATFORM) as PlatformTile).fall(cell.tileGroup, trackMesh)
+    }
+  }
+
+  updatePlatforms(delta: number): void {
+    ;(tileRegistry.get(CELL.PLATFORM) as PlatformTile).update(delta)
   }
 
   // ── Coin system (delegates to CoinSystem) ────────────────────────────────

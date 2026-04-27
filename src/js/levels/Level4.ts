@@ -1,5 +1,5 @@
 
-import { coin, G, R, S, T, V, X } from "../GridCell"
+import { coin, G, P, R, S, T, V, X } from "../GridCell"
 import type { Level } from "./Level"
 
 class Level4 implements Level {
@@ -9,7 +9,7 @@ class Level4 implements Level {
         [V(), V(), G(), coin(G()), G(), V(), V(),V()],
         [V(), V(), G(), G(), G(), V(), V(),V()],
         [X(), V(), X(), G(), G(), G(), G(),V()],
-        [S('E'), R('STRAIGHT_EW'), G(), G(), V(), V(), coin(G()), G()],
+        [S('E'), R('STRAIGHT_EW'), G(), G(), P(), P(), coin(G()), G()],
         [X(), G(), G(), G(), G(), G(), G(),V()],
         [V(), V(), G(), G(), G(), V(), V(),V()],
         [V(), V(), G(), T(), G(), V(), V(),V()],

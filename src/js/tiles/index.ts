@@ -1,6 +1,7 @@
 import { CurveTile } from './CurveTile.js'
 import { FloorTile } from './FloorTile.js'
 import { GrassTile } from './GrassTile.js'
+import { PlatformTile } from './PlatformTile.js'
 import { RailTile } from './RailTile.js'
 import { RockTile } from './RockTile.js'
 import { SnowRockTile } from './SnowRockTile.js'
@@ -22,10 +23,12 @@ tileRegistry.register(new RockTile())
 tileRegistry.register(new GrassTile())
 tileRegistry.register(new SnowTile())
 tileRegistry.register(new SnowRockTile())
+tileRegistry.register(new PlatformTile())
 
 export { CurveTile } from './CurveTile.js'
 export { FloorTile } from './FloorTile.js'
 export { GrassTile } from './GrassTile.js'
+export { PlatformTile } from './PlatformTile.js'
 export { RailTile } from './RailTile.js'
 export { RockTile } from './RockTile.js'
 export { SnowRockTile } from './SnowRockTile.js'

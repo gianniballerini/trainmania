@@ -36,6 +36,8 @@ export const S = (dir: Direction): GridCell => new GridCell('START', undefined, 
 /** Station (goal) cell */
 export const T = (): GridCell => new GridCell('STATION')
 
+export const P = (): GridCell => new GridCell('PLATFORM')
+
 /** Coin wrapper — marks any cell to have a floating collectible coin on top */
 export const coin = (cell: GridCell): GridCell =>
   new GridCell(cell.type, cell.prebuiltPiece, cell.dir, true)

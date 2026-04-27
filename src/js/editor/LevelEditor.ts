@@ -33,6 +33,7 @@ const TILE_COLORS: Record<string, string> = {
   RAIL:      '#2c3e50',
   START:     '#e67e22',
   STATION:   '#8e44ad',
+  PLATFORM:  '#a57214',
 }
 
 const PALETTE: PaletteItem[] = [
@@ -43,6 +44,7 @@ const PALETTE: PaletteItem[] = [
   { id: 'SNOW',      label: 'Snow',      color: TILE_COLORS.SNOW,      make: () => ({ type: 'SNOW',      hasCoin: false }) },
   { id: 'SNOW_ROCK', label: 'SnowRock',  color: TILE_COLORS.SNOW_ROCK, make: () => ({ type: 'SNOW_ROCK', hasCoin: false }) },
   { id: 'ROCK',      label: 'Rock',      color: TILE_COLORS.ROCK,      make: () => ({ type: 'ROCK',      hasCoin: false }) },
+  { id: 'PLATFORM',   label: 'Platform',  color: TILE_COLORS.PLATFORM, make: () => ({ type: 'PLATFORM',   hasCoin: false }) },
   // Special
   { id: 'STATION',   label: 'Station',   color: TILE_COLORS.STATION,   make: () => ({ type: 'STATION',   hasCoin: false }) },
   { id: 'START_N',   label: 'Start ↑',   color: TILE_COLORS.START,     make: () => ({ type: 'START',     dir: 'N', hasCoin: false }) },
@@ -79,7 +81,7 @@ function cellLabel(cell: EditorCell): string {
   if (cell.type === 'STATION') return 'T'
   if (cell.type === 'RAIL') return cell.piece?.replace('STRAIGHT_', '').replace('CURVE_', '⌒') ?? 'R'
   const abbrev: Partial<Record<CellType, string>> = {
-    FLOOR: 'F', GRASS: 'G', SNOW: 'Sn', SNOW_ROCK: 'SnX', ROCK: 'X',
+    FLOOR: 'F', GRASS: 'G', SNOW: 'Sn', SNOW_ROCK: 'SnX', ROCK: 'X', PLATFORM: 'P'
   }
   return abbrev[cell.type] ?? cell.type
 }
@@ -316,6 +318,7 @@ export class LevelEditor {
         else if (cell.type === 'RAIL')      used.add('R')
         else if (cell.type === 'START')     used.add('S')
         else if (cell.type === 'STATION')   used.add('T')
+        else if (cell.type === 'PLATFORM')  used.add('P')
         if (cell.hasCoin) hasCoin = true
       }
     }
@@ -333,6 +336,7 @@ export class LevelEditor {
         else if (cell.type === 'SNOW')      base = 'Sn()'
         else if (cell.type === 'SNOW_ROCK') base = 'SnX()'
         else if (cell.type === 'ROCK')      base = 'X()'
+        else if (cell.type === 'PLATFORM')  base = 'P()'
         else if (cell.type === 'STATION')   base = 'T()'
         else if (cell.type === 'START')     base = `S('${cell.dir ?? 'S'}')`
         else if (cell.type === 'RAIL')      base = `R('${cell.piece ?? 'STRAIGHT_NS'}')`

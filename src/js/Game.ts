@@ -263,6 +263,11 @@ export class Game {
       this.coinCount++
       this.updateCoinDisplay()
     }
+    // Trigger platform fall if the train just arrived on a platform cell
+    const currentCell = this.grid?.getCell(this.train.col, this.train.row)
+    if (currentCell?.type === CELL.PLATFORM) {
+      this.grid!.triggerPlatformFall(currentCell)
+    }
     const result = this.train.step()
 
     this.lerpSpeed = Math.min(MAX_SPEED, this.lerpSpeed * SPEED_ACCEL)
@@ -476,6 +481,7 @@ export class Game {
     this.cloudLayer.update(delta, now * 0.001)
     if (this.grid) this.grid.updateHover(now * 0.001)
     if (this.grid) this.grid.updateCoins(delta)
+    if (this.grid) this.grid.updatePlatforms(delta)
     this.playTime = this.playTimeAccumulated + (this.currentState instanceof PlayingState ? (performance.now() - this.playTimeStamp) / 1000 : 0)
     this.updateTimeDisplay()
     this.updateActionButtonsEnabled()
