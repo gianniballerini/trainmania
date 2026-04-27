@@ -1,4 +1,4 @@
-import { GAME_OVER_TRACKS } from '../Constants.js'
+import { BACKGROUND_TRACKS, GAME_OVER_TRACKS } from '../Constants.js'
 import type { Game } from '../Game.js'
 import { LEVELS } from '../levels/Level.js'
 import { showOverlay } from '../ui.js'
@@ -29,6 +29,7 @@ export class DeadState extends BaseGameState {
           game.changeState(new TitleState())
         },
         async () => {
+          game.audioManager.switchMusic(BACKGROUND_TRACKS)
           await game.loadLevel(game.levelIndex)
           game.changeState(new PlayingState())
         },
