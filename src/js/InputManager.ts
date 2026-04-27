@@ -83,7 +83,7 @@ export class InputManager {
 
     const doRotateL = () => {
       game.rotateCurrentTile(-1)
-      const idx = Math.floor(Math.random() * 3) + 1
+      const idx = Math.floor(Math.random() * 4) + 1
       game.audioManager.playSfx(`rotate_0${idx}`)
     }
     const doPlace = () => {

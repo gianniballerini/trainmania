@@ -100,24 +100,22 @@ export class PlayingState extends BaseGameState {
       case 'A':
         if (game.currentTileType === 'STRAIGHT') {
           game.rotateCurrentTile(1)
-          idx = Math.floor(Math.random() * 3) + 1
+          idx = Math.floor(Math.random() * 4) + 1
           game.audioManager.playSfx(`rotate_0${idx}`)
           break
         }
         game.selectTileType('STRAIGHT')
-        idx = Math.floor(Math.random() * 5) + 1
-        game.audioManager.playSfx(`toggle_0${idx}`)
+        game.audioManager.playSfx(`toggle_02`)
         break
       case 'S':
         if (game.currentTileType === 'CURVE') {
           game.rotateCurrentTile(1)
-          idx = Math.floor(Math.random() * 3) + 1
+          idx = Math.floor(Math.random() * 4) + 1
           game.audioManager.playSfx(`rotate_0${idx}`)
           break
         }
         game.selectTileType('CURVE')
-        idx = Math.floor(Math.random() * 5) + 1
-        game.audioManager.playSfx(`toggle_0${idx}`)
+        game.audioManager.playSfx(`toggle_01`)
         break
       case " ":
       case 'ENTER': {
