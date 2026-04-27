@@ -10,6 +10,7 @@ const PRODUCTION_LEVELS = [
   { id: 2, label: 'Level 2' },
   { id: 3, label: 'Level 3' },
   { id: 4, label: 'Level 4' },
+  { id: 5, label: 'Level 5' },
 ]
 
 // ── Controller ────────────────────────────────────────────────────────────────

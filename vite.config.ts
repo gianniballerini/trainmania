@@ -9,8 +9,11 @@ export default defineConfig({
       name: 'render-index-pug',
       transformIndexHtml: {
         order: 'pre',
-        handler() {
-          return renderFile(resolve(__dirname, 'index.pug'))
+        handler(html, ctx) {
+          if (!ctx.filename.endsWith('editor.html')) {
+            return renderFile(resolve(__dirname, 'index.pug'))
+          }
+          return html
         },
       },
       configureServer(server) {
@@ -29,5 +32,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    rollupOptions: {
+      input: {
+        main:   resolve(__dirname, 'index.html'),
+        editor: resolve(__dirname, 'editor.html'),
+      },
+    },
   },
 })

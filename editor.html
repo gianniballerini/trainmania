@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrainMania — Level Editor</title>
+  <script type="module" src="/src/editor.ts"></script>
+</head>
+<body>
+  <div id="topbar">
+    <label for="level-select">Load Level:</label>
+    <select id="level-select">
+      <option value="">— blank —</option>
+    </select>
+  </div>
+  <div id="app">
+    <div id="grid-wrap">
+      <div id="grid-container"></div>
+    </div>
+
+    <div id="sidebar">
+      <h2>Palette</h2>
+      <div id="palette"></div>
+
+      <h2>Resize Grid</h2>
+      <div class="resize-controls">
+        <div class="resize-row">
+          <span>Rows</span>
+          <div class="resize-group">
+            <button data-action="add-row" data-edge="top">+ Top</button>
+            <button data-action="remove-row" data-edge="top">− Top</button>
+          </div>
+          <div class="resize-group">
+            <button data-action="add-row" data-edge="bottom">+ Bot</button>
+            <button data-action="remove-row" data-edge="bottom">− Bot</button>
+          </div>
+        </div>
+        <div class="resize-row">
+          <span>Cols</span>
+          <div class="resize-group">
+            <button data-action="add-col" data-edge="left">+ Left</button>
+            <button data-action="remove-col" data-edge="left">− Left</button>
+          </div>
+          <div class="resize-group">
+            <button data-action="add-col" data-edge="right">+ Right</button>
+            <button data-action="remove-col" data-edge="right">− Right</button>
+          </div>
+        </div>
+      </div>
+
+      <h2>Level Meta</h2>
+      <div class="meta-form">
+        <label>ID <input id="meta-id" type="number" value="6" min="1" /></label>
+        <label>Label <input id="meta-label" type="text" value="Level 6" /></label>
+        <label>Base Speed <input id="meta-speed" type="number" value="3000" min="100" /></label>
+        <label>Countdown <input id="meta-countdown" type="number" value="10" min="1" /></label>
+        <label>Coins <input id="meta-coins" type="number" value="" min="0" placeholder="optional" /></label>
+      </div>
+
+      <h2>Output</h2>
+      <button id="generate-btn">Generate Code</button>
+      <button id="copy-btn">Copy</button>
+      <textarea id="code-output" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+</body>
+</html>
