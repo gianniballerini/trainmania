@@ -15,6 +15,12 @@ export const F = (): GridCell => new GridCell('FLOOR')
 /** Grass — buildable, no rail */
 export const G = (): GridCell => new GridCell('GRASS')
 
+/** Snow — buildable, no rail */
+export const Sn = (): GridCell => new GridCell('SNOW')
+
+/** Snow — buildable, no rail */
+export const SnX = (): GridCell => new GridCell('SNOW_ROCK')
+
 /** Void — unbuildable, not an obstacle */
 export const V = (): GridCell => new GridCell('VOID')
 
