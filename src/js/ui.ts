@@ -90,6 +90,11 @@ export function initUiSfx(audio: AudioManager): void {
   }, { capture: true })
 }
 
+function scrollSelectionIntoContainer(container: HTMLElement, selected: HTMLElement): void {
+  const targetLeft = selected.offsetLeft - (container.clientWidth - selected.offsetWidth) / 2
+  container.scrollTo({ left: Math.max(0, targetLeft), behavior: 'auto' })
+}
+
 
 export function showOverlay(
   titleText: string,
@@ -228,6 +233,12 @@ export function showTrainPicker(
 ): void {
   renderTrainStrip(trainStrip, trains, defaultId, onSelect)
   trainPicker.classList.remove('hidden')
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const selected = trainStrip.querySelector<HTMLElement>('.is-selected')
+      if (selected) scrollSelectionIntoContainer(trainPicker, selected)
+    })
+  })
 }
 
 export function hideTrainPicker(): void {
