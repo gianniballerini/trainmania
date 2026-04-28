@@ -1,4 +1,4 @@
-import { CELL } from '../Constants.js'
+import { CELL, Direction, OPPOSITE, TRACK_PIECES } from '../Constants.js'
 import type { Game } from '../Game.js'
 import type { CellData } from '../Grid.js'
 import { cellToWorld } from '../Grid.js'
@@ -58,13 +58,15 @@ export class PlayingState extends BaseGameState {
     }
     if (cell && cell.type !== CELL.VOID) {
       game.lastHoveredCell = { col, row }
-      game.grid.showGhost(col, row, game.selectedPiece)
-      game.updatePlaceBtn(cell.trackPiece !== null)
+      game.lastGhostApproachDir = null  // manual hover — stored approach dir is no longer valid
+      const state = game.classifyGhostCell(col, row)
+      game.grid.showGhost(col, row, game.selectedPiece, state)
+      game.updatePlaceBtn(state)
       this._playGhostSfx(game)
     } else {
       game.lastHoveredCell = null
       game.grid.hideGhost()
-      game.updatePlaceBtn(false)
+      game.updatePlaceBtn('invalid')
     }
   }
 
@@ -72,6 +74,15 @@ export class PlayingState extends BaseGameState {
     if (!game.selectedPiece || !game.grid || !cell || cell.type === CELL.VOID || cell.type === CELL.STATION) return
     const placed = game.grid.placeTrack(col, row, game.selectedPiece)
     if (placed) {
+      // Compute the track's exit direction so the next default ghost walks forward, not sideways
+      let exitDir: Direction | null = null
+      const approachDir = game.lastGhostApproachDir
+      if (approachDir) {
+        const piece = TRACK_PIECES[game.selectedPiece]
+        exitDir = piece.connections[OPPOSITE[approachDir]] ?? null
+      }
+      game.lastPlacedCell = { col, row, exitDir }
+      game.lastGhostApproachDir = null  // consumed
       game.railsPlaced++
       game.updateRailsDisplay()
       game.updateSelectedPiece()        // ← refresh ghost/selected piece
@@ -149,9 +160,11 @@ export class PlayingState extends BaseGameState {
     const cell = game.grid.getCell(col, row)
     if (!cell || cell.type === CELL.VOID) return
     game.lastHoveredCell = { col, row }
+    game.lastGhostApproachDir = null  // manual move — stored approach dir is no longer valid
     this._playGhostSfx(game)
-    game.grid.showGhost(col, row, game.selectedPiece)
-    game.updatePlaceBtn(cell.trackPiece !== null)
+    const state = game.classifyGhostCell(col, row)
+    game.grid.showGhost(col, row, game.selectedPiece, state)
+    game.updatePlaceBtn(state)
   }
 
   private _playGhostSfx(game: Game): void {

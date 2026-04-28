@@ -389,6 +389,12 @@
     transform: scale(0.93);
   }
 
+  &.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   @include respond-to($medium-breakpoint) {
     min-width: 96 * $ptr;
   }

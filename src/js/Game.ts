@@ -3,7 +3,7 @@ import { ApiClient } from './ApiClient.js'
 import { AudioManager } from './AudioManager.js'
 import { CameraController } from './CameraController.js'
 import { CloudLayer } from './CloudLayer.js'
-import { CELL, CELL_SIZE, DIR, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
+import { CELL, CELL_SIZE, DIR, Direction, GhostState, OPPOSITE, PieceId, tileToPieceId, TileType, TRACK_PIECES } from './Constants.js'
 import { GlobalHighScoreModal } from './GlobalHighScoreModal.js'
 import { Grid } from './Grid.js'
 import { InputManager } from './InputManager.js'
@@ -50,6 +50,8 @@ export class Game {
   private readonly straight_btn_annotation: HTMLElement
   private readonly curvedBtnSpan: HTMLElement
   private readonly curved_btn_annotation: HTMLElement
+
+  private readonly placeBtn: HTMLElement
   private readonly placeBtnSpan: HTMLElement
   private tweakpane: Tweakpane | undefined
   // ── Scene-level decorations (persist across levels) ────────────────────────
@@ -72,7 +74,9 @@ export class Game {
     STRAIGHT: 0,
     CURVE: 0,
   }
-  lastHoveredCell: { col: number; row: number } | null = null
+  lastHoveredCell:      { col: number; row: number } | null = null
+  lastPlacedCell:       { col: number; row: number; exitDir: Direction | null } | null = null
+  lastGhostApproachDir: Direction | null = null
 
   // ── Level ─────────────────────────────────────────────────────────────────
   levelIndex = 0
@@ -138,7 +142,8 @@ export class Game {
     this.curvedBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--curved span')!
     this.curved_btn_annotation = document.querySelector<HTMLElement>('.hud__annotation--curved')!
 
-    this.placeBtnSpan = document.querySelector<HTMLElement>('.hud__action-btn--place span')!
+    this.placeBtn = document.querySelector<HTMLElement>('.hud__action-btn--place')!
+    this.placeBtnSpan = this.placeBtn.querySelector<HTMLElement>('span')!
 
     this.countdownBtn.addEventListener('click', () => {
       if (this.currentState instanceof PlayingState) {
@@ -217,6 +222,8 @@ export class Game {
     this.baseSpeed     = 1000 / levelDef.baseSpeed
     this.lerpSpeed     = this.baseSpeed
     this.lastHoveredCell = null
+    this.lastPlacedCell  = null
+    this.lastGhostApproachDir = null
 
     this.levelNum.textContent = String(levelDef.id)
     this.updateSpeedBar(0)
@@ -296,9 +303,9 @@ export class Game {
       this.curved_btn_annotation.classList.remove('hidden')
     }
     if (this.grid && this.selectedPiece && this.lastHoveredCell) {
-      this.grid.showGhost(this.lastHoveredCell.col, this.lastHoveredCell.row, this.selectedPiece)
-      const hoveredCell = this.grid.getCell(this.lastHoveredCell.col, this.lastHoveredCell.row)
-      this.updatePlaceBtn(hoveredCell?.trackPiece != null)
+      const state = this.classifyGhostCell(this.lastHoveredCell.col, this.lastHoveredCell.row)
+      this.grid.showGhost(this.lastHoveredCell.col, this.lastHoveredCell.row, this.selectedPiece, state)
+      this.updatePlaceBtn(state)
     }
   }
 
@@ -332,14 +339,73 @@ export class Game {
   }
 
 
-  /** Place the ghost on the next free tile along the track ahead of the train. */
+  /** Classify the ghost state for the given cell: free, replace, or invalid. */
+  classifyGhostCell(col: number, row: number): GhostState {
+    if (!this.grid) return 'invalid'
+    if (!this.grid._trackPlaceable(col, row)) return 'invalid'
+    const cell = this.grid.getCell(col, row)
+    if (!cell) return 'invalid'
+    return cell.trackPiece !== null ? 'replace' : 'free'
+  }
+
+  /** Place the ghost on the next free tile along the track ahead of the last placed tile (or the train on first call). */
   showDefaultGhost(): void {
     if (!this.grid || !this.selectedPiece) return
-    const cell = this._findNextFreeTileAlongTrack()
-    if (!cell) return
-    this.lastHoveredCell = { col: cell.col, row: cell.row }
-    this.grid.showGhost(cell.col, cell.row, this.selectedPiece)
-    this.updatePlaceBtn(false)
+    const result = this._findNextFreeTile()
+    if (!result) return
+    this.lastHoveredCell = { col: result.col, row: result.row }
+    this.lastGhostApproachDir = result.approachDir
+    this.grid.showGhost(result.col, result.row, this.selectedPiece, 'free')
+    this.updatePlaceBtn('free')
+  }
+
+  /**
+   * Find the next free tile to suggest.
+   * After the first placement, anchors from the last placed tile via BFS.
+   * Before any placement, falls back to walking the track from the train.
+   */
+  private _findNextFreeTile(): { col: number; row: number; approachDir: Direction | null } | null {
+    if (this.lastPlacedCell?.exitDir) {
+      // Walk forward from the last placed tile using its known exit direction
+      const result = this._walkTrackFrom(this.lastPlacedCell.col, this.lastPlacedCell.row, this.lastPlacedCell.exitDir)
+      if (result) return result
+    }
+    // Fallback: traverse the full laid track starting from the train
+    return this._findNextFreeTileAlongTrack()
+  }
+
+  /** Walk forward from (startCol, startRow) in startDir, following laid track, to find the next free tile. */
+  private _walkTrackFrom(startCol: number, startRow: number, startDir: Direction): { col: number; row: number; approachDir: Direction | null } | null {
+    if (!this.grid) return null
+    let col = startCol
+    let row = startRow
+    let dir = startDir
+    const visited = new Set<string>()
+    visited.add(`${col},${row}`) // don't revisit the starting (last placed) cell
+    for (;;) {
+      const [dc, dr] = DIR[dir]
+      const nc = col + dc
+      const nr = row + dr
+      const cell = this.grid.getCell(nc, nr)
+      if (!cell) break
+      if (this._isPlaceable(cell)) return { col: nc, row: nr, approachDir: dir }
+      if (cell.trackPiece) {
+        const key = `${nc},${nr}`
+        if (visited.has(key)) break
+        visited.add(key)
+        const piece = TRACK_PIECES[cell.trackPiece]
+        const entryFrom = OPPOSITE[dir]
+        const exitDir = piece.connections[entryFrom]
+        if (!exitDir) break
+        col = nc
+        row = nr
+        dir = exitDir
+        continue
+      }
+      break
+    }
+    const bfsResult = this._bfsClosestFree(col, row)
+    return bfsResult ? { ...bfsResult, approachDir: null } : null
   }
 
   /**
@@ -347,7 +413,7 @@ export class Game {
    * path runs out, then return the first empty floor tile ahead.  If that tile
    * is not placeable, BFS outward from the track-end for the closest free tile.
    */
-  private _findNextFreeTileAlongTrack(): { col: number; row: number } | null {
+  private _findNextFreeTileAlongTrack(): { col: number; row: number; approachDir: Direction | null } | null {
     if (!this.grid || !this.train) return null
 
     let col = this.train.col
@@ -366,7 +432,7 @@ export class Game {
       if (!cell) break
 
       // Empty placeable floor → ideal target
-      if (this._isPlaceable(cell)) return { col: nc, row: nr }
+      if (this._isPlaceable(cell)) return { col: nc, row: nr, approachDir: dir }
 
       // Cell has a track piece → traverse it and keep walking
       if (cell.trackPiece) {
@@ -388,7 +454,8 @@ export class Game {
     }
 
     // BFS from the track-end position to find the closest placeable tile
-    return this._bfsClosestFree(col, row)
+    const bfsResult = this._bfsClosestFree(col, row)
+    return bfsResult ? { ...bfsResult, approachDir: null } : null
   }
 
   /** BFS outward from (startCol, startRow) returning the nearest placeable cell. */
@@ -455,8 +522,13 @@ export class Game {
     this.railsCountEl.textContent = String(this.railsPlaced)
   }
 
-  updatePlaceBtn(isReplace: boolean): void {
-    this.placeBtnSpan.textContent = isReplace ? 'Replace' : 'Place'
+  updatePlaceBtn(state: GhostState): void {
+    if (state === 'invalid') {
+      this.placeBtn.classList.add('is-disabled')
+    } else {
+      this.placeBtn.classList.remove('is-disabled')
+      this.placeBtnSpan.textContent = state === 'replace' ? 'Replace' : 'Place'
+    }
   }
 
   updateActionButtonsEnabled(): void {

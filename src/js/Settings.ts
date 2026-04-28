@@ -21,7 +21,9 @@ export interface ColorsConfig {
     station: string
     start: string
     rock: string
-    ghost: string
+    ghostFree:    string   // green — free placeable tile
+    ghostReplace: string   // blue  — replacing an existing rail
+    ghostInvalid: string   // red   — cannot place here
 }
 
 class Settings {
@@ -54,8 +56,10 @@ class Settings {
             rail:    '#c8a86a',   // sandy track bed
             station: '#d4a843',   // gold
             start:   '#5a7aaa',   // slate blue
-            rock:    '#8a7a6a',   // grey-brown rock base
-            ghost:   '#ffffff',   // white for ghost tiles
+            rock:         '#8a7a6a',   // grey-brown rock base
+            ghostFree:    '#ffee02',   // green  — free tile
+            ghostReplace: '#4080ff',   // blue   — replace existing rail
+            ghostInvalid: '#ff4040',   // red    — cannot place
         }
 
         this.scene = {

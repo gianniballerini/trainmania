@@ -172,6 +172,11 @@
     border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.12);
   }
 
+  tbody {
+    max-height: 300 * $ptr;
+    overflow-y: auto;
+  }
+
   tbody tr {
     border-bottom: 1 * $ptr solid rgba(45, 53, 97, 0.07);
 

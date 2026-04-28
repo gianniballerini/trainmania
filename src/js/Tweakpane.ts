@@ -80,7 +80,9 @@ class Tweakpane {
         colorsFolder.addBinding(Settings.colors, 'station').on('change', this.updateColors.bind(this));
         colorsFolder.addBinding(Settings.colors, 'start').on('change', this.updateColors.bind(this));
         colorsFolder.addBinding(Settings.colors, 'rock').on('change', this.updateColors.bind(this));
-        colorsFolder.addBinding(Settings.colors, 'ghost').on('change', this.updateColors.bind(this));
+        colorsFolder.addBinding(Settings.colors, 'ghostFree',    { label: 'Ghost Free'    }).on('change', this.updateColors.bind(this));
+        colorsFolder.addBinding(Settings.colors, 'ghostReplace', { label: 'Ghost Replace' }).on('change', this.updateColors.bind(this));
+        colorsFolder.addBinding(Settings.colors, 'ghostInvalid', { label: 'Ghost Invalid' }).on('change', this.updateColors.bind(this));
 
         const sceneFolder = (this.pane as any).addFolder({
             title: 'Scene',

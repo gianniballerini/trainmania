@@ -23,6 +23,9 @@ export type PieceId =
   | 'CURVE_SE'
   | 'CURVE_SW'
 
+/** Visual state of the placement ghost: free tile, replacing existing rail, or invalid position. */
+export type GhostState = 'free' | 'replace' | 'invalid'
+
 export type CellType =
   | 'VOID'
   | 'FLOOR'

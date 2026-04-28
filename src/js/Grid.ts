@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { CoinSystem } from './collectibles/CoinSystem.js'
-import { CELL, CELL_H, CELL_SIZE, CellType, Direction, GAP, PieceId } from './Constants.js'
+import { CELL, CELL_H, CELL_SIZE, CellType, Direction, GAP, GhostState, PieceId } from './Constants.js'
 import { Game } from './Game.js'
 import type { Level } from './levels/Level.js'
 import { Settings } from './Settings.js'
@@ -9,13 +9,22 @@ import hoverVert from './shaders/hover.vert.glsl?raw'
 import { tileRegistry } from './tiles/index.js'
 import { PlatformTile } from './tiles/PlatformTile.js'
 
-// Ghost material — a Grid-level concern, not delegated to tiles
-const MAT_GHOST = new THREE.MeshLambertMaterial({
-  color: new THREE.Color(Settings.colors.ghost),
-  transparent: true,
-  opacity: 0.25,
-  depthWrite: false,
-})
+// Ghost materials — one per placement state (free / replace / invalid)
+const MAT_GHOST_FREE    = new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.ghostFree),    transparent: true, opacity: 0.25, depthWrite: false })
+const MAT_GHOST_REPLACE = new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.ghostReplace), transparent: true, opacity: 0.25, depthWrite: false })
+const MAT_GHOST_INVALID = new THREE.MeshLambertMaterial({ color: new THREE.Color(Settings.colors.ghostInvalid), transparent: true, opacity: 0.25, depthWrite: false })
+
+function _ghostBaseMat(state: GhostState): THREE.MeshLambertMaterial {
+  if (state === 'replace') return MAT_GHOST_REPLACE
+  if (state === 'invalid') return MAT_GHOST_INVALID
+  return MAT_GHOST_FREE
+}
+
+function _ghostTrackColor(state: GhostState): number {
+  if (state === 'replace') return parseInt(Settings.colors.ghostReplace.replace('#', ''), 16)
+  if (state === 'invalid') return parseInt(Settings.colors.ghostInvalid.replace('#', ''), 16)
+  return parseInt(Settings.colors.ghostFree.replace('#', ''), 16)
+}
 
 export interface CellData {
   col: number
@@ -218,23 +227,23 @@ export class Grid {
     cell.trackMesh = group
   }
 
-  showGhost(col: number, row: number, pieceId?: PieceId): void {
+  showGhost(col: number, row: number, pieceId?: PieceId, state: GhostState = 'free'): void {
     this.hideGhost()
     const cell = this.getCell(col, row)
     if (!cell || cell.type === CELL.VOID) return
 
     const pos = cellToWorld(col, row, this.cols, this.rows)
 
-    // Base highlight box (translucent)
+    // Base highlight box — color driven by placement state
     const geo = new THREE.BoxGeometry(CELL_SIZE - GAP + 0.05, CELL_H + 0.05, CELL_SIZE - GAP + 0.05)
-    this.ghostMesh = new THREE.Mesh(geo, MAT_GHOST)
+    this.ghostMesh = new THREE.Mesh(geo, _ghostBaseMat(state))
     this.ghostMesh.position.set(pos.x, -CELL_H / 2 + 0.05, pos.z)
     this.scene.add(this.ghostMesh)
 
     // Track preview if a piece is specified
     if (pieceId) {
       const ghostMat = new THREE.MeshLambertMaterial({
-        color: 0xd4a843,
+        color: _ghostTrackColor(state),
         transparent: true,
         opacity: 0.6,
         depthWrite: false,
@@ -301,7 +310,9 @@ export class Grid {
   }
 
   updateColors(): void {
-    MAT_GHOST.color.set(Settings.colors.ghost)
+    MAT_GHOST_FREE.color.set(Settings.colors.ghostFree)
+    MAT_GHOST_REPLACE.color.set(Settings.colors.ghostReplace)
+    MAT_GHOST_INVALID.color.set(Settings.colors.ghostInvalid)
     tileRegistry.updateColors(Settings.colors)
   }
 
